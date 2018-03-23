@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PortableLibraryTelegramBot.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,11 +18,48 @@ namespace PortableLibraryTelegramBot
 {
     public class Bot
     {
-        private TelegramBotClient _client;
+        #region Fields
 
-        public Bot(TelegramBotClient client)
+        private TelegramBotClient _client;
+        private List<CommandMapping> _mappings;
+
+        private BookService _bookService;
+        private TvShowService _tvShowService;
+
+        #endregion
+
+        #region Properties
+
+        public BookService BookService
+        {
+            get
+            {
+                if (_bookService == null)
+                    _bookService = new BookService(_client);
+
+                return _bookService;
+            }
+        }
+
+        public TvShowService TvShowService
+        {
+            get
+            {
+                if (_tvShowService == null)
+                    _tvShowService = new TvShowService(_client);
+
+                return _tvShowService;
+            }
+        }
+
+        #endregion
+
+        #region .ctor
+
+        public Bot(TelegramBotClient client, List<CommandMapping> mappings)
         {
             _client = client;
+            _mappings = mappings;
 
             _client.OnMessage += OnMessageReceived;
             _client.OnMessageEdited += OnMessageReceived;
@@ -30,6 +68,10 @@ namespace PortableLibraryTelegramBot
             _client.OnInlineResultChosen += OnChosenInlineResultReceived;
             _client.OnReceiveError += OnReceiveError;
         }
+
+        #endregion
+
+        #region Public Methods
 
         public async Task RunAsync()
         {
@@ -43,87 +85,70 @@ namespace PortableLibraryTelegramBot
             _client.StopReceiving();
         }
 
+        #endregion
+
+        #region Event Handlers
+
         private async void OnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
 
             if (message == null || message.Type != MessageType.TextMessage) return;
 
-            //IReplyMarkup keyboard = new ReplyKeyboardRemove();
+            var commands = message.Text.Split(' ').ToList();
 
-            switch (message.Text.Split(' ').First())
+            if (commands.Count == 0)
             {
-                // send inline keyboard
-                case "/inline":
-                    await _client.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
+                throw new Exception("");
+            }
 
-                    await Task.Delay(500); // simulate longer running task
+            var mapping = _mappings.FirstOrDefault(m => m.Value == commands[0]);
 
-                    var inlineKeyboard = new InlineKeyboardMarkup(new[]
+            // add/добавить -> показать клавиатуру с выбором типов (библиотека, книга, сериал) -> введите название -> если библиотека, выберите тип (книга, сериал)
+
+            // add/remove library book/tvshow 'name'
+            // добавить/удалить бибилотеку книга/сериал 'название'
+
+            // add/remove book/tvshow 'name' 'libraryname'
+            // добавить/удалить книгу/сериал 'название' в 'название библиотеки'
+
+            switch (mapping.Command)
+            {
+                case Command.Add:
+
+                    if (commands.Count < 4)
                     {
-                        new [] // first row
+                        throw new Exception("");
+                    }
+
+                    var type1 = commands[1];
+                    var type2 = commands[2];
+                    var name = commands[3];
+
+                    Enum.TryParse<Command>(type1, out var command1);
+                    Enum.TryParse<Command>(type2, out var command2);
+
+                    if (command1 == Command.Library)
+                    {
+                        if (command2 == Command.Book)
                         {
-                            InlineKeyboardButton.WithCallbackData("1.1"),
-                            InlineKeyboardButton.WithCallbackData("1.2"),
-                        },
-                        new [] // second row
-                        {
-                            InlineKeyboardButton.WithCallbackData("2.1"),
-                            InlineKeyboardButton.WithCallbackData("2.2"),
+                            _bookService.AddBookLibrary(name, mapping.Language);
                         }
-                    });
+                        if (command2 == Command.TvShow)
+                        {
+                            _tvShowService.AddTvShowLibrary(name, mapping.Language);
+                        }
+                    }
+                    else if (command1 == Command.Book)
+                    {
+                        _bookService.AddBook(commands[1], mapping.Language);
+                    }
+                    else if (command1 == Command.TvShow)
+                    {
+                        _tvShowService.AddTvShow(name, mapping.Language);
+                    }
 
-                    await _client.SendTextMessageAsync(
-                        message.Chat.Id,
-                        "Choose",
-                        replyMarkup: inlineKeyboard);
                     break;
-
-                // send custom keyboard
-                case "/keyboard":
-                    //var replyKeyboard = new[]
-                    //{
-                    //    new[] { "1.1", "1.2" },
-                    //    new[] { "2.1", "2.2" },
-                    //};
-
-                    //await _client.SendTextMessageAsync(
-                    //    message.Chat.Id,
-                    //    "Choose",
-                    //    replyMarkup: new ReplyKeyboardMarkup(replyKeyboard));
-                    break;
-
-                // send a photo
-                case "/photo":
-                    await _client.SendChatActionAsync(message.Chat.Id, ChatAction.UploadPhoto);
-
-                    const string file = @"Files/tux.png";
-
-                    var fileName = file.Split(Path.DirectorySeparatorChar).Last();
-
-                    //using (var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    //{
-                    //    await _client.SendPhotoAsync(
-                    //        message.Chat.Id,
-                    //        fileStream,
-                    //        "Nice Picture");
-                    //}
-                    break;
-
-                // request location or contact
-                case "/request":
-                    //var RequestReplyKeyboard = new ReplyKeyboardMarkup(new[]
-                    //{
-                    //    KeyboardButton.WithRequestLocation("Location"),
-                    //    KeyboardButton.WithRequestContact("Contact"),
-                    //});
-
-                    //await _client.SendTextMessageAsync(
-                    //    message.Chat.Id,
-                    //    "Who or Where are you?",
-                    //    replyMarkup: RequestReplyKeyboard);
-                    break;
-
                 default:
                     const string usage = @"Usage:
 /inline   - send inline keyboard
@@ -194,5 +219,7 @@ namespace PortableLibraryTelegramBot
                 receiveErrorEventArgs.ApiRequestException.ErrorCode,
                 receiveErrorEventArgs.ApiRequestException.Message);
         }
+
+        #endregion
     }
 }

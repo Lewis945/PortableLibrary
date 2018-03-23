@@ -15,7 +15,7 @@ namespace PortableLibraryTelegramBot
 
             var client = new TelegramBotClient(configuration.Token);
 
-            var bot = new Bot(client);
+            var bot = new Bot(client, configuration.Mappings);
             await bot.RunAsync();
         }
 
