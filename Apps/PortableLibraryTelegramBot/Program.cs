@@ -11,12 +11,19 @@ namespace PortableLibraryTelegramBot
     {
         public static async Task Main(string[] args)
         {
-            var configuration = await GetConfiguration(GetConfigurationFilePath(args));
+            try
+            {
+                var configuration = await GetConfiguration(GetConfigurationFilePath(args));
 
-            var client = new TelegramBotClient(configuration.Token);
+                var client = new TelegramBotClient(configuration.Token);
 
-            var bot = new Bot(client, configuration.Mappings);
-            await bot.RunAsync();
+                var bot = new Bot(client, configuration);
+                await bot.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                // log
+            }
         }
 
         private static string GetConfigurationFilePath(string[] args)
