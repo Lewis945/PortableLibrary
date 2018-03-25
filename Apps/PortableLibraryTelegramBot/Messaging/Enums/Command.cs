@@ -6,6 +6,7 @@
         Remove,
         SetName,
         Mark,
+        Display,
         Clear
     }
 }

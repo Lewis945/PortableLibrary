@@ -274,11 +274,19 @@ namespace PortableLibraryTelegramBot
                             case Command.Add:
                                 await ProcessAddCommandAsync(language, chatId, service);
                                 break;
+                            case Command.Remove:
+                                break;
+                            case Command.Display:
+                                break;
+                            case Command.Mark:
+                                break;
+                            case Command.SetName:
+                                break;
                             case Command.Clear:
                                 await ProcessClearCommandAsync(chatId);
                                 break;
                             default:
-                                await SenDefaultAsync(chatId);
+                                await SendDefaultAsync(chatId);
                                 break;
                         }
                     }
@@ -396,7 +404,7 @@ namespace PortableLibraryTelegramBot
             // добавить/удалить книгу/сериал 'название' в 'название библиотеки'
         }
 
-        private async Task SenDefaultAsync(ChatId id)
+        private async Task SendDefaultAsync(ChatId id)
         {
             const string usage = @"Usage:
 /inline   - send inline keyboard
