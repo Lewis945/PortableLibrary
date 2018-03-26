@@ -1,162 +1,204 @@
 {
-	"Commands": [
-		{
-			"Command": "Add",
-			"Aliases": [
-				{
-					"Alias": "add", 
-					"Language":"eng"
-				},
-				{
-					"Alias": "добавить",
-					"Language":"rus"
-				}
-			],
-			"ArgumentsSequence": [
-				{
-					"Argument": "Type",
-					"Options": [
-						{
-							"Option" :"Library",
-							"Aliases": [
-								{
-									"Alias":"library",
-									"Language":"eng"
-								},
-								{
-									"Alias":"библиотека",
-									"Language":"rus"
-								}
-							]
-						},
-						{
-							"Option" :"Book",
-							"Aliases": [
-								{
-									"Alias":"book",
-									"Language":"eng"
-								},
-								{
-									"Alias":"книга",
-									"Language":"rus"
-								}
-							]
-						},
-						{
-							"Option" :"TvShow",
-							"Aliases": [
-								{
-									"Alias":"Tv show",
-									"Language":"eng"
-								},
-								{
-									"Alias":"Сериал",
-									"Language":"rus"
-								}
-							]
-						}
-					]
-				},
-				{
-					"Argument": "LibraryType",
-					"Options": [
-						{
-							"Option" :"Book",
-							"Aliases": [
-								{
-									"Alias":"book",
-									"Language":"eng"
-								},
-								{
-									"Alias":"книга",
-									"Language":"rus"
-								}
-							]
-						},
-						{
-							"Option" :"TvShow",
-							"Aliases": [
-								{
-									"Alias":"Tv show",
-									"Language":"eng"
-								},
-								{
-									"Alias":"Сериал",
-									"Language":"rus"
-								}
-							]
-						}
-					]
-				}
-			],
-			"InlineArguments": [
-              {
-				"Language": "eng",
-				"Arguments": "{Library} of {LibraryType} {Name}",
-				  "Options": [
-					  {
-						  "Option": "Library",
-						  "Type": "Library",
-						  "Value": "Library"
-					  },
-					  {
-						  "Option": "LibraryType",
-						  "Type": "Book",
-						  "Value": "Books"
-					  },
-					  {
-						  "Option": "LibraryType",
-						  "Type": "TvShow",
-						  "Value": "Tv shows"
-					  },
-					  {
-						  "Option": "Name",
-						  "Type": "String"
-					  }
-			  	]
-              },
-				{
-					"Language": "rus",
-					"Arguments": "{Library} {LibraryType} {Name}",
-					"Options": [
-						{
-							"Option": "Library",
-							"Type": "Library",
-							"Value": "Библиотеку"
-						},
-						{
-							"Option": "LibraryType",
-							"Type": "Book",
-							"Value": "Книг"
-						},
-						{
-							"Option": "LibraryType",
-							"Type": "TvShow",
-							"Value": "Сериалов"
-						},
-						{
-							"Option": "Name",
-							"Type": "String"
-						}
-					]
-				}
-			],
-			"Messages": []
-		}
-	],
-	"GeneralMessages": [
-		{
-			"Type": "Choose",
-			"Aliases": [
-				{
-					"Alias": "Choose",
-					"Language": "eng"
-				},
-				{
-					"Alias": "Выберите",
-					"Language": "rus"
-				}
-			]
-		}
-	]
+  "Commands": [
+    {
+      "Command": "Add",
+      "Aliases": [
+        {
+          "Alias": "Add",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Добавить",
+          "Language": "rus"
+        }
+      ],
+      "ArgumentsSequence": [
+        {
+          "Argument": "Type",
+          "Options": [
+            {
+              "Option": "Library",
+              "Aliases": [
+                {
+                  "Alias": "Library",
+                  "Language": "eng"
+                },
+                {
+                  "Alias": "Библиотека",
+                  "Language": "rus"
+                }
+              ]
+            },
+            {
+              "Option": "Book",
+              "Aliases": [
+                {
+                  "Alias": "Book",
+                  "Language": "eng"
+                },
+                {
+                  "Alias": "Книга",
+                  "Language": "rus"
+                }
+              ]
+            },
+            {
+              "Option": "TvShow",
+              "Aliases": [
+                {
+                  "Alias": "Tv show",
+                  "Language": "eng"
+                },
+                {
+                  "Alias": "Сериал",
+                  "Language": "rus"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Argument": "LibraryType",
+          "Options": [
+            {
+              "Option": "Book",
+              "Aliases": [
+                {
+                  "Alias": "Book",
+                  "Language": "eng"
+                },
+                {
+                  "Alias": "Книга",
+                  "Language": "rus"
+                }
+              ]
+            },
+            {
+              "Option": "TvShow",
+              "Aliases": [
+                {
+                  "Alias": "Tv show",
+                  "Language": "eng"
+                },
+                {
+                  "Alias": "Сериал",
+                  "Language": "rus"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "InlineArguments": [
+        {
+          "Language": "eng",
+          "Arguments": "{Library} of {LibraryType} {Name}",
+          "Options": [
+            {
+              "Option": "Library",
+              "Type": "Library",
+              "Value": "Library"
+            },
+            {
+              "Option": "LibraryType",
+              "Type": "Book",
+              "Value": "Books"
+            },
+            {
+              "Option": "LibraryType",
+              "Type": "TvShow",
+              "Value": "Tv shows"
+            },
+            {
+              "Option": "Name",
+              "Type": "String"
+            }
+          ]
+        },
+        {
+          "Language": "rus",
+          "Arguments": "{Library} {LibraryType} {Name}",
+          "Options": [
+            {
+              "Option": "Library",
+              "Type": "Library",
+              "Value": "Библиотеку"
+            },
+            {
+              "Option": "LibraryType",
+              "Type": "Book",
+              "Value": "Книг"
+            },
+            {
+              "Option": "LibraryType",
+              "Type": "TvShow",
+              "Value": "Сериалов"
+            },
+            {
+              "Option": "Name",
+              "Type": "String"
+            }
+          ]
+        }
+      ],
+      "Messages": []
+    }
+  ],
+  "GeneralMessages": [
+    {
+      "Type": "Choose",
+      "Aliases": [
+        {
+          "Alias": "Choose",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Выберите",
+          "Language": "rus"
+        }
+      ]
+    },
+
+    {
+      "Type": "EnterName",
+      "Aliases": [
+        {
+          "Alias": "Enter name:",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Введите название:",
+          "Language": "rus"
+        }
+      ]
+    },
+
+    {
+      "Type": "YourCurrentSelection",
+      "Aliases": [
+        {
+          "Alias": "Your current selection: {0}",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Ваш текущий выбор: {0}",
+          "Language": "rus"
+        }
+      ]
+    },
+
+    {
+      "Type": "Success",
+      "Aliases": [
+        {
+          "Alias": "Success!",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Успех!",
+          "Language": "rus"
+        }
+      ]
+    }
+  ]
 }

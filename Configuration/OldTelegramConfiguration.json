@@ -1,0 +1,164 @@
+﻿{
+  "Token": "549003428:AAEcGv3Ex0GHVxng1hYLQOHkdFyixIquzCw",
+  "Commands": [
+    {
+      "Command": "Add",
+      "Language": "eng",
+      "Value": "add"
+    },
+    {
+      "Command": "Add",
+      "Language": "rus",
+      "Value": "добавить"
+    },
+
+    {
+      "Command": "Remove",
+      "Language": "eng",
+      "Value": "remove"
+    },
+    {
+      "Command": "Remove",
+      "Language": "rus",
+      "Value": "удалить"
+    },
+
+    {
+      "Command": "Display",
+      "Language": "eng",
+      "Value": "display"
+    },
+    {
+      "Command": "Display",
+      "Language": "rus",
+      "Value": "показать"
+    },
+
+    {
+      "Command": "SetName",
+      "Language": "eng",
+      "Value": "setname"
+    },
+    {
+      "Command": "SetName",
+      "Language": "rus",
+      "Value": "именовать"
+    },
+
+    {
+      "Command": "Mark",
+      "Language": "eng",
+      "Value": "mark"
+    },
+    {
+      "Command": "Mark",
+      "Language": "rus",
+      "Value": "пометить"
+    },
+
+    {
+      "Command": "Clear",
+      "Language": "eng",
+      "Value": "clear"
+    },
+    {
+      "Command": "Clear",
+      "Language": "rus",
+      "Value": "очистить"
+    }
+  ],
+
+  "Replies": [
+    {
+      "Reply": "Library",
+      "Language": "eng",
+      "Value": "Library"
+    },
+    {
+      "Command": "Library",
+      "Language": "rus",
+      "Value": "Библиотека"
+    },
+
+    {
+      "Reply": "Book",
+      "Language": "eng",
+      "Value": "Book"
+    },
+    {
+      "Reply": "Book",
+      "Language": "rus",
+      "Value": "Книга"
+    },
+
+    {
+      "Reply": "TvShow",
+      "Language": "eng",
+      "Value": "TV show"
+    },
+    {
+      "Reply": "TvShow",
+      "Language": "rus",
+      "Value": "Cериал"
+    }
+  ],
+
+  "Messages": [
+    {
+      "Message": "Choose",
+      "Language": "eng",
+      "Value": "Choose"
+    },
+    {
+      "Message": "Choose",
+      "Language": "rus",
+      "Value": "Выберите"
+    },
+
+    {
+      "Message": "EnterName",
+      "Language": "eng",
+      "Value": "Enter name:"
+    },
+    {
+      "Message": "EnterName",
+      "Language": "rus",
+      "Value": "Введите название:"
+    },
+
+    {
+      "Message": "YourCurrentSelection",
+      "Language": "eng",
+      "Value": "Your current selection: {0}"
+    },
+    {
+      "Message": "YourCurrentSelection",
+      "Language": "rus",
+      "Value": "Ваш текущий выбор: {0}"
+    },
+
+    {
+      "Message": "Success",
+      "Language": "eng",
+      "Value": "Success!"
+    },
+    {
+      "Message": "Success",
+      "Language": "rus",
+      "Value": "Успех!"
+    }
+  ],
+
+  "Errors": [
+    {
+      "Message": "CommandNotFound",
+      "Language": "eng",
+      "Value": "Command not found"
+    },
+    {
+      "Message": "CommandNotFound",
+      "Language": "rus",
+      "Value": "Команда не найдена"
+    }
+  ]
+}

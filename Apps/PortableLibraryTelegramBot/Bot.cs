@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PortableLibraryTelegramBot.Configuration;
 using PortableLibraryTelegramBot.Data.Database;
-using PortableLibraryTelegramBot.Extensions;
 using PortableLibraryTelegramBot.Messaging.Enums;
+using PortableLibraryTelegramBot.Messaging.Mappings.Models;
 using PortableLibraryTelegramBot.Processing;
+using PortableLibraryTelegramBot.Processing.Inline;
+using PortableLibraryTelegramBot.Processing.Sequence;
 using PortableLibraryTelegramBot.Services;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
@@ -93,11 +95,9 @@ namespace PortableLibraryTelegramBot
         {
             try
             {
-                var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
-                
                 //Command
                 if (message.StartsWith("/"))
-                {   
+                {
                     var items = message.Split(' ').ToList();
 
                     if (items.Count == 0)
@@ -105,87 +105,33 @@ namespace PortableLibraryTelegramBot
                         //send message back
                         return;
                     }
-                    
-                    var firstItem = items.First();
-                    firstItem = firstItem.Replace("/", string.Empty);
-                    var mapping = _configuration.Commands.FirstOrDefault(m =>
-                        string.Equals(m.Value, firstItem, StringComparison.InvariantCultureIgnoreCase));
-
-                    if (mapping == null)
-                    {
-                        //send message back
-                        return;
-                    }
-
-                    string language = mapping.Language;
 
                     if (items.Count == 1)
                     {
-                        switch (mapping.Command)
-                        {
-                            case Command.Enter:
-                                break;
-                            case Command.Exit:
-                                break;
-                            case Command.Cancel:
-                                break;
-                            case Command.Add:
-                                // start add command sequence
-//                                await ProcessAddCommandAsync(language, chatId, service);
-                                break;
-                            case Command.Remove:
-                                break;
-                            case Command.Display:
-                                break;
-                            case Command.Mark:
-                                break;
-                            case Command.SetName:
-                                break;
-                            default:
-                                await SendDefaultAsync(chatId);
-                                break;
-                        }
+                        var firstItem = items.First();
+                        firstItem = firstItem.Replace("/", string.Empty);
+
+                        var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
+                        var commandFound = await commandSequenceProcessor.StartCommandSequence(chatId, firstItem);
+                        if (!commandFound)
+                            await SendDefaultAsync(chatId);
                     }
                     else
                     {
-                        // process full command string
-                        switch (mapping.Command)
-                        {
-                            case Command.Enter:
-                                break;
-                            case Command.Exit:
-                                break;
-                            case Command.Cancel:
-                                break;
-                            case Command.Add:
-                                break;
-                            case Command.Remove:
-                                break;
-                            case Command.Display:
-                                break;
-                            case Command.Mark:
-                                break;
-                            case Command.SetName:
-                                break;
-                            default:
-                                await SendDefaultAsync(chatId);
-                                break;
-                        }
+                        // process inline command string
+                        var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
+                        var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, items);
+                        if (!commandFound)
+                            await SendDefaultAsync(chatId);
                     }
                 }
                 // Message
                 else
                 {
-                    var result = await commandSequenceProcessor.IsCommandSequence(chatId.Identifier);
-
-                    if (result.Item1)
-                    {
-                        await commandSequenceProcessor.ProcessCommandSequence(chatId, result.Item2, message);
-                    }
-                    else
-                    {
+                    var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
+                    var isSequenceFound = await commandSequenceProcessor.ProcessCommandSequence(chatId, message);
+                    if (!isSequenceFound)
                         await SendDefaultAsync(chatId);
-                    }
                 }
             }
             catch (Exception ex)

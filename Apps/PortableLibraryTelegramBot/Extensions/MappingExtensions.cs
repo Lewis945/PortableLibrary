@@ -9,7 +9,7 @@ namespace PortableLibraryTelegramBot.Extensions
     public static class MappingExtensions
     {
         public static T GetMapping<T>(this List<T> mappings, Expression<Func<T, bool>> filter)
-            where T : Mapping
+            where T : class
         {
             var mapping = mappings.FirstOrDefault(filter.Compile());
 

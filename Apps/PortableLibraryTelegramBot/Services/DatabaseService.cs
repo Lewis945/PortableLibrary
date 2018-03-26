@@ -42,6 +42,13 @@ namespace PortableLibraryTelegramBot.Services
             state.IsComplete = isComplete;
         }
 
+        public async Task<ChatCommandSequenceState> GetFirstCommand(long chatId)
+        {
+            var sequence = await _context.ChatCommandSequencesState.Where(s => s.ChatId == chatId)
+                .OrderBy(s => s.CreationDate).FirstOrDefaultAsync();
+            return sequence;
+        }
+
         public async Task<ChatCommandSequenceState> GetLastCommand(long chatId)
         {
             var sequence = await _context.ChatCommandSequencesState.Where(s => s.ChatId == chatId)

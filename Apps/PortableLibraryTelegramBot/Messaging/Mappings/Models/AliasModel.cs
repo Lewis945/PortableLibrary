@@ -1,8 +1,12 @@
 ﻿namespace PortableLibraryTelegramBot.Messaging.Mappings.Models
 {
-    public class AliasModel
+    public struct AliasModel
     {
         public string Alias { get; set; }
         public string Language { get; set; }
+
+        public bool IsEmpty =>
+            string.IsNullOrWhiteSpace(Alias) &&
+            string.IsNullOrWhiteSpace(Language);
     }
 }
