@@ -5,7 +5,8 @@ VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{36E778BB-5A7F-4FE2-A86E-2C057B7827D0}"
 	ProjectSection(SolutionItems) = preProject
-		Configuration\TelegramConfiguration.json = Configuration\TelegramConfiguration.json
+		Configuration\TelegramBotConfiguration.json = Configuration\TelegramBotConfiguration.json
+		Configuration\TelegramBotAuthConfiguration.json = Configuration\TelegramBotAuthConfiguration.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{7F701D3D-D8B7-4A4E-AC9B-D4BA5EFE616D}"

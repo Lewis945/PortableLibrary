@@ -1,15 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using PortableLibraryTelegramBot.Configuration;
 using PortableLibraryTelegramBot.Data.Database;
 using PortableLibraryTelegramBot.Extensions;
 using PortableLibraryTelegramBot.Messaging.Enums;
-using PortableLibraryTelegramBot.Messaging.Mappings;
+using PortableLibraryTelegramBot.Processing;
 using PortableLibraryTelegramBot.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
@@ -22,8 +20,8 @@ namespace PortableLibraryTelegramBot
     {
         #region Fields
 
-        private TelegramBotClient _client;
-        private TelegramConfiguration _configuration;
+        private readonly TelegramBotClient _client;
+        private readonly TelegramConfiguration _configuration;
 
         private BookService _bookService;
         private TvShowService _tvShowService;
@@ -91,188 +89,49 @@ namespace PortableLibraryTelegramBot
 
         #region Private Methods
 
-        private string GenerateKey(params object[] args)
-        {
-            if (args.Length > 0)
-                return string.Join(".", args.Select(a => a.ToString()));
-            return null;
-        }
-
-        private string GenerateCurrentStateMessage(string language, params object[] args)
-        {
-            var mapping = _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.YourCurrentSelection && m.Language == language);
-            return string.Format(mapping.Value, string.Join(" -> ", args.Select(a => GetLocalizedMessage(language, a))));
-        }
-
-        private string GetLocalizedMessage(string language, object value)
-        {
-            var command = _configuration.Commands.FirstOrDefault(c => c.Command.ToString().ToLowerInvariant() == value.ToString().ToLowerInvariant() && c.Language == language);
-            if (command != null)
-                return command.Value.ToLowerInvariant();
-
-            var reply = _configuration.Replies.FirstOrDefault(c => c.Reply.ToString().ToLowerInvariant() == value.ToString().ToLowerInvariant() && c.Language == language);
-            if (reply != null)
-                return reply.Value.ToLowerInvariant();
-
-            return value.ToString();
-        }
-
-        private async Task ProcessClearCommandAsync(ChatId chatId)
-        {
-            var updates = await _client.GetUpdatesAsync();
-
-            //foreach (var update in updates.Where(u => u.Message != null && u.Message.Chat.Id == chatId.Identifier))
-            //    await _client.DeleteMessageAsync(chatId, update.Message.MessageId);
-        }
-
-        private async Task ProcessAddCommandAsync(string language, ChatId chatId, DatabaseService databaseService)
-        {
-            await _client.SendChatActionAsync(chatId, ChatAction.Typing);
-            await Task.Delay(1000);
-
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Command.Add.ToString(), language, false);
-            await databaseService.SaveAsync();
-
-            var replyKeyboard = new ReplyKeyboardMarkup(
-                                new KeyboardButton[3] {
-                                    new KeyboardButton(_configuration.Replies.GetMapping(r => r.Reply == Messaging.Enums.Type.Library && r.Language == language).Value),
-                                    new KeyboardButton(_configuration.Replies.GetMapping(r => r.Reply == Messaging.Enums.Type.Book && r.Language == language).Value),
-                                    new KeyboardButton(_configuration.Replies.GetMapping(r => r.Reply == Messaging.Enums.Type.TvShow && r.Language == language).Value)
-                                },
-                                oneTimeKeyboard: true
-                            );
-
-            await _client.SendTextMessageAsync(chatId,
-                _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.Choose && m.Language == language).Value,
-                replyMarkup: replyKeyboard);
-        }
-
-        private async Task ProcessAddLibraryCommandAsync(string language, ChatId chatId, DatabaseService databaseService)
-        {
-            await _client.SendChatActionAsync(chatId, ChatAction.Typing);
-            await Task.Delay(1000);
-
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Command.Add.ToString(), language, true);
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Library.ToString(), language, false);
-            await databaseService.SaveAsync();
-
-            await _client.SendTextMessageAsync(chatId, GenerateCurrentStateMessage(language, Command.Add, Messaging.Enums.Type.Library));
-
-            var replyKeyboard = new ReplyKeyboardMarkup(
-                                new KeyboardButton[2] {
-                                    new KeyboardButton(_configuration.Replies.GetMapping(r => r.Reply == Messaging.Enums.Type.Book && r.Language == language).Value),
-                                    new KeyboardButton(_configuration.Replies.GetMapping(r => r.Reply == Messaging.Enums.Type.TvShow && r.Language == language).Value)
-                                },
-                                oneTimeKeyboard: true
-                            );
-
-            await _client.SendTextMessageAsync(chatId,
-                _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.Choose && m.Language == language).Value,
-                replyMarkup: replyKeyboard);
-        }
-
-        private async Task ProcessAddBooksLibraryCommandAsync(string language, ChatId chatId, DatabaseService databaseService)
-        {
-            await _client.SendChatActionAsync(chatId, ChatAction.Typing);
-            await Task.Delay(1000);
-
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Library.ToString(), language, true);
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Book.ToString(), language, false);
-            await databaseService.SaveAsync();
-
-            await _client.SendTextMessageAsync(chatId, GenerateCurrentStateMessage(language, Command.Add, Messaging.Enums.Type.Library, Messaging.Enums.Type.Book));
-
-            await _client.SendTextMessageAsync(chatId,
-               _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.EnterName && m.Language == language).Value);
-        }
-
-        private async Task ProcessAddTvShowsLibraryCommandAsync(string language, ChatId chatId, DatabaseService databaseService)
-        {
-            await _client.SendChatActionAsync(chatId, ChatAction.Typing);
-            await Task.Delay(1000);
-
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Library.ToString(), language, true);
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.TvShow.ToString(), language, false);
-            await databaseService.SaveAsync();
-
-            await _client.SendTextMessageAsync(chatId, GenerateCurrentStateMessage(language, Command.Add, Messaging.Enums.Type.Library, Messaging.Enums.Type.TvShow));
-
-            await _client.SendTextMessageAsync(chatId,
-               _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.EnterName && m.Language == language).Value);
-        }
-
-        private async Task ProcessAddBooksLibraryNameCommandAsync(string name, string language, ChatId chatId, DatabaseService databaseService)
-        {
-            await _client.SendChatActionAsync(chatId, ChatAction.Typing);
-            await Task.Delay(1000);
-
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Library.ToString(), language, true);
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Book.ToString(), language, true);
-            await databaseService.SaveAsync();
-
-            await _client.SendTextMessageAsync(chatId, GenerateCurrentStateMessage(language, Command.Add, Messaging.Enums.Type.Library, Messaging.Enums.Type.Book, name));
-
-            await _client.SendTextMessageAsync(chatId,
-               _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.Success && m.Language == language).Value);
-
-            var isCleared = await databaseService.ClearSequence(chatId.Identifier);
-            if (!isCleared)
-                throw new Exception("At this point sequence must be complete.");
-            await databaseService.SaveAsync();
-        }
-
-        private async Task ProcessAddTvShowsLibraryNameCommandAsync(string name, string language, ChatId chatId, DatabaseService databaseService)
-        {
-            await _client.SendChatActionAsync(chatId, ChatAction.Typing);
-            await Task.Delay(1000);
-
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.Library.ToString(), language, true);
-            await databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Messaging.Enums.Type.TvShow.ToString(), language, true);
-            await databaseService.SaveAsync();
-
-            await _client.SendTextMessageAsync(chatId, GenerateCurrentStateMessage(language, Command.Add, Messaging.Enums.Type.Library, Messaging.Enums.Type.TvShow, name));
-
-            await _client.SendTextMessageAsync(chatId,
-               _configuration.Messages.GetMapping(m => m.Message == Messaging.Enums.Message.Success && m.Language == language).Value);
-
-            var isCleared = await databaseService.ClearSequence(chatId.Identifier);
-            if (!isCleared)
-                throw new Exception("At this point sequence must be complete.");
-            await databaseService.SaveAsync();
-        }
-
         private async Task ProcessTextMessageAsync(string message, ChatId chatId, DatabaseService service)
         {
             try
             {
-                var items = message.Split(' ').ToList();
-
-                if (items.Count == 0)
-                {
-                    //send message back
-                    return;
-                }
-
+                var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
+                
+                //Command
                 if (message.StartsWith("/"))
-                {
+                {   
+                    var items = message.Split(' ').ToList();
+
+                    if (items.Count == 0)
+                    {
+                        //send message back
+                        return;
+                    }
+                    
+                    var firstItem = items.First();
+                    firstItem = firstItem.Replace("/", string.Empty);
+                    var mapping = _configuration.Commands.FirstOrDefault(m =>
+                        string.Equals(m.Value, firstItem, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (mapping == null)
+                    {
+                        //send message back
+                        return;
+                    }
+
+                    string language = mapping.Language;
+
                     if (items.Count == 1)
                     {
-                        var firstItem = items.First();
-                        firstItem = firstItem.Replace("/", string.Empty);
-                        var mapping = _configuration.Commands.FirstOrDefault(m => m.Value.ToLowerInvariant() == firstItem.ToLowerInvariant());
-
-                        if (mapping == null)
-                        {
-                            //send message back
-                            return;
-                        }
-
-                        string language = mapping.Language;
-
                         switch (mapping.Command)
                         {
+                            case Command.Enter:
+                                break;
+                            case Command.Exit:
+                                break;
+                            case Command.Cancel:
+                                break;
                             case Command.Add:
-                                await ProcessAddCommandAsync(language, chatId, service);
+                                // start add command sequence
+//                                await ProcessAddCommandAsync(language, chatId, service);
                                 break;
                             case Command.Remove:
                                 break;
@@ -282,9 +141,6 @@ namespace PortableLibraryTelegramBot
                                 break;
                             case Command.SetName:
                                 break;
-                            case Command.Clear:
-                                await ProcessClearCommandAsync(chatId);
-                                break;
                             default:
                                 await SendDefaultAsync(chatId);
                                 break;
@@ -293,75 +149,42 @@ namespace PortableLibraryTelegramBot
                     else
                     {
                         // process full command string
+                        switch (mapping.Command)
+                        {
+                            case Command.Enter:
+                                break;
+                            case Command.Exit:
+                                break;
+                            case Command.Cancel:
+                                break;
+                            case Command.Add:
+                                break;
+                            case Command.Remove:
+                                break;
+                            case Command.Display:
+                                break;
+                            case Command.Mark:
+                                break;
+                            case Command.SetName:
+                                break;
+                            default:
+                                await SendDefaultAsync(chatId);
+                                break;
+                        }
                     }
                 }
                 // Message
                 else
                 {
-                    var sequenceKey = await service.GetCommandSequenceKey(chatId.Identifier);
+                    var result = await commandSequenceProcessor.IsCommandSequence(chatId.Identifier);
 
-                    if (!string.IsNullOrWhiteSpace(sequenceKey))
+                    if (result.Item1)
                     {
-                        if (GenerateKey(Command.Add) == sequenceKey)
-                        {
-                            if (items.Count == 1)
-                            {
-                                var firstItem = items.First();
-                                var reply = _configuration.Replies.FirstOrDefault(r => r.Value.ToLowerInvariant() == firstItem.ToLowerInvariant());
-
-                                if (reply == null)
-                                {
-                                    //send message back
-                                    return;
-                                }
-
-                                if (reply.Reply == Messaging.Enums.Type.Library)
-                                {
-                                    await ProcessAddLibraryCommandAsync(reply.Language, chatId, service);
-                                }
-                                else if (reply.Reply == Messaging.Enums.Type.Book)
-                                {
-                                    //
-                                }
-                                else if (reply.Reply == Messaging.Enums.Type.TvShow)
-                                {
-                                    //
-                                }
-                            }
-                        }
-                        else if (GenerateKey(Command.Add, Messaging.Enums.Type.Library) == sequenceKey)
-                        {
-                            if (items.Count == 1)
-                            {
-                                var firstItem = items.First();
-                                var reply = _configuration.Replies.FirstOrDefault(r => r.Value.ToLowerInvariant() == firstItem.ToLowerInvariant());
-
-                                if (reply == null)
-                                {
-                                    //send message back
-                                    return;
-                                }
-
-                                if (reply.Reply == Messaging.Enums.Type.Book)
-                                {
-                                    await ProcessAddBooksLibraryCommandAsync(reply.Language, chatId, service);
-                                }
-                                else if (reply.Reply == Messaging.Enums.Type.TvShow)
-                                {
-                                    await ProcessAddTvShowsLibraryCommandAsync(reply.Language, chatId, service);
-                                }
-                            }
-                        }
-                        else if (GenerateKey(Command.Add, Messaging.Enums.Type.Library, Messaging.Enums.Type.Book) == sequenceKey)
-                        {
-                            var lastCommand = await service.GetLastCommand(chatId.Identifier);
-                            await ProcessAddBooksLibraryNameCommandAsync(message, lastCommand.Language, chatId, service);
-                        }
-                        else if (GenerateKey(Command.Add, Messaging.Enums.Type.Library, Messaging.Enums.Type.TvShow) == sequenceKey)
-                        {
-                            var lastCommand = await service.GetLastCommand(chatId.Identifier);
-                            await ProcessAddTvShowsLibraryNameCommandAsync(message, lastCommand.Language, chatId, service);
-                        }
+                        await commandSequenceProcessor.ProcessCommandSequence(chatId, result.Item2, message);
+                    }
+                    else
+                    {
+                        await SendDefaultAsync(chatId);
                     }
                 }
             }
@@ -383,25 +206,17 @@ namespace PortableLibraryTelegramBot
             var user = message.From;
             var chat = message.Chat;
 
-            if (message == null || message.Type != MessageType.TextMessage) return;
+            if (message.Type != MessageType.TextMessage) return;
 
             var options = new DbContextOptionsBuilder<BotDataContext>()
-               .UseInMemoryDatabase(databaseName: "PortableLibrary")
-               .Options;
+                .UseInMemoryDatabase(databaseName: "PortableLibrary")
+                .Options;
 
             using (var context = new BotDataContext(options))
             {
                 var databaseService = new DatabaseService(context);
                 await ProcessTextMessageAsync(message.Text, message.Chat.Id, databaseService);
             }
-
-            // add/добавить -> показать клавиатуру с выбором типов (библиотека, книга, сериал) -> введите название -> если библиотека, выберите тип (книга, сериал)
-
-            // add/remove library book/tvshow 'name'
-            // добавить/удалить бибилотеку книга/сериал 'название'
-
-            // add/remove book/tvshow 'name' 'libraryname'
-            // добавить/удалить книгу/сериал 'название' в 'название библиотеки'
         }
 
         private async Task SendDefaultAsync(ChatId id)
@@ -462,7 +277,8 @@ namespace PortableLibraryTelegramBot
             //    cacheTime: 0);
         }
 
-        private void OnChosenInlineResultReceived(object sender, ChosenInlineResultEventArgs chosenInlineResultEventArgs)
+        private void OnChosenInlineResultReceived(object sender,
+            ChosenInlineResultEventArgs chosenInlineResultEventArgs)
         {
             Console.WriteLine($"Received inline result: {chosenInlineResultEventArgs.ChosenInlineResult.ResultId}");
         }
