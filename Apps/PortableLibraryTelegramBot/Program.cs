@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using PortableLibraryTelegramBot.Configuration;
+using PortableLibrary.TelegramBot.Configuration;
 using Telegram.Bot;
 
 namespace PortableLibraryTelegramBot
@@ -13,8 +13,8 @@ namespace PortableLibraryTelegramBot
         {
             try
             {
-                var authConfiguration = await GetAuthConfiguration(GetAuthConfigurationFilePath(args));
-                var configuration = await GetConfiguration(GetConfigurationFilePath(args));
+                var authConfiguration = await Configuration.GetAuthConfiguration(Configuration.GetAuthConfigurationFilePath(args));
+                var configuration = await Configuration.GetConfiguration(Configuration.GetConfigurationFilePath(args));
 
                 var client = new TelegramBotClient(authConfiguration.Token);
 
@@ -25,40 +25,6 @@ namespace PortableLibraryTelegramBot
             {
                 // log
             }
-        }
-
-        private static string GetAuthConfigurationFilePath(string[] args)
-        {
-            var configPath = args.Length > 0 ? args[0] : null;
-
-            if (string.IsNullOrWhiteSpace(configPath))
-                throw new ArgumentNullException(nameof(args),
-                    "Path to auth configuration file is not specified at index 0.");
-
-            return configPath;
-        }
-
-        private static string GetConfigurationFilePath(string[] args)
-        {
-            var configPath = args.Length > 1 ? args[1] : null;
-
-            if (string.IsNullOrWhiteSpace(configPath))
-                throw new ArgumentNullException(nameof(args),
-                    "Path to configuration file is not specified at index 1.");
-
-            return configPath;
-        }
-
-        private static async Task<TelegramAuthConfiguration> GetAuthConfiguration(string path)
-        {
-            var fileContent = await File.ReadAllTextAsync(path);
-            return JsonConvert.DeserializeObject<TelegramAuthConfiguration>(fileContent);
-        }
-
-        private static async Task<TelegramConfiguration> GetConfiguration(string path)
-        {
-            var fileContent = await File.ReadAllTextAsync(path);
-            return JsonConvert.DeserializeObject<TelegramConfiguration>(fileContent);
         }
     }
 }

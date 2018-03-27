@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\PortableLibrary.Core\PortableLibrary.Core.csproj" />
+    <ProjectReference Include="..\..\Libraries\PortableLibrary.TelegramBot\PortableLibrary.TelegramBot.csproj" />
   </ItemGroup>
 </Project>

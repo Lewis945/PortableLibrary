@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PortableLibraryTelegramBot.Configuration;
-using PortableLibraryTelegramBot.Data.Database;
-using PortableLibraryTelegramBot.Messaging.Enums;
-using PortableLibraryTelegramBot.Messaging.Mappings.Models;
-using PortableLibraryTelegramBot.Processing;
-using PortableLibraryTelegramBot.Processing.Inline;
-using PortableLibraryTelegramBot.Processing.Sequence;
-using PortableLibraryTelegramBot.Services;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PortableLibrary.TelegramBot.Configuration;
+using PortableLibrary.TelegramBot.Data.Database;
+using PortableLibrary.TelegramBot.Processing.Inline;
+using PortableLibrary.TelegramBot.Processing.Sequence;
+using PortableLibrary.TelegramBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
@@ -32,27 +29,11 @@ namespace PortableLibraryTelegramBot
 
         #region Properties
 
-        public BookService BookService
-        {
-            get
-            {
-                if (_bookService == null)
-                    _bookService = new BookService(_client);
+        public BookService BookService =>
+            _bookService ?? (_bookService = new BookService(_client));
 
-                return _bookService;
-            }
-        }
-
-        public TvShowService TvShowService
-        {
-            get
-            {
-                if (_tvShowService == null)
-                    _tvShowService = new TvShowService(_client);
-
-                return _tvShowService;
-            }
-        }
+        public TvShowService TvShowService =>
+            _tvShowService ?? (_tvShowService = new TvShowService(_client));
 
         #endregion
 
