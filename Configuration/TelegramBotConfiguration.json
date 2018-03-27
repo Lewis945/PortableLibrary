@@ -92,21 +92,21 @@
       "InlineArguments": [
         {
           "Language": "eng",
-          "Arguments": "{Library} of {LibraryType} {Name}",
+          "Arguments": "{Type} of {LibraryType} {Name}",
           "Options": [
             {
-              "Option": "Library",
-              "Type": "Library",
+              "Option": "Type",
+              "Type": "Match",
               "Value": "Library"
             },
             {
               "Option": "LibraryType",
-              "Type": "Book",
+              "Type": "Match",
               "Value": "Books"
             },
             {
               "Option": "LibraryType",
-              "Type": "TvShow",
+              "Type": "Match",
               "Value": "Tv shows"
             },
             {
@@ -117,21 +117,21 @@
         },
         {
           "Language": "rus",
-          "Arguments": "{Library} {LibraryType} {Name}",
+          "Arguments": "{Type} {LibraryType} {Name}",
           "Options": [
             {
-              "Option": "Library",
-              "Type": "Library",
+              "Option": "Type",
+              "Type": "Match",
               "Value": "Библиотеку"
             },
             {
               "Option": "LibraryType",
-              "Type": "Book",
+              "Type": "Match",
               "Value": "Книг"
             },
             {
               "Option": "LibraryType",
-              "Type": "TvShow",
+              "Type": "Match",
               "Value": "Сериалов"
             },
             {

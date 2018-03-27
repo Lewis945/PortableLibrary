@@ -1,8 +1,8 @@
 ﻿namespace PortableLibrary.TelegramBot.Messaging.Enums
 {
-    public enum ArgumentsSequenceType
+    public enum InlineArgumentOptionsType
     {
-        Type,
-        LibraryType
+        Match,
+        String
     }
 }

@@ -5,9 +5,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using PortableLibrary.TelegramBot.Configuration;
 using PortableLibrary.TelegramBot.Messaging.Enums;
+using PortableLibrary.TelegramBot.Processing.Models;
 using PortableLibrary.TelegramBot.Services;
+using PortableLibraryTelegramBot.Messaging.Mappings.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace PortableLibrary.TelegramBot.Processing.Inline
 {
@@ -15,33 +18,32 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
     {
         #region Fields
 
-        private readonly TelegramBotClient _client;
+        private readonly ITelegramBotClient _client;
         private readonly TelegramConfiguration _configuration;
         private DatabaseService _databaseService;
+
+        private readonly AddCommandInlineProcessor _addCommandInlineProcessor;
 
         #endregion
 
         #region .ctor
 
-        public InlineCommandProcessor(TelegramBotClient client, TelegramConfiguration configuration,
+        public InlineCommandProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
             DatabaseService databaseService)
         {
             _client = client;
             _configuration = configuration;
             _databaseService = databaseService;
+
+            _addCommandInlineProcessor = new AddCommandInlineProcessor(client, configuration, databaseService);
         }
 
         #endregion
 
         #region Public Methods
 
-        public async Task<bool> ProcessInlineCommand(ChatId chatId, List<string> items)
+        public async Task<bool> ProcessInlineCommand(ChatId chatId, string commandAlias, string arguments)
         {
-            var commandAlias = items.First();
-            commandAlias = commandAlias.Replace("/", "");
-
-            items.RemoveAt(0);
-
             var command = _configuration.GetCommand(commandAlias, out var aliasModel);
 
             if (command == null)
@@ -50,15 +52,11 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                 return false;
             }
 
-            var arguments = string.Join(" ", items);
-
             var argumentsModel = command.InlineArguments.FirstOrDefault(a => a.Language == aliasModel.Language);
             if (argumentsModel == null)
                 throw new Exception("");
 
-            var options = argumentsModel.Options.Select(o => o.Option).Distinct();
-
-            var line = Regex.Replace(argumentsModel.Arguments, string.Join("|", options), "");
+            var argumentsList = GetArguments(arguments, argumentsModel);
 
             switch (command.Command)
             {
@@ -69,7 +67,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                 case Command.Cancel:
                     break;
                 case Command.Add:
-                    await ProcessAddInlineCommand(chatId);
+                    await _addCommandInlineProcessor.ProcessAddInlineCommand(chatId, argumentsList, aliasModel.Language);
                     break;
                 case Command.Remove:
                     break;
@@ -90,9 +88,29 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #region Private Methods
 
-        private async Task<bool> ProcessAddInlineCommand(ChatId chatId)
+        private List<OptionModel> GetArguments(string arguments, InlineArgumentModel argumentsModel)
         {
-            return true;
+            var options = argumentsModel.Options.Select(o => o.Option).Distinct();
+
+            var pattern = argumentsModel.Arguments;
+            foreach (var option in argumentsModel.Options)
+            {
+                if (option.Type == InlineArgumentOptionsType.Match)
+                    pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>(?i){option.Value})(?-i)");
+                else
+                    pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>[a-zA-Z0-9-_'\s]+)");
+            }
+            pattern = pattern.Replace(" ", @"\s");
+
+            var match = Regex.Match(arguments, pattern);
+
+            var argumentsList = match.Groups.Join(argumentsModel.Options, g => g.Name, o => o.Option, (g, o) => new OptionModel
+            {
+                Option = g.Name,
+                Value = g.Value
+            }).ToList();
+
+            return argumentsList;
         }
 
         #endregion

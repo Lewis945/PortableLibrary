@@ -12,7 +12,7 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
     {
         #region Fields
 
-        private readonly TelegramBotClient _client;
+        private readonly ITelegramBotClient _client;
         private readonly TelegramConfiguration _configuration;
         private readonly DatabaseService _databaseService;
 
@@ -22,7 +22,7 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
 
         #region .ctor
 
-        public CommandSequenceProcessor(TelegramBotClient client, TelegramConfiguration configuration,
+        public CommandSequenceProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
             DatabaseService databaseService)
         {
             _client = client;

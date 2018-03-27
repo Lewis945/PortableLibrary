@@ -1,6 +1,6 @@
 ﻿namespace PortableLibrary.TelegramBot.Messaging.Enums
 {
-    public enum Message
+    public enum GeneralMessage
     {
         Choose,
         EnterName,

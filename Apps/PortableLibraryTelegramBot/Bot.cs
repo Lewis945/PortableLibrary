@@ -87,11 +87,11 @@ namespace PortableLibraryTelegramBot
                         return;
                     }
 
+                    string firstItem = items.First();
+                    string command = firstItem.Replace("/", string.Empty);
+
                     if (items.Count == 1)
                     {
-                        var firstItem = items.First();
-                        firstItem = firstItem.Replace("/", string.Empty);
-
                         var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
                         var commandFound = await commandSequenceProcessor.StartCommandSequence(chatId, firstItem);
                         if (!commandFound)
@@ -101,7 +101,7 @@ namespace PortableLibraryTelegramBot
                     {
                         // process inline command string
                         var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
-                        var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, items);
+                        var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, firstItem, string.Join(" ", items.Skip(1)));
                         if (!commandFound)
                             await SendDefaultAsync(chatId);
                     }

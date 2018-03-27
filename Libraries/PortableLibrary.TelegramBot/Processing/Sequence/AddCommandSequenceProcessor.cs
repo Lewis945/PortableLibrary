@@ -8,17 +8,19 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using Message = PortableLibrary.TelegramBot.Messaging.Enums.Message;
+using GeneralMessage = PortableLibrary.TelegramBot.Messaging.Enums.GeneralMessage;
 using Type = PortableLibrary.TelegramBot.Messaging.Enums.Type;
 
 namespace PortableLibrary.TelegramBot.Processing.Sequence
 {
     public class AddCommandSequenceProcessor : BaseCommandSequenceProcessor
     {
-        private readonly TelegramBotClient _client;
+        private readonly ITelegramBotClient _client;
         private readonly DatabaseService _databaseService;
 
-        public AddCommandSequenceProcessor(TelegramBotClient client, TelegramConfiguration configuration,
+        public const int SequenceLength = 4;
+
+        public AddCommandSequenceProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
             DatabaseService databaseService)
             : base(configuration)
         {
@@ -52,7 +54,7 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
 
                     if (result.Type == Type.Library)
                     {
-                        await ProcessAddLibraryCommandAsync(result.Language, chatId);
+                        await ProcessAddLibraryCommandAsync(chatId, result.Language);
                     }
                     else if (result.Type == Type.Book)
                     {
@@ -81,32 +83,32 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
 
                     if (result.Type == Type.Book)
                     {
-                        await ProcessAddBooksLibraryCommandAsync(result.Language, chatId);
+                        await ProcessAddBooksLibraryCommandAsync(chatId, result.Language);
                     }
                     else if (result.Type == Type.TvShow)
                     {
-                        await ProcessAddTvShowsLibraryCommandAsync(result.Language, chatId);
+                        await ProcessAddTvShowsLibraryCommandAsync(chatId, result.Language);
                     }
                 }
             }
-            else if (GenerateKey(Command.Add, Type.Library, Type.Book) ==
-                     sequenceKey)
+            else if (GenerateKey(Command.Add, Type.Library, Type.Book) == sequenceKey)
             {
                 var lastCommand = await _databaseService.GetLastCommand(chatId.Identifier);
-                await ProcessAddBooksLibraryNameCommandAsync(message, lastCommand.Language, chatId);
+                await ProcessAddBooksLibraryNameCommandAsync(chatId, message, lastCommand.Language);
             }
-            else if (GenerateKey(Command.Add, Type.Library, Type.TvShow) ==
-                     sequenceKey)
+            else if (GenerateKey(Command.Add, Type.Library, Type.TvShow) == sequenceKey)
             {
                 var lastCommand = await _databaseService.GetLastCommand(chatId.Identifier);
-                await ProcessAddTvShowsLibraryNameCommandAsync(message, lastCommand.Language, chatId);
+                await ProcessAddTvShowsLibraryNameCommandAsync(chatId, message, lastCommand.Language);
             }
         }
 
         #endregion
 
+        #region Private Methods
+
         private async Task<(bool Result, Type Type, string Language)> Prevalidate(ChatId chatId,
-            string alias)
+    string alias)
         {
             var command = Configuration.Commands.FirstOrDefault(c => c.Command == Command.Add);
             if (command == null)
@@ -146,37 +148,34 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
 
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Command.Add.ToString(), language,
-                false);
+            await _databaseService.AddSequenceCommandAsync(chatId.Identifier, Command.Add.ToString(), language);
             await _databaseService.SaveAsync();
 
             var replyKeyboard = new ReplyKeyboardMarkup(
                 new[]
                 {
-                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, ArgumentsSequenceType.Type,
+                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, AddCommandArgumentType.Type.ToString(),
                         Type.Library.ToString(), language)),
-                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, ArgumentsSequenceType.Type,
+                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, AddCommandArgumentType.Type.ToString(),
                         Type.Book.ToString(), language)),
-                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, ArgumentsSequenceType.Type,
+                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, AddCommandArgumentType.Type.ToString(),
                         Type.TvShow.ToString(), language))
                 },
                 oneTimeKeyboard: true
             );
 
             await _client.SendTextMessageAsync(chatId,
-                Configuration.GetGeneralMessage(Message.Choose, language),
+                Configuration.GetGeneralMessage(GeneralMessage.Choose, language),
                 replyMarkup: replyKeyboard);
         }
 
-        private async Task ProcessAddLibraryCommandAsync(string language, ChatId chatId)
+        private async Task ProcessAddLibraryCommandAsync(ChatId chatId, string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
 
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier, Command.Add.ToString(), language,
-                true);
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Library.ToString(), language, false);
+            await _databaseService.AddSequenceCommandAsync(chatId.Identifier,
+                Type.Library.ToString(), language);
             await _databaseService.SaveAsync();
 
             await _client.SendTextMessageAsync(chatId,
@@ -185,28 +184,26 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
             var replyKeyboard = new ReplyKeyboardMarkup(
                 new[]
                 {
-                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, ArgumentsSequenceType.LibraryType,
+                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, AddCommandArgumentType.LibraryType.ToString(),
                         Type.Book.ToString(), language)),
-                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, ArgumentsSequenceType.LibraryType,
+                    new KeyboardButton(Configuration.GetSequenceOption(Command.Add, AddCommandArgumentType.LibraryType.ToString(),
                         Type.TvShow.ToString(), language))
                 },
                 oneTimeKeyboard: true
             );
 
             await _client.SendTextMessageAsync(chatId,
-                Configuration.GetGeneralMessage(Message.Choose, language),
+                Configuration.GetGeneralMessage(GeneralMessage.Choose, language),
                 replyMarkup: replyKeyboard);
         }
 
-        private async Task ProcessAddBooksLibraryCommandAsync(string language, ChatId chatId)
+        private async Task ProcessAddBooksLibraryCommandAsync(ChatId chatId, string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
 
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Library.ToString(), language, true);
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Book.ToString(), language, false);
+            await _databaseService.AddSequenceCommandAsync(chatId.Identifier,
+                Type.Book.ToString(), language);
             await _databaseService.SaveAsync();
 
             await _client.SendTextMessageAsync(chatId,
@@ -214,18 +211,16 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
                     Type.Book));
 
             await _client.SendTextMessageAsync(chatId,
-                Configuration.GetGeneralMessage(Message.EnterName, language));
+                Configuration.GetGeneralMessage(GeneralMessage.EnterName, language));
         }
 
-        private async Task ProcessAddTvShowsLibraryCommandAsync(string language, ChatId chatId)
+        private async Task ProcessAddTvShowsLibraryCommandAsync(ChatId chatId, string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
 
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Library.ToString(), language, true);
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.TvShow.ToString(), language, false);
+            await _databaseService.AddSequenceCommandAsync(chatId.Identifier,
+                Type.TvShow.ToString(), language);
             await _databaseService.SaveAsync();
 
             await _client.SendTextMessageAsync(chatId,
@@ -233,55 +228,45 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
                     Type.TvShow));
 
             await _client.SendTextMessageAsync(chatId,
-                Configuration.GetGeneralMessage(Message.EnterName, language));
+                Configuration.GetGeneralMessage(GeneralMessage.EnterName, language));
         }
 
-        private async Task ProcessAddBooksLibraryNameCommandAsync(string name, string language, ChatId chatId)
+        private async Task ProcessAddBooksLibraryNameCommandAsync(ChatId chatId, string name, string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
-
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Library.ToString(), language, true);
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Book.ToString(), language, true);
-            await _databaseService.SaveAsync();
 
             await _client.SendTextMessageAsync(chatId,
                 GenerateCurrentStateMessage(language, Command.Add, Type.Library,
                     Type.Book, name));
 
             await _client.SendTextMessageAsync(chatId,
-                Configuration.GetGeneralMessage(Message.Success, language));
+                Configuration.GetGeneralMessage(GeneralMessage.Success, language));
 
-            var isCleared = await _databaseService.ClearSequence(chatId.Identifier);
+            var isCleared = await _databaseService.ClearSequence(chatId.Identifier, SequenceLength - 1);
             if (!isCleared)
                 throw new Exception("At this point sequence must be complete.");
             await _databaseService.SaveAsync();
         }
 
-        private async Task ProcessAddTvShowsLibraryNameCommandAsync(string name, string language, ChatId chatId)
+        private async Task ProcessAddTvShowsLibraryNameCommandAsync(ChatId chatId, string name, string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
-
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.Library.ToString(), language, true);
-            await _databaseService.AddOrUpdateSequenceCommandAsync(chatId.Identifier,
-                Type.TvShow.ToString(), language, true);
-            await _databaseService.SaveAsync();
 
             await _client.SendTextMessageAsync(chatId,
                 GenerateCurrentStateMessage(language, Command.Add, Type.Library,
                     Type.TvShow, name));
 
             await _client.SendTextMessageAsync(chatId,
-                Configuration.GetGeneralMessage(Message.Success, language));
+                Configuration.GetGeneralMessage(GeneralMessage.Success, language));
 
-            var isCleared = await _databaseService.ClearSequence(chatId.Identifier);
+            var isCleared = await _databaseService.ClearSequence(chatId.Identifier, SequenceLength - 1);
             if (!isCleared)
                 throw new Exception("At this point sequence must be complete.");
             await _databaseService.SaveAsync();
         }
+
+        #endregion
     }
 }

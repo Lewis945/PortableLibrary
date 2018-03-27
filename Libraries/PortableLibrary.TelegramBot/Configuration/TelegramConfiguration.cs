@@ -34,7 +34,7 @@ namespace PortableLibrary.TelegramBot.Configuration
             return command;
         }
 
-        public string GetSequenceOption(Command command, ArgumentsSequenceType argument, string option, string language)
+        public string GetSequenceOption(Command command, string argument, string option, string language)
         {
             var commandMapping = Commands.GetMapping(m => m.Command == command);
             var alias = commandMapping.Aliases.FirstOrDefault(a => a.Language == language);
@@ -58,7 +58,7 @@ namespace PortableLibrary.TelegramBot.Configuration
             return aliasModel.Alias;
         }
 
-        public string GetGeneralMessage(Message type, string language)
+        public string GetGeneralMessage(GeneralMessage type, string language)
         {
             var message = GeneralMessages.GetMapping(m => m.Type == type);
             var alias = message.Aliases.FirstOrDefault(a => a.Language == language);

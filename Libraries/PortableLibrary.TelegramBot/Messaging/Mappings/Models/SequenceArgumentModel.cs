@@ -5,7 +5,7 @@ namespace PortableLibraryTelegramBot.Messaging.Mappings.Models
 {
     public class SequenceArgumentModel
     {
-        public ArgumentsSequenceType Argument { get; set; }
+        public string Argument { get; set; }
         public List<SequenceOptionModel> Options { get; set; }
     }
 }

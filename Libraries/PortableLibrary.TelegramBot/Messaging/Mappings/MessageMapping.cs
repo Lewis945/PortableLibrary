@@ -6,7 +6,7 @@ namespace PortableLibraryTelegramBot.Messaging.Mappings
 {
     public class MessageMapping
     {
-        public Message Type { get; set; }
+        public GeneralMessage Type { get; set; }
         public List<AliasModel> Aliases { get; set; }
     }
 }

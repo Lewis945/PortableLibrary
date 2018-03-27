@@ -15,8 +15,6 @@ namespace PortableLibrary.TelegramBot.Data.Database.Entities
         public string Command { get; set; }
         public string Language { get; set; }
 
-        public bool IsComplete { get; set; }
-
         public DateTime CreationDate { get; set; }
 
         public virtual ChatCommandSequenceState ParentChatCommandSequenceState { get; set; }

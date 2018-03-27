@@ -21,7 +21,7 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
 
         protected string GenerateCurrentStateMessage(string language, params object[] args)
         {
-            var message = Configuration.GetGeneralMessage(Message.YourCurrentSelection, language);
+            var message = Configuration.GetGeneralMessage(GeneralMessage.YourCurrentSelection, language);
             return string.Format(message,
                 string.Join(" -> ", args.Select(a => GetLocalizedMessage(language, a))));
         }
