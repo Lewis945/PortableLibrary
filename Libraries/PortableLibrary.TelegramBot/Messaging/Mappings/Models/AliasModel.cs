@@ -1,4 +1,4 @@
-﻿namespace PortableLibraryTelegramBot.Messaging.Mappings.Models
+﻿namespace PortableLibrary.TelegramBot.Messaging.Mappings.Models
 {
     public struct AliasModel
     {

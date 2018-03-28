@@ -5,12 +5,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using PortableLibrary.TelegramBot.Configuration;
 using PortableLibrary.TelegramBot.Messaging.Enums;
+using PortableLibrary.TelegramBot.Messaging.Mappings;
+using PortableLibrary.TelegramBot.Messaging.Mappings.Models;
 using PortableLibrary.TelegramBot.Processing.Models;
 using PortableLibrary.TelegramBot.Services;
-using PortableLibraryTelegramBot.Messaging.Mappings.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace PortableLibrary.TelegramBot.Processing.Inline
 {
@@ -52,11 +52,12 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                 return false;
             }
 
-            var argumentsModel = command.InlineArguments.FirstOrDefault(a => a.Language == aliasModel.Language);
-            if (argumentsModel == null)
-                throw new Exception("");
-
-            var argumentsList = GetArguments(arguments, argumentsModel);
+            var argumentsList = GetArguments(command, arguments, aliasModel.Language, out var argumentsLineName);
+            if (argumentsList == null)
+            {
+                //send message: arguments are wrong
+                return false;
+            }
 
             switch (command.Command)
             {
@@ -67,7 +68,8 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                 case Command.Cancel:
                     break;
                 case Command.Add:
-                    await _addCommandInlineProcessor.ProcessAddInlineCommand(chatId, argumentsList, aliasModel.Language);
+                    await _addCommandInlineProcessor.ProcessAddInlineCommand(chatId, argumentsList,
+                        argumentsLineName, aliasModel.Language);
                     break;
                 case Command.Remove:
                     break;
@@ -88,27 +90,56 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #region Private Methods
 
-        private List<OptionModel> GetArguments(string arguments, InlineArgumentModel argumentsModel)
+        private static List<OptionModel> GetArguments(CommandMapping command, string arguments, string language,
+            out string name)
         {
-            var options = argumentsModel.Options.Select(o => o.Option).Distinct();
+            var argumentsModels = command.InlineArguments.Where(a => a.Language == language).ToList();
+            if (argumentsModels.Count == 0)
+                throw new Exception("");
 
-            var pattern = argumentsModel.Arguments;
-            foreach (var option in argumentsModel.Options)
+            foreach (var argumentsModel in argumentsModels)
+            {
+                var formattedPattern =
+                    FormatArgumentsPattern(argumentsModel.Arguments, argumentsModel.Options);
+
+                if (!Regex.IsMatch(arguments, formattedPattern)) continue;
+                
+                name = argumentsModel.Name;
+                return GetArguments(arguments, formattedPattern, argumentsModel);
+            }
+
+            name = null;
+            return null;
+        }
+
+        private static string FormatArgumentsPattern(string pattern, IEnumerable<InlineOptionModel> options)
+        {
+            foreach (var option in options)
             {
                 if (option.Type == InlineArgumentOptionsType.Match)
-                    pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>(?i){option.Value})(?-i)");
+                {
+                    foreach (var value in option.Values)
+                        pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>(?i){value})(?-i)");
+                }
                 else
                     pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>[a-zA-Z0-9-_'\s]+)");
             }
-            pattern = pattern.Replace(" ", @"\s");
 
+            pattern = pattern.Replace(" ", @"\s");
+            return pattern;
+        }
+
+        private static List<OptionModel> GetArguments(string arguments, string pattern,
+            InlineArgumentModel argumentsModel)
+        {
             var match = Regex.Match(arguments, pattern);
 
-            var argumentsList = match.Groups.Join(argumentsModel.Options, g => g.Name, o => o.Option, (g, o) => new OptionModel
-            {
-                Option = g.Name,
-                Value = g.Value
-            }).ToList();
+            var argumentsList = match.Groups.Join(argumentsModel.Options, g => g.Name, o => o.Option, (g, o) =>
+                new OptionModel
+                {
+                    Option = g.Name,
+                    Value = g.Value
+                }).ToList();
 
             return argumentsList;
         }

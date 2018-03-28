@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using PortableLibrary.TelegramBot.Extensions;
 using PortableLibrary.TelegramBot.Messaging.Enums;
-using PortableLibraryTelegramBot.Messaging.Mappings;
-using PortableLibraryTelegramBot.Messaging.Mappings.Models;
+using PortableLibrary.TelegramBot.Messaging.Mappings;
+using PortableLibrary.TelegramBot.Messaging.Mappings.Models;
 
 namespace PortableLibrary.TelegramBot.Configuration
 {

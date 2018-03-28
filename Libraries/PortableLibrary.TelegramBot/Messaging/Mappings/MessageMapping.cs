@@ -1,8 +1,8 @@
-﻿using PortableLibraryTelegramBot.Messaging.Mappings.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PortableLibrary.TelegramBot.Messaging.Enums;
+using PortableLibrary.TelegramBot.Messaging.Mappings.Models;
 
-namespace PortableLibraryTelegramBot.Messaging.Mappings
+namespace PortableLibrary.TelegramBot.Messaging.Mappings
 {
     public class MessageMapping
     {

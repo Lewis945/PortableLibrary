@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PortableLibraryTelegramBot.Messaging.Mappings.Models
+namespace PortableLibrary.TelegramBot.Messaging.Mappings.Models
 {
     public class SequenceOptionModel
     {

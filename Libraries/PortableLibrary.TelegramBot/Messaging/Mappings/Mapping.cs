@@ -1,4 +1,4 @@
-﻿namespace PortableLibraryTelegramBot.Messaging.Mappings
+﻿namespace PortableLibrary.TelegramBot.Messaging.Mappings
 {
     public class Mapping
     {

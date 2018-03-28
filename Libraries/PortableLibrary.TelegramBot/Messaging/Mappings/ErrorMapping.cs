@@ -1,6 +1,6 @@
 ﻿using PortableLibrary.TelegramBot.Messaging.Enums;
 
-namespace PortableLibraryTelegramBot.Messaging.Mappings
+namespace PortableLibrary.TelegramBot.Messaging.Mappings
 {
     public class ErrorMapping : Mapping
     {
