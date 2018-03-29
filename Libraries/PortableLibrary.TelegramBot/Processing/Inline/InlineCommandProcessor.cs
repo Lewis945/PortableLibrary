@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using PortableLibrary.TelegramBot.Configuration;
+using PortableLibrary.TelegramBot.Configuration.Commands.Enums.Inline;
+using PortableLibrary.TelegramBot.Configuration.Commands.Models.Inline;
+using PortableLibrary.TelegramBot.EventHandlers;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Messaging.Mappings;
-using PortableLibrary.TelegramBot.Messaging.Mappings.Models;
 using PortableLibrary.TelegramBot.Processing.Models;
 using PortableLibrary.TelegramBot.Services;
 using Telegram.Bot;
@@ -26,6 +28,12 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #endregion
 
+        #region Events
+
+        public event AddLibraryEventHandler AddLibraryEvent;
+
+        #endregion
+        
         #region .ctor
 
         public InlineCommandProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
@@ -36,6 +44,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             _databaseService = databaseService;
 
             _addCommandInlineProcessor = new AddCommandInlineProcessor(client, configuration, databaseService);
+            _addCommandInlineProcessor.AddLibraryEvent += AddLibraryEvent;
         }
 
         #endregion
@@ -90,58 +99,84 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #region Private Methods
 
-        private static List<OptionModel> GetArguments(CommandMapping command, string arguments, string language,
+        private static List<ArgumentModel> GetArguments(CommandMapping command, string arguments, string language,
             out string name)
         {
-            var argumentsModels = command.InlineArguments.Where(a => a.Language == language).ToList();
-            if (argumentsModels.Count == 0)
+            var argumentsLines = command.ArgumentsLines.Where(a => a.Language == language).ToList();
+            if (argumentsLines.Count == 0)
                 throw new Exception("");
 
-            foreach (var argumentsModel in argumentsModels)
+            foreach (var argumentsLine in argumentsLines)
             {
                 var formattedPattern =
-                    FormatArgumentsPattern(argumentsModel.Arguments, argumentsModel.Options);
+                    FormatArgumentsPattern(argumentsLine.Line, argumentsLine.Arguments);
 
-                if (!Regex.IsMatch(arguments, formattedPattern)) continue;
-                
-                name = argumentsModel.Name;
-                return GetArguments(arguments, formattedPattern, argumentsModel);
+                var match = Regex.Match(arguments, formattedPattern);
+                if (!match.Success)
+                    continue;
+
+                var items = GetArguments(match, argumentsLine);
+                if (items == null)
+                    continue;
+
+                name = argumentsLine.Name;
             }
 
             name = null;
             return null;
         }
 
-        private static string FormatArgumentsPattern(string pattern, IEnumerable<InlineOptionModel> options)
+        private static string FormatArgumentsPattern(string pattern, IEnumerable<InlineArgument> arguments)
         {
-            foreach (var option in options)
+            foreach (var argument in arguments)
             {
-                if (option.Type == InlineArgumentOptionsType.Match)
+                switch (argument.Type)
                 {
-                    foreach (var value in option.Values)
-                        pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>(?i){value})(?-i)");
+                    //^(?<type>(?i)library(?-i))\sof\s(?<libtype>(?<bookstype>(?i)books(?-i))|(?<tvtype>(?i)tv shows(?-i)))(?<name>[a-zA-Z0-9-_'\s]+)$
+                    case ArgumentType.Match:
+                        pattern = pattern.Replace($"{{{argument.Argument}}}",
+                            $@"(?<{argument.Argument}>{
+                                    string.Join("|", argument.Options.Select(o => $"(?<{o.Option}>(?i){o.Alias}(?-i))"))
+                                })");
+                        break;
+                    case ArgumentType.String:
+                        pattern = pattern.Replace($"{{{argument.Argument}}}",
+                            $@"(?<{argument.Argument}>[a-zA-Z0-9-_'\s]+)");
+                        break;
+                    default:
+                        break;
                 }
-                else
-                    pattern = pattern.Replace($"{{{option.Option}}}", $@"(?<{option.Option}>[a-zA-Z0-9-_'\s]+)");
             }
 
             pattern = pattern.Replace(" ", @"\s");
             return pattern;
         }
 
-        private static List<OptionModel> GetArguments(string arguments, string pattern,
-            InlineArgumentModel argumentsModel)
+        private static IEnumerable<ArgumentModel> GetArguments(Match match,
+            ArgumentsLine argumentsLine)
         {
-            var match = Regex.Match(arguments, pattern);
-
-            var argumentsList = match.Groups.Join(argumentsModel.Options, g => g.Name, o => o.Option, (g, o) =>
-                new OptionModel
+            foreach (var argument in argumentsLine.Arguments)
+            {
+                var argumentGroup = match.Groups.FirstOrDefault(g => g.Name == argument.Argument);
+                if (argumentGroup == null)
                 {
-                    Option = g.Name,
-                    Value = g.Value
-                }).ToList();
+                    //validation
+                    yield break;
+                }
 
-            return argumentsList;
+                var argumentModel = new ArgumentModel
+                {
+                    Argument = argumentGroup.Name,
+                    Alias = argumentGroup.Value
+                };
+
+                var options = argument.Options.Select(o => o.Option).ToList();
+                var option = match.Groups.FirstOrDefault(g => options.Contains(g.Name));
+                if (option != null)
+                    argumentModel.Option = option.Name;
+
+                yield return argumentModel;
+            }
         }
 
         #endregion

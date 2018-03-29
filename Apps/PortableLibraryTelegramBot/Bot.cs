@@ -93,7 +93,7 @@ namespace PortableLibraryTelegramBot
                     if (items.Count == 1)
                     {
                         var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
-                        var commandFound = await commandSequenceProcessor.StartCommandSequence(chatId, firstItem);
+                        var commandFound = await commandSequenceProcessor.StartCommandSequence(chatId, command);
                         if (!commandFound)
                             await SendDefaultAsync(chatId);
                     }
@@ -101,7 +101,7 @@ namespace PortableLibraryTelegramBot
                     {
                         // process inline command string
                         var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
-                        var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, firstItem, string.Join(" ", items.Skip(1)));
+                        var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, command, string.Join(" ", items.Skip(1)));
                         if (!commandFound)
                             await SendDefaultAsync(chatId);
                     }

@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortableLibrary.Core.Enums;
 using PortableLibrary.TelegramBot.Configuration;
+using PortableLibrary.TelegramBot.Configuration.Commands.Enums.Inline.Add;
+using PortableLibrary.TelegramBot.EventHandlers;
+using PortableLibrary.TelegramBot.Extensions;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Processing.Models;
 using PortableLibrary.TelegramBot.Services;
@@ -22,6 +26,12 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #endregion
 
+        #region Events
+
+        public event AddLibraryEventHandler AddLibraryEvent;
+
+        #endregion
+
         #region .ctor
 
         public AddCommandInlineProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
@@ -36,7 +46,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #region Public Methods
 
-        public async Task<bool> ProcessAddInlineCommand(ChatId chatId, List<OptionModel> arguments,
+        public async Task<bool> ProcessAddInlineCommand(ChatId chatId, List<ArgumentModel> arguments,
             string argumentsLineName, string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
@@ -53,7 +63,12 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             switch (type)
             {
                 case AddCommandInlineArgumentsLine.AddLibrary:
-                    // save library to database
+                    var libraryType = arguments.FirstOrDefault(a => a.Argument.Matches(AddLibraryArgument.LibraryType));
+                    var name = arguments.FirstOrDefault(a => a.Argument.Matches(AddLibraryArgument.Name));
+
+                    Enum.TryParse<LibraryType>(libraryType.Option, out var libType);
+                    
+                    AddLibraryEvent?.Invoke(name.Alias, libType);
                     break;
                 case AddCommandInlineArgumentsLine.AddBook:
                     break;
@@ -68,6 +83,10 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
             return true;
         }
+
+        #endregion
+
+        #region Private Methods
 
         #endregion
     }

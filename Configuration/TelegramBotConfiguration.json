@@ -89,24 +89,38 @@
           ]
         }
       ],
-      "InlineArguments": [
+      "ArgumentsLines": [
         {
           "Language": "eng",
           "Name": "AddLibrary",
-          "Arguments": "{Type} of {LibraryType} {Name}",
-          "Options": [
+          "Line": "{Type} of {LibraryType} {Name}",
+          "Arguments": [
             {
-              "Option": "Type",
+              "Argument": "Type",
               "Type": "Match",
-              "Values": ["Library"]
+              "Options": [
+                {
+                  "Option": "Library",
+                  "Alias": "Library"
+                }
+              ]
             },
             {
-              "Option": "LibraryType",
+              "Argument": "LibraryType",
               "Type": "Match",
-              "Values": ["Books", "Tv shows"]
+              "Options": [
+                {
+                  "Option": "Book",
+                  "Alias": "Books"
+                },
+                {
+                  "Option": "TvShow",
+                  "Alias": "Tv shows"
+                }
+              ]
             },
             {
-              "Option": "Name",
+              "Argument": "Name",
               "Type": "String"
             }
           ]
@@ -114,20 +128,34 @@
         {
           "Language": "rus",
           "Name": "AddLibrary",
-          "Arguments": "{Type} {LibraryType} {Name}",
-          "Options": [
+          "Line": "{Type} {LibraryType} {Name}",
+          "Arguments": [
             {
-              "Option": "Type",
+              "Argument": "Type",
               "Type": "Match",
-              "Values": ["Библиотеку"]
+              "Options": [
+                {
+                  "Option": "Library",
+                  "Alias": "Библиотеку"
+                }
+              ]
             },
             {
-              "Option": "LibraryType",
+              "Argument": "LibraryType",
               "Type": "Match",
-              "Values": ["Книг", "Сериалов"]
+              "Options": [
+                {
+                  "Option": "Book",
+                  "Alias": "Книг"
+                },
+                {
+                  "Option": "TvShow",
+                  "Alias": "Сериалов"
+                }
+              ]
             },
             {
-              "Option": "Name",
+              "Argument": "Name",
               "Type": "String"
             }
           ]

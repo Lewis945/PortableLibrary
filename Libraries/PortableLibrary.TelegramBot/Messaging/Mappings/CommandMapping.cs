@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortableLibrary.TelegramBot.Configuration.Commands.Models.Inline;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Messaging.Mappings.Models;
 
@@ -12,7 +13,7 @@ namespace PortableLibrary.TelegramBot.Messaging.Mappings
 
         public List<AliasModel> Aliases { get; set; }
         public List<SequenceArgumentModel> ArgumentsSequence { get; set; }
-        public List<InlineArgumentModel> InlineArguments { get; set; }
+        public List<ArgumentsLine> ArgumentsLines { get; set; }
 
         public AliasModel GetAlias(string alias)
         {
