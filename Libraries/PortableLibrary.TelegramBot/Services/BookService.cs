@@ -1,22 +1,15 @@
-﻿using Telegram.Bot;
+﻿using PortableLibrary.Core.Database;
+using Telegram.Bot;
 
 namespace PortableLibrary.TelegramBot.Services
 {
-    public class BookService
+    public class BookService : IBookService
     {
-        private TelegramBotClient _client;
+        private PortableLibraryDataContext _context;
 
-        public BookService(TelegramBotClient client)
+        public BookService(PortableLibraryDataContext context)
         {
-            _client = client;
-        }
-
-        public void AddBookLibrary(string name, string language)
-        {
-        }
-
-        public void AddBook(string name, string language)
-        {
+            _context = context;
         }
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using System;
 
-namespace Mea.Modules.PortableLibrary.Data.Database.EntityFramework
+namespace PortableLibrary.Core.Database
 {
     public class PortableLibraryDesignTimeDbContextFactory : IDesignTimeDbContextFactory<PortableLibraryDataContext>
     {

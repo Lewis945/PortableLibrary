@@ -1,22 +1,15 @@
-﻿using Telegram.Bot;
+﻿using PortableLibrary.Core.Database;
+using Telegram.Bot;
 
 namespace PortableLibrary.TelegramBot.Services
 {
-    public class TvShowService
+    public class TvShowService : ITvShowService
     {
-        private TelegramBotClient _client;
+        private PortableLibraryDataContext _context;
 
-        public TvShowService(TelegramBotClient client)
+        public TvShowService(PortableLibraryDataContext context)
         {
-            _client = client;
-        }
-
-        public void AddTvShowLibrary(string name, string language)
-        {
-        }
-
-        public void AddTvShow(string name, string language)
-        {
+            _context = context;
         }
     }
 }

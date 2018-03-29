@@ -2,7 +2,7 @@
 using PortableLibrary.Core.Database.Entities.Book;
 using PortableLibrary.Core.Database.Entities.TvShow;
 
-namespace Mea.Modules.PortableLibrary.Data.Database.EntityFramework
+namespace PortableLibrary.Core.Database
 {
     public class PortableLibraryDataContext : DbContext
     {

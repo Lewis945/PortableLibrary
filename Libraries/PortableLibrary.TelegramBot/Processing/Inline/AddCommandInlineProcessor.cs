@@ -24,22 +24,25 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
         private readonly TelegramConfiguration _configuration;
         private DatabaseService _databaseService;
 
-        #endregion
-
-        #region Events
-
-        public event AddLibraryEventHandler AddLibraryEvent;
+        private ILibraryService _libraryService;
+        private IBookService _bookService;
+        private ITvShowService _tvShowService;
 
         #endregion
 
         #region .ctor
 
         public AddCommandInlineProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
-            DatabaseService databaseService)
+            DatabaseService databaseService, ILibraryService libraryService, IBookService bookService, 
+            ITvShowService tvShowService)
         {
             _client = client;
             _configuration = configuration;
             _databaseService = databaseService;
+
+            _libraryService = libraryService;
+            _bookService = bookService;
+            _tvShowService = tvShowService;
         }
 
         #endregion
@@ -67,8 +70,8 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                     var name = arguments.FirstOrDefault(a => a.Argument.Matches(AddLibraryArgument.Name));
 
                     Enum.TryParse<LibraryType>(libraryType.Option, out var libType);
-                    
-                    AddLibraryEvent?.Invoke(name.Alias, libType);
+
+                    _libraryService.AddLibrary(name.Alias, libType);
                     break;
                 case AddCommandInlineArgumentsLine.AddBook:
                     break;

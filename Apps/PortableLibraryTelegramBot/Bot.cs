@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using PortableLibrary.Core.Database;
 using PortableLibrary.TelegramBot.Configuration;
 using PortableLibrary.TelegramBot.Data.Database;
 using PortableLibrary.TelegramBot.Processing.Inline;
@@ -21,19 +22,6 @@ namespace PortableLibraryTelegramBot
 
         private readonly TelegramBotClient _client;
         private readonly TelegramConfiguration _configuration;
-
-        private BookService _bookService;
-        private TvShowService _tvShowService;
-
-        #endregion
-
-        #region Properties
-
-        public BookService BookService =>
-            _bookService ?? (_bookService = new BookService(_client));
-
-        public TvShowService TvShowService =>
-            _tvShowService ?? (_tvShowService = new TvShowService(_client));
 
         #endregion
 
@@ -72,12 +60,13 @@ namespace PortableLibraryTelegramBot
 
         #region Private Methods
 
-        private async Task ProcessTextMessageAsync(string message, ChatId chatId, DatabaseService service)
+        private async Task ProcessTextMessageAsync(string message, ChatId chatId, DatabaseService service,
+            LibraryService libraryService, BookService bookService, TvShowService tvShowService)
         {
             try
             {
                 //Command
-                if (message.StartsWith("/"))
+                if (message.StartsWith("/", StringComparison.InvariantCultureIgnoreCase))
                 {
                     var items = message.Split(' ').ToList();
 
@@ -100,7 +89,7 @@ namespace PortableLibraryTelegramBot
                     else
                     {
                         // process inline command string
-                        var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
+                        var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service, libraryService, bookService, tvShowService);
                         var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, command, string.Join(" ", items.Skip(1)));
                         if (!commandFound)
                             await SendDefaultAsync(chatId);
@@ -139,10 +128,22 @@ namespace PortableLibraryTelegramBot
                 .UseInMemoryDatabase(databaseName: "PortableLibrary")
                 .Options;
 
+            var libraryOptions = new DbContextOptionsBuilder<PortableLibraryDataContext>()
+               .UseInMemoryDatabase(databaseName: "PortableLibrary")
+               .Options;
+
             using (var context = new BotDataContext(options))
             {
                 var databaseService = new DatabaseService(context);
-                await ProcessTextMessageAsync(message.Text, message.Chat.Id, databaseService);
+                using (var libraryContext = new PortableLibraryDataContext(libraryOptions))
+                {
+                    var libraryService = new LibraryService(libraryContext);
+                    var bookService = new BookService(libraryContext);
+                    var tvShowService = new TvShowService(libraryContext);
+
+                    await ProcessTextMessageAsync(message.Text, message.Chat.Id, databaseService,
+                        libraryService, bookService, tvShowService);
+                }
             }
         }
 

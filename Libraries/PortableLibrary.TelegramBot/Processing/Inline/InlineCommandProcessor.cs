@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using PortableLibrary.TelegramBot.Configuration;
+﻿using PortableLibrary.TelegramBot.Configuration;
 using PortableLibrary.TelegramBot.Configuration.Commands.Enums.Inline;
 using PortableLibrary.TelegramBot.Configuration.Commands.Models.Inline;
 using PortableLibrary.TelegramBot.EventHandlers;
@@ -11,6 +6,11 @@ using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Messaging.Mappings;
 using PortableLibrary.TelegramBot.Processing.Models;
 using PortableLibrary.TelegramBot.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -26,28 +26,23 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         private readonly AddCommandInlineProcessor _addCommandInlineProcessor;
 
-        #endregion
+        #endregion Fields
 
-        #region Events
-
-        public event AddLibraryEventHandler AddLibraryEvent;
-
-        #endregion
-        
         #region .ctor
 
         public InlineCommandProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
-            DatabaseService databaseService)
+            DatabaseService databaseService, ILibraryService libraryService, IBookService bookService,
+            ITvShowService tvShowService)
         {
             _client = client;
             _configuration = configuration;
             _databaseService = databaseService;
 
-            _addCommandInlineProcessor = new AddCommandInlineProcessor(client, configuration, databaseService);
-            _addCommandInlineProcessor.AddLibraryEvent += AddLibraryEvent;
+            _addCommandInlineProcessor = new AddCommandInlineProcessor(client, configuration, databaseService,
+                libraryService, bookService, tvShowService);
         }
 
-        #endregion
+        #endregion .ctor
 
         #region Public Methods
 
@@ -72,22 +67,30 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             {
                 case Command.Enter:
                     break;
+
                 case Command.Exit:
                     break;
+
                 case Command.Cancel:
                     break;
+
                 case Command.Add:
                     await _addCommandInlineProcessor.ProcessAddInlineCommand(chatId, argumentsList,
                         argumentsLineName, aliasModel.Language);
                     break;
+
                 case Command.Remove:
                     break;
+
                 case Command.Display:
                     break;
+
                 case Command.Mark:
                     break;
+
                 case Command.SetName:
                     break;
+
                 default:
                     return false;
             }
@@ -95,7 +98,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             return true;
         }
 
-        #endregion
+        #endregion Public Methods
 
         #region Private Methods
 
@@ -115,11 +118,12 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                 if (!match.Success)
                     continue;
 
-                var items = GetArguments(match, argumentsLine);
+                var items = GetArguments(match, argumentsLine).ToList();
                 if (items == null)
                     continue;
 
                 name = argumentsLine.Name;
+                return items;
             }
 
             name = null;
@@ -139,10 +143,12 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                                     string.Join("|", argument.Options.Select(o => $"(?<{o.Option}>(?i){o.Alias}(?-i))"))
                                 })");
                         break;
+
                     case ArgumentType.String:
                         pattern = pattern.Replace($"{{{argument.Argument}}}",
-                            $@"(?<{argument.Argument}>[a-zA-Z0-9-_'\s]+)");
+                            $@"(?<{argument.Argument}>[\w\s'!@$""%_-]+)");
                         break;
+
                     default:
                         break;
                 }
@@ -170,15 +176,19 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                     Alias = argumentGroup.Value
                 };
 
-                var options = argument.Options.Select(o => o.Option).ToList();
-                var option = match.Groups.FirstOrDefault(g => options.Contains(g.Name));
-                if (option != null)
-                    argumentModel.Option = option.Name;
+                if (argument.Options != null)
+                {
+                    var options = argument.Options.Select(o => o.Option).ToList();
+                    var option = match.Groups.FirstOrDefault(g => !string.IsNullOrWhiteSpace(g.Value) &&
+                        options.Contains(g.Name));
+                    if (option != null)
+                        argumentModel.Option = option.Name;
+                }
 
                 yield return argumentModel;
             }
         }
 
-        #endregion
+        #endregion Private Methods
     }
 }
