@@ -14,4 +14,9 @@
     <ProjectReference Include="..\..\Apps\PortableLibraryTelegramBot\PortableLibraryTelegramBot.csproj" />
     <ProjectReference Include="..\..\Libraries\PortableLibrary.TelegramBot\PortableLibrary.TelegramBot.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\Display\" />
+    <Folder Include="Commands\Mark\" />
+    <Folder Include="Commands\Enable\" />
+  </ItemGroup>
 </Project>

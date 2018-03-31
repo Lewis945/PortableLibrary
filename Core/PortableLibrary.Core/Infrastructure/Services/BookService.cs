@@ -1,7 +1,7 @@
 ﻿using PortableLibrary.Core.Database;
-using Telegram.Bot;
+using PortableLibrary.Core.Services;
 
-namespace PortableLibrary.TelegramBot.Services
+namespace PortableLibrary.Core.Infrastructure.Services
 {
     public class BookService : IBookService
     {

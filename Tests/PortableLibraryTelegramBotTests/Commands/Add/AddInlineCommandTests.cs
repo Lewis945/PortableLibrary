@@ -23,10 +23,6 @@ namespace PortableLibraryTelegramBotTests.Commands.Add
         private TelegramConfiguration _configuration;
         private Mock<ITelegramBotClient> _clientMock;
 
-        private Mock<ILibraryService> _libraryServiceMock;
-        private Mock<IBookService> _bookServiceMock;
-        private Mock<ITvShowService> _tvShowServiceMock;
-
         private DbContextOptions<BotDataContext> _options;
         private ChatId _chatId;
 
@@ -48,12 +44,12 @@ namespace PortableLibraryTelegramBotTests.Commands.Add
             _clientMock = new Mock<ITelegramBotClient>();
             _clientMock.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(), default(System.Threading.CancellationToken)));
 
-            _libraryServiceMock = new Mock<ILibraryService>();
-            _libraryServiceMock.Setup(s => s.AddLibrary(It.IsAny<string>(), It.IsIn<LibraryType>()));
+            //_libraryServiceMock = new Mock<ILibraryService>();
+            //_libraryServiceMock.Setup(s => s.AddLibrary(It.IsAny<string>(), It.IsIn<LibraryType>()));
 
-            _bookServiceMock = new Mock<IBookService>();
+            //_bookServiceMock = new Mock<IBookService>();
 
-            _tvShowServiceMock = new Mock<ITvShowService>();
+            //_tvShowServiceMock = new Mock<ITvShowService>();
         }
 
         #endregion
@@ -95,15 +91,24 @@ namespace PortableLibraryTelegramBotTests.Commands.Add
         private async Task SuccessfullyProcessAddCommand(string commandAlias, string arguments, string dbName,
             string libraryName, LibraryType libraryType)
         {
+            bool isAddLibraryTriggered = false;
+
             using (var context = new BotDataContext(GetDatabaseOptions<BotDataContext>(dbName)))
             {
                 var databaseService = new DatabaseService(context);
-                var commandSequenceProcessor = new InlineCommandProcessor(_clientMock.Object, _configuration, databaseService,
-                    _libraryServiceMock.Object, _bookServiceMock.Object, _tvShowServiceMock.Object);
+                var commandSequenceProcessor = new InlineCommandProcessor(_clientMock.Object, _configuration, databaseService);
+
+                commandSequenceProcessor.OnAddLibrary += (string name, LibraryType type) =>
+                {
+                    isAddLibraryTriggered = true;
+                    Assert.Equal(libraryName, name);
+                    Assert.Equal(libraryType, type);
+                };
+
                 await commandSequenceProcessor.ProcessInlineCommand(_chatId, commandAlias, arguments);
             }
 
-            _libraryServiceMock.Verify(mock => mock.AddLibrary(libraryName, libraryType), Times.Once());
+            Assert.True(isAddLibraryTriggered);
         }
 
         #endregion

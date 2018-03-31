@@ -60,8 +60,7 @@ namespace PortableLibraryTelegramBot
 
         #region Private Methods
 
-        private async Task ProcessTextMessageAsync(string message, ChatId chatId, DatabaseService service,
-            LibraryService libraryService, BookService bookService, TvShowService tvShowService)
+        private async Task ProcessTextMessageAsync(string message, ChatId chatId, DatabaseService service)
         {
             try
             {
@@ -89,7 +88,7 @@ namespace PortableLibraryTelegramBot
                     else
                     {
                         // process inline command string
-                        var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service, libraryService, bookService, tvShowService);
+                        var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
                         var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, command, string.Join(" ", items.Skip(1)));
                         if (!commandFound)
                             await SendDefaultAsync(chatId);
@@ -135,15 +134,8 @@ namespace PortableLibraryTelegramBot
             using (var context = new BotDataContext(options))
             {
                 var databaseService = new DatabaseService(context);
-                using (var libraryContext = new PortableLibraryDataContext(libraryOptions))
-                {
-                    var libraryService = new LibraryService(libraryContext);
-                    var bookService = new BookService(libraryContext);
-                    var tvShowService = new TvShowService(libraryContext);
 
-                    await ProcessTextMessageAsync(message.Text, message.Chat.Id, databaseService,
-                        libraryService, bookService, tvShowService);
-                }
+                await ProcessTextMessageAsync(message.Text, message.Chat.Id, databaseService);
             }
         }
 

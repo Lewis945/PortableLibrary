@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PortableLibrary.TelegramBot.Services
+namespace PortableLibrary.Core.Services
 {
     public interface ILibraryService
     {

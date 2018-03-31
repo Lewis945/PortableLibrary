@@ -1,7 +1,6 @@
 ﻿using PortableLibrary.TelegramBot.Configuration;
 using PortableLibrary.TelegramBot.Configuration.Commands.Enums.Inline;
 using PortableLibrary.TelegramBot.Configuration.Commands.Models.Inline;
-using PortableLibrary.TelegramBot.EventHandlers;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Messaging.Mappings;
 using PortableLibrary.TelegramBot.Processing.Models;
@@ -16,7 +15,7 @@ using Telegram.Bot.Types;
 
 namespace PortableLibrary.TelegramBot.Processing.Inline
 {
-    public class InlineCommandProcessor
+    public partial class InlineCommandProcessor
     {
         #region Fields
 
@@ -24,22 +23,16 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
         private readonly TelegramConfiguration _configuration;
         private DatabaseService _databaseService;
 
-        private readonly AddCommandInlineProcessor _addCommandInlineProcessor;
-
         #endregion Fields
 
         #region .ctor
 
         public InlineCommandProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
-            DatabaseService databaseService, ILibraryService libraryService, IBookService bookService,
-            ITvShowService tvShowService)
+            DatabaseService databaseService)
         {
             _client = client;
             _configuration = configuration;
             _databaseService = databaseService;
-
-            _addCommandInlineProcessor = new AddCommandInlineProcessor(client, configuration, databaseService,
-                libraryService, bookService, tvShowService);
         }
 
         #endregion .ctor
@@ -57,25 +50,24 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             }
 
             var argumentsList = GetArguments(command, arguments, aliasModel.Language, out var argumentsLineName);
-            if (argumentsList == null)
-            {
-                //send message: arguments are wrong
-                return false;
-            }
 
             switch (command.Command)
             {
                 case Command.Enter:
+                    await ProcessEnterInlineCommand(chatId, argumentsList,
+                        argumentsLineName, aliasModel.Language);
                     break;
 
                 case Command.Exit:
+                    await ProcessExitInlineCommand(chatId, argumentsList,
+                        argumentsLineName, aliasModel.Language);
                     break;
 
                 case Command.Cancel:
                     break;
 
                 case Command.Add:
-                    await _addCommandInlineProcessor.ProcessAddInlineCommand(chatId, argumentsList,
+                    await ProcessAddInlineCommand(chatId, argumentsList,
                         argumentsLineName, aliasModel.Language);
                     break;
 
@@ -111,8 +103,11 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
             foreach (var argumentsLine in argumentsLines)
             {
+                if (argumentsLine.Line == null)
+                    continue;
+
                 var formattedPattern =
-                    FormatArgumentsPattern(argumentsLine.Line, argumentsLine.Arguments);
+                FormatArgumentsPattern(argumentsLine.Line, argumentsLine.Arguments);
 
                 var match = Regex.Match(arguments, formattedPattern);
                 if (!match.Success)
@@ -127,7 +122,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             }
 
             name = null;
-            return null;
+            return new List<ArgumentModel>();
         }
 
         private static string FormatArgumentsPattern(string pattern, IEnumerable<InlineArgument> arguments)

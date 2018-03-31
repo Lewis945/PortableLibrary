@@ -1,11 +1,8 @@
 ﻿using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Telegram.Bot;
+using PortableLibrary.Core.Services;
 
-namespace PortableLibrary.TelegramBot.Services
+namespace PortableLibrary.Core.Infrastructure.Services
 {
     public class LibraryService : ILibraryService
     {

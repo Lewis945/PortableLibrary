@@ -1,49 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using PortableLibrary.Core.Enums;
-using PortableLibrary.TelegramBot.Configuration;
+﻿using PortableLibrary.Core.Enums;
 using PortableLibrary.TelegramBot.Configuration.Commands.Enums.Inline.Add;
 using PortableLibrary.TelegramBot.EventHandlers;
 using PortableLibrary.TelegramBot.Extensions;
+using PortableLibrary.TelegramBot.Messaging.Commands.Add.Enums;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Processing.Models;
-using PortableLibrary.TelegramBot.Services;
-using Telegram.Bot;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace PortableLibrary.TelegramBot.Processing.Inline
 {
-    public class AddCommandInlineProcessor
+    public partial class InlineCommandProcessor
     {
-        #region Fields
+        #region Events
 
-        private readonly ITelegramBotClient _client;
-        private readonly TelegramConfiguration _configuration;
-        private DatabaseService _databaseService;
-
-        private ILibraryService _libraryService;
-        private IBookService _bookService;
-        private ITvShowService _tvShowService;
-
-        #endregion
-
-        #region .ctor
-
-        public AddCommandInlineProcessor(ITelegramBotClient client, TelegramConfiguration configuration,
-            DatabaseService databaseService, ILibraryService libraryService, IBookService bookService, 
-            ITvShowService tvShowService)
-        {
-            _client = client;
-            _configuration = configuration;
-            _databaseService = databaseService;
-
-            _libraryService = libraryService;
-            _bookService = bookService;
-            _tvShowService = tvShowService;
-        }
+        public event AddLibraryEventHandler OnAddLibrary;
 
         #endregion
 
@@ -71,7 +46,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
                     Enum.TryParse<LibraryType>(libraryType.Option, out var libType);
 
-                    _libraryService.AddLibrary(name.Alias, libType);
+                    OnAddLibrary?.Invoke(name.Alias, libType);
                     break;
                 case AddCommandInlineArgumentsLine.AddBook:
                     break;

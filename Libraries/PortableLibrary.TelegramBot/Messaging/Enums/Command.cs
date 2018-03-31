@@ -9,6 +9,8 @@
         Remove,
         SetName,
         Mark,
-        Display
+        Display,
+        EnableNotifications,
+        DisableNotifications
     }
 }

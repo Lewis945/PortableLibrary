@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PortableLibrary.TelegramBot.Configuration;
+using PortableLibrary.TelegramBot.Messaging.Commands.Add.Enums;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Services;
 using Telegram.Bot;

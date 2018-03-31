@@ -162,6 +162,202 @@
         }
       ],
       "Messages": []
+    },
+    {
+      "Command": "Remove",
+      "Aliases": [
+        {
+          "Alias": "Remove",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Удалить",
+          "Language": "rus"
+        }
+      ],
+      "ArgumentsSequence": [
+      ],
+      "ArgumentsLines": [
+        {
+          "Language": "eng",
+          "Name": "RemoveLibrary",
+          "Line": "{Type} {Name}",
+          "Arguments": [
+            {
+              "Argument": "Type",
+              "Type": "Match",
+              "Options": [
+                {
+                  "Option": "Library",
+                  "Alias": "Library"
+                }
+              ]
+            },
+            {
+              "Argument": "Name",
+              "Type": "String"
+            }
+          ]
+        },
+        {
+          "Language": "rus",
+          "Name": "RemoveLibrary",
+          "Line": "{Type} {Name}",
+          "Arguments": [
+            {
+              "Argument": "Type",
+              "Type": "Match",
+              "Options": [
+                {
+                  "Option": "Library",
+                  "Alias": "Библиотеку"
+                }
+              ]
+            },
+            {
+              "Argument": "Name",
+              "Type": "String"
+            }
+          ]
+        }
+      ],
+      "Messages": []
+    },
+    {
+      "Command": "Enter",
+      "Aliases": [
+        {
+          "Alias": "Enter",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Войти",
+          "Language": "rus"
+        }
+      ],
+      "ArgumentsSequence": [
+      ],
+      "ArgumentsLines": [
+        {
+          "Language": "eng",
+          "Name": "EnterLibrary",
+          "Line": "{Name}",
+          "Arguments": [
+            {
+              "Argument": "Name",
+              "Type": "String"
+            }
+          ]
+        },
+        {
+          "Language": "rus",
+          "Name": "EnterLibrary",
+          "Line": "{Name}",
+          "Arguments": [
+            {
+              "Argument": "Name",
+              "Type": "String"
+            }
+          ]
+        }
+      ],
+      "Messages": []
+    },
+    {
+      "Command": "Exit",
+      "Aliases": [
+        {
+          "Alias": "Exit",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Выйти",
+          "Language": "rus"
+        }
+      ],
+      "ArgumentsSequence": [
+      ],
+      "ArgumentsLines": [
+        {
+          "Language": "eng",
+          "Name": "ExitLibrary",
+          "Line": null,
+          "Arguments": [
+          ]
+        },
+        {
+          "Language": "rus",
+          "Name": "ExitLibrary",
+          "Line": null,
+          "Arguments": [
+          ]
+        }
+      ],
+      "Messages": []
+    },
+    {
+      "Command": "Display",
+      "Aliases": [
+        {
+          "Alias": "Display",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Показать",
+          "Language": "rus"
+        }
+      ],
+      "ArgumentsSequence": [
+      ],
+      "ArgumentsLines": [
+        {
+          "Language": "eng",
+          "Name": "Display",
+          "Line": null,
+          "Arguments": [
+          ]
+        },
+        {
+          "Language": "rus",
+          "Name": "Display",
+          "Line": null,
+          "Arguments": [
+          ]
+        }
+      ],
+      "Messages": []
+    },
+    {
+      "Command": "Mark",
+      "Aliases": [
+        {
+          "Alias": "Mark",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Пометить",
+          "Language": "rus"
+        }
+      ],
+      "ArgumentsSequence": [
+      ],
+      "ArgumentsLines": [
+        {
+          "Language": "eng",
+          "Name": "Mark",
+          "Line": null,
+          "Arguments": [
+          ]
+        },
+        {
+          "Language": "rus",
+          "Name": "Mark",
+          "Line": null,
+          "Arguments": [
+          ]
+        }
+      ],
+      "Messages": []
     }
   ],
   "GeneralMessages": [

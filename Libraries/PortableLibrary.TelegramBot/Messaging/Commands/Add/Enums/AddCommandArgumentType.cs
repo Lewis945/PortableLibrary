@@ -1,4 +1,4 @@
-﻿namespace PortableLibrary.TelegramBot.Messaging.Enums
+﻿namespace PortableLibrary.TelegramBot.Messaging.Commands.Add.Enums
 {
     public enum AddCommandArgumentType
     {
