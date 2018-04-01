@@ -42,7 +42,9 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             {
                 case EnterCommandInlineArgumentsLine.EnterLibrary:
                     var name = arguments.FirstOrDefault(a => a.Argument.Matches(EnterCommandArgumentType.Name));
-
+                    await _databaseService.AddNavigationPositionAsync(chatId.Identifier,
+                        EnterCommandInlineArgumentsLine.EnterLibrary.ToString(), name.Alias);
+                    await _databaseService.SaveAsync();
                     OnEnterLibrary?.Invoke(name.Alias);
                     break;
                 default:

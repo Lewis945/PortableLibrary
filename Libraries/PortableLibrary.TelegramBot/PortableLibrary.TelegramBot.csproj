@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configuration\Commands" />
+    <Folder Include="Messaging\Commands\Exit\Enums\" />
   </ItemGroup>
 </Project>

@@ -16,6 +16,7 @@ namespace PortableLibrary.TelegramBot.Data.Database
         #region DbSets
 
         public DbSet<ChatCommandSequenceState> ChatCommandSequencesState { get; set; }
+        public DbSet<ChatNavigationState> ChatNavigationsState { get; set; }
 
         #endregion
     }

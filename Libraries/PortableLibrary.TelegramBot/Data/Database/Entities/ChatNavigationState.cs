@@ -4,19 +4,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.TelegramBot.Data.Database.Entities
 {
-    public class ChatCommandSequenceState
+    public class ChatNavigationState
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ChatCommandSequenceStateId { get; set; }
-        public int? ParentChatCommandSequenceStateId { get; set; }
+        public int ChatNavigationStateId { get; set; }
+        public int? ParentChatNavigationStateId { get; set; }
 
         public long ChatId { get; set; }
 
-        public string Command { get; set; }
-        public string Language { get; set; }
+        public string Position { get; set; }
+        public string Value { get; set; }
 
         public DateTime CreationDate { get; set; }
 
-        public virtual ChatCommandSequenceState ParentChatCommandSequenceState { get; set; }
+        public virtual ChatNavigationState ParentChatNavigationState { get; set; }
     }
 }

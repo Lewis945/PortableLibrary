@@ -83,13 +83,16 @@ namespace PortableLibraryTelegramBot
                         var commandSequenceProcessor = new CommandSequenceProcessor(_client, _configuration, service);
                         var commandFound = await commandSequenceProcessor.StartCommandSequence(chatId, command);
                         if (!commandFound)
-                            await SendDefaultAsync(chatId);
+                        {
+                            commandFound = await ProcessInlineComamnd(chatId.Identifier, command, string.Join(" ", items.Skip(1)), service);
+                            if (!commandFound)
+                                await SendDefaultAsync(chatId);
+                        }
                     }
                     else
                     {
                         // process inline command string
-                        var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
-                        var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, command, string.Join(" ", items.Skip(1)));
+                        var commandFound = await ProcessInlineComamnd(chatId.Identifier, command, string.Join(" ", items.Skip(1)), service);
                         if (!commandFound)
                             await SendDefaultAsync(chatId);
                     }
@@ -108,6 +111,14 @@ namespace PortableLibraryTelegramBot
                 await service.ClearSequence(chatId.Identifier);
                 throw;
             }
+        }
+
+        private async Task<bool> ProcessInlineComamnd(long chatId, string command, string arguments, DatabaseService service)
+        {
+            // process inline command string
+            var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
+            var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, command, arguments);
+            return commandFound;
         }
 
         #endregion

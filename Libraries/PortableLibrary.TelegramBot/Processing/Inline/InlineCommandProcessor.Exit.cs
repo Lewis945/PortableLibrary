@@ -1,5 +1,4 @@
 ﻿using PortableLibrary.TelegramBot.EventHandlers;
-using PortableLibrary.TelegramBot.Messaging.Commands.Exit.Enums;
 using PortableLibrary.TelegramBot.Messaging.Enums;
 using PortableLibrary.TelegramBot.Processing.Models;
 using System;
@@ -21,8 +20,8 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         #region Public Methods
 
-        public async Task<bool> ProcessExitInlineCommand(ChatId chatId, List<ArgumentModel> arguments,
-            string argumentsLineName, string language)
+        public async Task<bool> ProcessExitInlineCommand(ChatId chatId, List<ArgumentModel> arguments, 
+            string language)
         {
             await _client.SendChatActionAsync(chatId, ChatAction.Typing);
             await Task.Delay(1000);
@@ -33,16 +32,9 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                 return false;
             }
 
-            Enum.TryParse<ExitCommandInlineArgumentsLine>(argumentsLineName, out var type);
-
-            switch (type)
-            {
-                case ExitCommandInlineArgumentsLine.ExitLibrary:
-                    OnExitLibrary?.Invoke();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            await _databaseService.ClearLocations(chatId.Identifier);
+            await _databaseService.SaveAsync();
+            OnExitLibrary?.Invoke();
 
             await _client.SendTextMessageAsync(chatId,
                 _configuration.GetGeneralMessage(GeneralMessage.Success, language));

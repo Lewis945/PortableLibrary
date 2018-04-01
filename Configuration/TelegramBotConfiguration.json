@@ -278,20 +278,6 @@
       "ArgumentsSequence": [
       ],
       "ArgumentsLines": [
-        {
-          "Language": "eng",
-          "Name": "ExitLibrary",
-          "Line": null,
-          "Arguments": [
-          ]
-        },
-        {
-          "Language": "rus",
-          "Name": "ExitLibrary",
-          "Line": null,
-          "Arguments": [
-          ]
-        }
       ],
       "Messages": []
     },
@@ -390,14 +376,28 @@
     },
 
     {
-      "Type": "YourCurrentSelection",
+      "Type": "CurrentSelection",
       "Aliases": [
         {
-          "Alias": "Your current selection: {0}",
+          "Alias": "Current selection: {0}",
           "Language": "eng"
         },
         {
-          "Alias": "Ваш текущий выбор: {0}",
+          "Alias": "Текущий выбор: {0}",
+          "Language": "rus"
+        }
+      ]
+    },
+
+    {
+      "Type": "CurrentLocation",
+      "Aliases": [
+        {
+          "Alias": "Current location: {0}",
+          "Language": "eng"
+        },
+        {
+          "Alias": "Текущая локация: {0}",
           "Language": "rus"
         }
       ]

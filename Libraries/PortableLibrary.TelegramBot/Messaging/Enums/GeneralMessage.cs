@@ -4,7 +4,8 @@
     {
         Choose,
         EnterName,
-        YourCurrentSelection,
+        CurrentSelection,
+        CurrentLocation,
         Success
     }
 }

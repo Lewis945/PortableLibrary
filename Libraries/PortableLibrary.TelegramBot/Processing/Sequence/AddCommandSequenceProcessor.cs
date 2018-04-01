@@ -109,7 +109,7 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
         #region Private Methods
 
         private async Task<(bool Result, Type Type, string Language)> Prevalidate(ChatId chatId,
-    string alias)
+            string alias)
         {
             var command = Configuration.Commands.FirstOrDefault(c => c.Command == Command.Add);
             if (command == null)

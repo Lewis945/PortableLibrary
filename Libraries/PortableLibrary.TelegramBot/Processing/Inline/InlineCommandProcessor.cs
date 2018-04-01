@@ -60,7 +60,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
                 case Command.Exit:
                     await ProcessExitInlineCommand(chatId, argumentsList,
-                        argumentsLineName, aliasModel.Language);
+                        aliasModel.Language);
                     break;
 
                 case Command.Cancel:
@@ -87,6 +87,10 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
                     return false;
             }
 
+            var locationMessage = await GenerateCurrentLocationMessage(chatId.Identifier, aliasModel.Language);
+            if (locationMessage != null)
+                await _client.SendTextMessageAsync(chatId, locationMessage);
+
             return true;
         }
 
@@ -98,8 +102,6 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
             out string name)
         {
             var argumentsLines = command.ArgumentsLines.Where(a => a.Language == language).ToList();
-            if (argumentsLines.Count == 0)
-                throw new Exception("");
 
             foreach (var argumentsLine in argumentsLines)
             {
@@ -182,6 +184,17 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
                 yield return argumentModel;
             }
+        }
+
+        protected async Task<string> GenerateCurrentLocationMessage(long chatId, string language)
+        {
+            var positions = await _databaseService.GetLocation(chatId);
+            if (positions.Count == 0)
+                return null;
+
+            var message = _configuration.GetGeneralMessage(GeneralMessage.CurrentLocation, language);
+            return string.Format(message,
+                string.Join(" -> ", positions.Select(p => p.Value)));
         }
 
         #endregion Private Methods

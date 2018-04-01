@@ -50,8 +50,6 @@ namespace PortableLibrary.TelegramBot.Processing.Sequence
             {
                 case Command.Enter:
                     break;
-                case Command.Exit:
-                    break;
                 case Command.Cancel:
                     break;
                 case Command.Add:
