@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
-    public sealed class LibraryBook : BaseEntity
+    public class LibraryBook : BaseEntity
     {
         public LibraryBook()
         {

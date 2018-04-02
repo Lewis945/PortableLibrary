@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 {
-    public sealed class LibraryTvShowEpisode : BaseEntity
+    public class LibraryTvShowEpisode : BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LibraryTvShowEpisodeId { get; set; }

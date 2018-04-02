@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 {
-    public sealed class LibraryTvShowSeason : BaseEntity
+    public class LibraryTvShowSeason : BaseEntity
     {
         public LibraryTvShowSeason()
         {

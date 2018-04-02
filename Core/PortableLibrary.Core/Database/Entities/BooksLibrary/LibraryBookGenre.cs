@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
-    public sealed class LibraryBookGenre : BaseEntity
+    public class LibraryBookGenre : BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LibraryBookGenreId { get; set; }

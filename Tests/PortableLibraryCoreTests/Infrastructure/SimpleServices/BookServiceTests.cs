@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
-using PortableLibrary.Core.Database.Entities.Book;
+using PortableLibrary.Core.Database.Entities.BooksLibrary;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
 using Xunit;

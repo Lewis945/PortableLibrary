@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.Base;
-using PortableLibrary.Core.Database.Entities.Book;
-using PortableLibrary.Core.Database.Entities.TvShow;
+using PortableLibrary.Core.Database.Entities.BooksLibrary;
+using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
 using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.SimpleServices;
@@ -43,11 +43,11 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                 {
                     case LibraryType.Book:
                         library = new BooksLibrary();
-                        _context.BookLibraries.Add((BooksLibrary) library);
+                        _context.BookLibraries.Add((BooksLibrary)library);
                         break;
                     case LibraryType.TvShow:
                         library = new TvShowsLibrary();
-                        _context.TvShowsLibraries.Add((TvShowsLibrary) library);
+                        _context.TvShowsLibraries.Add((TvShowsLibrary)library);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -58,6 +58,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                 library.Name = name;
                 library.DateCreated = now;
                 library.DateModified = now;
+                library.IsPublished = true;
                 library.Alias = await GenerateAliasAsync(name, type);
 
                 await _context.SaveChangesAsync();
@@ -80,7 +81,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                     return false;
 
                 library.IsDeleted = true;
-                
+
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

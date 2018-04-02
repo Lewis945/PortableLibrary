@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
-    public sealed class LibraryBookCategory : BaseEntity
+    public class LibraryBookCategory : BaseEntity
     {
         public LibraryBookCategory()
         {

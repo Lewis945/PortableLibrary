@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
-using PortableLibrary.Core.Database.Entities.TvShow;
+using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
+using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.SimpleServices;
 
 namespace PortableLibrary.Core.Infrastructure.SimpleServices
@@ -42,9 +43,15 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                 if (libraryTvShow != null)
                     return false;
 
+                var now = DateTime.Now;
+
                 libraryTvShow = new LibraryTvShow
                 {
-                    Name = tvShowName
+                    Name = tvShowName,
+                    DateCreated = now,
+                    DateModified = now,
+                    Alias = await GenerateLibraryTvShowAliasAsync(tvShowName),
+                    IsPublished = true
                 };
 
                 library.TvShows.Add(libraryTvShow);
@@ -59,11 +66,41 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             return true;
         }
 
+        public async Task<bool> RemoveLibraryTvShowAsync(string name)
+        {
+            try
+            {
+                var tvShow = await _context.LibrariesTvShows.FirstOrDefaultAsync(show => show.Name == name);
+
+                if (tvShow == null)
+                    return false;
+
+                tvShow.IsDeleted = true;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<string> GenerateLibraryTvShowAliasAsync(string name)
+        {
+            var alias = name.FormatAlias();
+            var tvShow = await _context.LibrariesTvShows.FirstOrDefaultAsync(show => show.Alias == alias);
+            if (tvShow != null)
+                throw new Exception($"Tv show with the given alias ({alias}) already exists.");
+            return alias;
+        }
+
         #endregion
 
         #region Private Methods
 
-        
+
 
         #endregion
     }

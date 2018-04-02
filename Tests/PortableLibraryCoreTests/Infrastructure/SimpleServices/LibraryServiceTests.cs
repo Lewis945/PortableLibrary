@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
-using PortableLibrary.Core.Database.Entities.Book;
+using PortableLibrary.Core.Database.Entities.BooksLibrary;
 using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
@@ -38,7 +38,7 @@ namespace PortableLibraryCoreTests.Infrastructure.SimpleServices
             const string title = "Books library";
 
             using (var context =
-                new PortableLibraryDataContext(GetDatabaseOptions<PortableLibraryDataContext>("libserviceaddlibrary")))
+                new PortableLibraryDataContext(GetDatabaseOptions<PortableLibraryDataContext>("libserviceremovelibrary")))
             {
                 context.BookLibraries.Add(new BooksLibrary
                 {

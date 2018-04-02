@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortableLibrary.Core.Database.Entities.Book;
-using PortableLibrary.Core.Database.Entities.TvShow;
+using PortableLibrary.Core.Database.Entities.BooksLibrary;
+using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
 
 namespace PortableLibrary.Core.Database
 {
@@ -17,7 +17,10 @@ namespace PortableLibrary.Core.Database
         #region DbSets
 
         public DbSet<BooksLibrary> BookLibraries { get; set; }
+        public DbSet<LibraryBook> LibrariesBooks { get; set; }
+
         public DbSet<TvShowsLibrary> TvShowsLibraries { get; set; }
+        public DbSet<LibraryTvShow> LibrariesTvShows { get; set; }
 
         #endregion
     }
