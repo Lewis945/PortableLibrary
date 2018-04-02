@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
+using PortableLibrary.Core.Database.Entities.TvShow;
 using PortableLibrary.Core.SimpleServices;
 
 namespace PortableLibrary.Core.Infrastructure.SimpleServices
@@ -25,28 +27,27 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
 
         #region ITvShowService
 
-        public async Task<bool> AddLibraryTvShowAsync(string tvShowName, string author, string libraryName)
+        public async Task<bool> AddLibraryTvShowAsync(string tvShowName, string libraryName)
         {
             try
             {
                 var library =
-                    await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.Name == libraryName);
+                    await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.Name == libraryName);
 
                 if (library == null)
                     return false;
 
-                var libraryBook = library.Books.FirstOrDefault(b => b.Name == bookName && b.Author == author);
+                var libraryTvShow = library.TvShows.FirstOrDefault(show => show.Name == tvShowName);
 
-                if (libraryBook != null)
+                if (libraryTvShow != null)
                     return false;
 
-                libraryBook = new LibraryBook
+                libraryTvShow = new LibraryTvShow
                 {
-                    Name = bookName,
-                    Author = author
+                    Name = tvShowName
                 };
 
-                library.Books.Add(libraryBook);
+                library.TvShows.Add(libraryTvShow);
 
                 await _context.SaveChangesAsync();
             }

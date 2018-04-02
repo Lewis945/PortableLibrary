@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using PortableLibrary.Core.Database.Entities.Base;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PortableLibrary.Core.Database.Entities.TvShow
+namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 {
-    public class LibraryTvShowCategory
+    public sealed class LibraryTvShowCategory : BaseEntity
     {
         public LibraryTvShowCategory()
         {
@@ -15,8 +16,6 @@ namespace PortableLibrary.Core.Database.Entities.TvShow
         public int LibraryTvShowCategoryId { get; set; }
         public int? ParentLibraryTvShowCategoryId { get; set; }
         public int LibraryTvShowId { get; set; }
-
-        public int LanguageId { get; set; }
 
         public string Name { get; set; }
 

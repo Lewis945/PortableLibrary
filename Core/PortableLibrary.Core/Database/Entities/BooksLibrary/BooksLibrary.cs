@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PortableLibrary.Core.Database.Entities.Book
+namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
-    public sealed class BooksLibrary : BaseLibrary
+    public sealed sealed class BooksLibrary : BaseLibrary
     {
         public BooksLibrary()
         {

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using PortableLibrary.Core.Database.Entities.Base;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PortableLibrary.Core.Database.Entities.Book
+namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
-    public class LibraryBookCategory
+    public sealed class LibraryBookCategory : BaseEntity
     {
         public LibraryBookCategory()
         {
@@ -15,8 +16,6 @@ namespace PortableLibrary.Core.Database.Entities.Book
         public int LibraryBookCategoryId { get; set; }
         public int? ParentLibraryBookCategoryId { get; set; }
         public int LibraryBookId { get; set; }
-
-        public int LanguageId { get; set; }
 
         public string Name { get; set; }
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PortableLibrary.Core.Database.Entities.TvShow
+namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 {
-    public class TvShowsLibrary : BaseLibrary
+    public sealed class TvShowsLibrary : BaseLibrary
     {
         public TvShowsLibrary()
         {

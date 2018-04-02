@@ -1,11 +1,12 @@
-﻿using System;
+﻿using PortableLibrary.Core.Database.Entities.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PortableLibrary.Core.Database.Entities.Book
+namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
-    public class LibraryBook
+    public sealed class LibraryBook : BaseEntity
     {
         public LibraryBook()
         {
@@ -15,10 +16,7 @@ namespace PortableLibrary.Core.Database.Entities.Book
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LibraryBookId { get; set; }
-        public int? BookId { get; set; }
         public int BooksLibraryId { get; set; }
-
-        public int LanguageId { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -35,7 +33,6 @@ namespace PortableLibrary.Core.Database.Entities.Book
         public bool IsReadingPlanned { get; set; }
         public bool IsWaitingToBecomeGlobal { get; set; }
 
-        public virtual Book Book { get; set; }
         public virtual BooksLibrary BooksLibrary { get; set; }
 
         public virtual ICollection<LibraryBookGenre> Genres { get; set; }

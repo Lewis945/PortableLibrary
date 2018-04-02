@@ -1,15 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PortableLibrary.Core.Database.Entities.Base;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PortableLibrary.Core.Database.Entities.TvShow
+namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 {
-    public class LibraryTvShowGenre
+    public sealed class LibraryTvShowGenre : BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LibraryTvShowGenreId { get; set; }
         public int LibraryTvShowId { get; set; }
-
-        public int LanguageId { get; set; }
 
         public string Name { get; set; }
 
