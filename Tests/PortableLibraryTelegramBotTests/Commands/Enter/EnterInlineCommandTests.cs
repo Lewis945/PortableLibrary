@@ -14,7 +14,7 @@ namespace PortableLibraryTelegramBotTests.Commands.Enter
         public async Task Should_Process_English_Enters_Library_Command_With_Arguments()
         {
             const string libraryName = "Test library of books";
-            await SuccessfullyProcessEnterLibraryCommand("enter", libraryName, $"enterlibengdb", libraryName);
+            await SuccessfullyProcessEnterLibraryCommand("enter", libraryName, "enterlibengdb", libraryName);
         }
 
 
@@ -22,7 +22,7 @@ namespace PortableLibraryTelegramBotTests.Commands.Enter
         public async Task Should_Process_Russian_Enter_Library_Command_With_Arguments()
         {
             const string libraryName = "Тестовая бибилотека книг";
-            await SuccessfullyProcessEnterLibraryCommand("войти", libraryName, $"enterlibrusdb", libraryName);
+            await SuccessfullyProcessEnterLibraryCommand("войти", libraryName, "enterlibrusdb", libraryName);
         }
 
         #endregion

@@ -21,7 +21,7 @@ namespace PortableLibrary.TelegramBot.Processing.Inline
 
         private readonly ITelegramBotClient _client;
         private readonly TelegramConfiguration _configuration;
-        private DatabaseService _databaseService;
+        private readonly DatabaseService _databaseService;
 
         #endregion Fields
 

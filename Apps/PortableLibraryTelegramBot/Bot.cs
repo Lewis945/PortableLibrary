@@ -16,7 +16,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PortableLibraryTelegramBot
 {
-    public class Bot
+    public partial class Bot
     {
         #region Fields
 
@@ -117,6 +117,7 @@ namespace PortableLibraryTelegramBot
         {
             // process inline command string
             var inlineCommandProcessor = new InlineCommandProcessor(_client, _configuration, service);
+            RegisterInlineProcessingEventHandlers(inlineCommandProcessor);
             var commandFound = await inlineCommandProcessor.ProcessInlineCommand(chatId, command, arguments);
             return commandFound;
         }
@@ -137,10 +138,6 @@ namespace PortableLibraryTelegramBot
             var options = new DbContextOptionsBuilder<BotDataContext>()
                 .UseInMemoryDatabase(databaseName: "PortableLibrary")
                 .Options;
-
-            var libraryOptions = new DbContextOptionsBuilder<PortableLibraryDataContext>()
-               .UseInMemoryDatabase(databaseName: "PortableLibrary")
-               .Options;
 
             using (var context = new BotDataContext(options))
             {

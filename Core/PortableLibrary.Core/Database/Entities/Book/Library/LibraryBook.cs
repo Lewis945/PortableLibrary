@@ -22,7 +22,6 @@ namespace PortableLibrary.Core.Database.Entities.Book
 
         [Required]
         public string Name { get; set; }
-        public string OriginalName { get; set; }
         [Required]
         public string Author { get; set; }
         public string Comments { get; set; }

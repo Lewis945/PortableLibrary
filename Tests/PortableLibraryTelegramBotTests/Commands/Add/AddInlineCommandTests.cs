@@ -103,6 +103,7 @@ namespace PortableLibraryTelegramBotTests.Commands.Add
                     isAddLibraryTriggered = true;
                     Assert.Equal(libraryName, name);
                     Assert.Equal(libraryType, type);
+                    return Task.CompletedTask;
                 };
 
                 await commandSequenceProcessor.ProcessInlineCommand(_chatId, commandAlias, arguments);
