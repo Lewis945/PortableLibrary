@@ -2,13 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 {
     /// <summary>
     /// http://online.animedia.tv
     /// </summary>
-    public class OnlineAnimediaExternalProvider : IExternalServiceProvider
+    public class OnlineAnimediaExternalProvider : IExternalServiceProvider<OnlineAnimediaTvShowModel>
     {
+        public string ProviderUri => "http://online.animedia.tv";
+        public Task<OnlineAnimediaTvShowModel> Extract()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

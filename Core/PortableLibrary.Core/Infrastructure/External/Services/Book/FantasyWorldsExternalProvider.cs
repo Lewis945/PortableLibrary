@@ -2,13 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
     /// <summary>
     /// https://fantasy-worlds.org
     /// </summary>
-    public class FantasyWorldsExternalProvider : IExternalServiceProvider
+    public class FantasyWorldsExternalProvider : IExternalServiceProvider<FantasyWorldsBookModel>
     {
+        public string ProviderUri => "https://fantasy-worlds.org";
+
+        public Task<FantasyWorldsBookModel> Extract()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

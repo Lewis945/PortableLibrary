@@ -2,13 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 {
     /// <summary>
     /// https://en.myshows.me/
     /// </summary>
-    public class MyShowsExternalProvider : IExternalServiceProvider
+    public class MyShowsExternalProvider : IExternalServiceProvider<MyShowsTvShowModel>
     {
+        public string ProviderUri => "https://en.myshows.me/";
+        public Task<MyShowsTvShowModel> Extract()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
