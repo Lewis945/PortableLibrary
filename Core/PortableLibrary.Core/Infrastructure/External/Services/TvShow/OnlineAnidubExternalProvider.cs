@@ -12,7 +12,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class OnlineAnidubExternalProvider : IExternalServiceProvider<OnlineAnidubTvShowModel>
     {
-        public string ProviderUri => "https://online.anidub.com/";
+        public string ServiceUri => "https://online.anidub.com/";
+        public string ServiceName => "AnidubOnline";
+
         public Task<OnlineAnidubTvShowModel> Extract()
         {
             throw new NotImplementedException();

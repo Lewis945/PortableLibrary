@@ -1,8 +1,8 @@
-﻿using PortableLibrary.Core.Database.Entities.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using PortableLibrary.Core.Database.Entities.Base;
 
 namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 {
@@ -12,16 +12,16 @@ namespace PortableLibrary.Core.Database.Entities.BooksLibrary
         {
             Genres = new List<LibraryBookGenre>();
             Categories = new List<LibraryBookCategory>();
+            ExternalServices = new List<LibraryBookExternalService>();
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LibraryBookId { get; set; }
+
         public int BooksLibraryId { get; set; }
 
-        [Required]
-        public string Name { get; set; }
-        [Required]
-        public string Author { get; set; }
+        [Required] public string Name { get; set; }
+        [Required] public string Author { get; set; }
         public string Comments { get; set; }
         public string CoverImage { get; set; }
 
@@ -37,5 +37,6 @@ namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 
         public virtual ICollection<LibraryBookGenre> Genres { get; set; }
         public virtual ICollection<LibraryBookCategory> Categories { get; set; }
+        public virtual ICollection<LibraryBookExternalService> ExternalServices { get; set; }
     }
 }

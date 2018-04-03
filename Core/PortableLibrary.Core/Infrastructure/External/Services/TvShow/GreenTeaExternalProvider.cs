@@ -12,7 +12,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class GreenTeaExternalProvider : IExternalServiceProvider<GreenTeaTvShowModel>
     {
-        public string ProviderUri => "http://green-tea.tv/";
+        public string ServiceUri => "http://green-tea.tv/";
+        public string ServiceName => "GreenTeaTv";
+
         public Task<GreenTeaTvShowModel> Extract()
         {
             throw new NotImplementedException();

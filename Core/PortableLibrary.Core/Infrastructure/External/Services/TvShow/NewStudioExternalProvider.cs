@@ -12,7 +12,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class NewStudioExternalProvider : IExternalServiceProvider<NewStudioTvShowModel>
     {
-        public string ProviderUri => "http://newstudio.tv/";
+        public string ServiceUri => "http://newstudio.tv/";
+        public string ServiceName => "NewStudio";
+
         public Task<NewStudioTvShowModel> Extract()
         {
             throw new NotImplementedException();

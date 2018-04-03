@@ -10,7 +10,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// </summary>
     public class FantLabExternalProvider : IExternalServiceProvider<FantasyWorldsBookModel>
     {
-        public string ProviderUri => "https://fantlab.ru";
+        public string ServiceUri => "https://fantlab.ru";
+        public string ServiceName => "FantLib";
 
         public Task<FantasyWorldsBookModel> Extract()
         {

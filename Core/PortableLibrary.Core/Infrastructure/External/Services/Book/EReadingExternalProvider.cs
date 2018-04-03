@@ -1,8 +1,6 @@
-﻿using PortableLibrary.Core.External.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
+using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
@@ -12,7 +10,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// </summary>
     public class EReadingExternalProvider : IExternalServiceProvider<EReadingBookModel>
     {
-        public string ProviderUri => "https://www.e-reading.club";
+        public string ServiceUri => "https://www.e-reading.club";
+        public string ServiceName => "EReading";
 
         public Task<EReadingBookModel> Extract()
         {

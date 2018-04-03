@@ -6,7 +6,8 @@ namespace PortableLibrary.Core.External.Services
     public interface IExternalServiceProvider<T>
         where T : IExternalModel
     {
-        string ProviderUri { get; }
+        string ServiceUri { get; }
+        string ServiceName { get; }
 
         Task<T> Extract();
     }

@@ -12,7 +12,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class OnlineAnimediaExternalProvider : IExternalServiceProvider<OnlineAnimediaTvShowModel>
     {
-        public string ProviderUri => "http://online.animedia.tv";
+        public string ServiceUri => "http://online.animedia.tv";
+        public string ServiceName => "AnimediaOnline";
+
         public Task<OnlineAnimediaTvShowModel> Extract()
         {
             throw new NotImplementedException();

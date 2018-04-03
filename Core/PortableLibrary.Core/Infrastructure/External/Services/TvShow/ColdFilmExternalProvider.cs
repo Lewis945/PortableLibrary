@@ -12,7 +12,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class ColdFilmExternalProvider : IExternalServiceProvider<ColdFilmTvShowModel>
     {
-        public string ProviderUri => "http://coldfilm.tv/";
+        public string ServiceUri => "http://coldfilm.tv/";
+        public string ServiceName => "ColdFilm";
+
         public Task<ColdFilmTvShowModel> Extract()
         {
             throw new NotImplementedException();

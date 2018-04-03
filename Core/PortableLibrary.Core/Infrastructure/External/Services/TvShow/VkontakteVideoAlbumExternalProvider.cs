@@ -10,7 +10,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class VkontakteVideoAlbumExternalProvider : IExternalServiceProvider<VkontakteVideoAlbumTvShowModel>
     {
-        public string ProviderUri => "http://vk.com/";
+        public string ServiceUri => "http://vk.com/";
+        public string ServiceName => "VkontakteAlbum";
 
         public Task<VkontakteVideoAlbumTvShowModel> Extract()
         {
