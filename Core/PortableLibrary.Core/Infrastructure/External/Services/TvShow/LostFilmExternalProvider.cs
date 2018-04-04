@@ -10,12 +10,27 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// </summary>
     public class LostFilmExternalProvider : IExternalServiceProvider<LostFilmTvShowModel>
     {
+        #region Properties
+
         public string ServiceUri => "https://www.lostfilm.tv";
         public string ServiceName => "LostFilm";
+
+        #endregion
+
+        #region IExternalServiceProvider
 
         public Task<LostFilmTvShowModel> Extract()
         {
             throw new NotImplementedException();
         }
+
+        public async Task<LostFilmTvShowModel> Extract(string uri)
+        {
+            var model = new LostFilmTvShowModel();
+
+            return model;
+        }
+
+        #endregion
     }
 }
