@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using PortableLibrary.Core.External.Services;
@@ -15,8 +16,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// </summary>
     public class LitresExternalProvider : IExternalServiceProvider<LitresBookModel>
     {
+        #region Properties
+
         public string ServiceUri => "https://www.litres.ru";
         public string ServiceName => "Litres";
+
+        #endregion
+
+        #region IExternalServiceProvider
 
         public async Task<LitresBookModel> Extract()
         {
@@ -31,147 +38,199 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             var document = web.Load(uri);
 
             //biblio_book_top block_table
-            var divInfo1 = document.DocumentNode.SelectNodes(".//div")
+            var divInfo1 = document.DocumentNode.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("biblio_book_top") && n.HasClass("block_table"));
 
-            if (divInfo1 == null)
-                throw new Exception("The first information container div.biblio_book_top.block_table is not found.");
-
-            #region Extract book's cover image
-
-            var imageUri = ExtractImage(divInfo1);
-            var imageByteArray = await GetImageAsByteArray(imageUri);
-
-            model.ImageUri = imageUri;
-            model.ImageByteArray = imageByteArray;
-
-            #endregion
-
-            #region Extract book's title
-
-            var h1Title = divInfo1.SelectNodes(".//h1").FirstOrDefault(n => n.HasClass("biblio_book_name"));
-            if (h1Title == null)
-                throw new Exception("Title h1.biblio_book_name is not found");
-
-            model.Title = h1Title.InnerText.Trim();
-
-            #endregion
-
-            #region Extract book's author
-
-            var divBiblioBookAuthor =
-                divInfo1.SelectNodes(".//div").FirstOrDefault(d => d.HasClass("biblio_book_author"));
-            if (divBiblioBookAuthor == null)
-                throw new Exception("div.biblio_book_author is not found.");
-
-            var authorLink = divBiblioBookAuthor.SelectSingleNode(".//a");
-            if (authorLink == null)
-                throw new Exception("Link (<a href=''><a/>) to author is not found.");
-
-            model.Author = authorLink.InnerText.Trim();
-
-            #endregion
-
-            #region Extract book's series
-
-            var divBiblioBookSequences = divInfo1.SelectNodes(".//div").Where(d => d.HasClass("biblio_book_sequences"))
-                .ToList();
-
-            foreach (var divBiblioBookSequence in divBiblioBookSequences)
+            if (divInfo1 != null)
             {
-                var spanSeries = divBiblioBookSequence.SelectNodes("./span")
-                    .FirstOrDefault(n => n.HasClass("serie_item"));
-                if (spanSeries != null)
+                #region Extract book's cover image
+
+                var imageUri = ExtractImage(divInfo1);
+                var imageByteArray = await GetImageAsByteArray(imageUri);
+
+                model.ImageUri = imageUri;
+                model.ImageByteArray = imageByteArray;
+
+                #endregion
+
+                #region Extract book's title
+
+                model.Title = ExtractBookTitle(divInfo1);
+
+                #endregion
+
+                #region Extract book's author
+
+                model.Author = ExtractBookAuthor(divInfo1);
+
+                #endregion
+
+                #region Extract book's series
+
+                var series = ExtractBookSeries(divInfo1).ToList();
+
+                var authorSeries = series.FirstOrDefault(s => s.Index > 0);
+                if (!authorSeries.Equals(default((string, int))))
                 {
-                    var spanNumber = spanSeries.SelectNodes("./span")?.FirstOrDefault(n => n.HasClass("number"));
-                    if (spanNumber != null)
-                    {
-                        var numberString = spanNumber.InnerText.Replace("#", string.Empty);
-                        int.TryParse(numberString, out var index);
-                        model.Index = index;
-                        model.AuthorSeries = spanSeries.InnerText.Replace(spanNumber.InnerText, string.Empty).Trim();
-                    }
-                    else
-                        model.PublishersSeries.Add(spanSeries.InnerText.Trim());
+                    model.AuthorSeries = authorSeries.Name;
+                    model.Index = authorSeries.Index;
                 }
+
+                var publisherSeries = series.Where(s => s.Index == 0).Select(s => s.Name).ToList();
+                model.PublishersSeries = publisherSeries.Count > 0 ? publisherSeries : null;
+
+                #endregion
+
+                #region Extract book's genres
+
+                model.Genres = ExtractBookGenres(divInfo1);
+
+                #endregion
             }
 
-            #endregion
-
-            #region Extract book's genres
-
-            var divBiblioBookInfo = divInfo1.SelectNodes(".//div")?.FirstOrDefault(d => d.HasClass("biblio_book_info"));
-            if (divBiblioBookInfo != null)
-            {
-                var liGenres = divBiblioBookInfo.SelectNodes(".//li")
-                    ?.FirstOrDefault(n => n.Descendants().First().InnerText == "Жанр:");
-
-                if (liGenres != null)
-                {
-                    model.Genres = liGenres.SelectNodes("./a")?.Select(n => n.InnerText.Trim()).ToList() ??
-                                   new List<string>();
-                }
-            }
-
-            #endregion
-
-            //biblio_book_bottom biblio_bottom__tab
-            var divInfo2 = document.DocumentNode.SelectNodes(".//div")
+            var divInfo2 = document.DocumentNode.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("biblio_book_bottom") && n.HasClass("biblio_bottom__tab"));
 
-            if (divInfo2 == null)
-                throw new Exception("The second information container div.biblio_book_top.block_table is not found.");
-
-            #region Extract book's description
-
-            //biblio_book_descr_publishers
-
-            var divBiblioBookDescrPublishers = divInfo2.SelectNodes(".//div")
-                ?.FirstOrDefault(n => n.HasClass("biblio_book_descr_publishers"));
-
-            if (divBiblioBookDescrPublishers != null)
+            if (divInfo2 != null)
             {
-                model.Description = divBiblioBookDescrPublishers.InnerText.Trim();
+                #region Extract book's description
+
+                model.Description = ExtractBookDescription(divInfo2);
+
+                #endregion
+
+                var divBiblioBookInfoDetailed = divInfo2.SelectNodes("//div")?
+                    .FirstOrDefault(n => n.HasClass("biblio_book_info_detailed"));
+
+                #region Extract book's publish date
+
+                model.DatePublished = ExtractBookPublishDate(divBiblioBookInfoDetailed);
+
+                #endregion
+
+                #region Extract book's pages count
+
+                model.PagesCount = ExtractBookPagesCount(divBiblioBookInfoDetailed);
+
+                #endregion
             }
-
-            #endregion
-
-            #region Extract book's publish date
-
-            #endregion
-
-            #region Extract book's pages count
-
-            #endregion
 
             return model;
         }
 
+        #endregion
+
+        #region Private Methods
+
         private static string ExtractImage(HtmlNode divInfo1)
         {
             var divBiblioBookCover =
-                divInfo1.SelectNodes(".//div").FirstOrDefault(d => d.HasClass("biblio_book_cover"));
-            if (divBiblioBookCover == null)
-                throw new Exception("div.biblio_book_cover is not found.");
+                divInfo1.SelectNodes(".//div")?.FirstOrDefault(d => d.HasClass("biblio_book_cover"));
 
-            var divBiblioBookCoverInside = divBiblioBookCover.SelectNodes(".//div")
+            var divBiblioBookCoverInside = divBiblioBookCover?.SelectNodes(".//div")?
                 .FirstOrDefault(d => d.HasClass("biblio_book_cover_inside"));
-            if (divBiblioBookCoverInside == null)
-                throw new Exception("div.biblio_book_cover_inside is not found.");
 
-            var img = divBiblioBookCoverInside.SelectNodes(".//img").FirstOrDefault();
-            if (img == null)
-                throw new Exception("img is not found.");
+            var img = divBiblioBookCoverInside?.SelectNodes(".//img")?.FirstOrDefault();
 
-            var imageUri = img.Attributes["data-original-image-url"].Value;
+            var imageUri = img?.Attributes["data-original-image-url"].Value;
             if (string.IsNullOrWhiteSpace(imageUri))
-                throw new Exception($"No source image is found: {img}.");
+                return null;
 
             if (imageUri.StartsWith("//"))
                 imageUri = imageUri.Substring(2);
 
             imageUri = $"https://{imageUri}";
             return imageUri;
+        }
+
+        private static string ExtractBookTitle(HtmlNode divInfo1)
+        {
+            var h1Title = divInfo1.SelectNodes(".//h1")?.FirstOrDefault(n => n.HasClass("biblio_book_name"));
+            return h1Title?.InnerText.Trim();
+        }
+
+        private static string ExtractBookAuthor(HtmlNode divInfo1)
+        {
+            var divBiblioBookAuthor =
+                divInfo1.SelectNodes(".//div")?.FirstOrDefault(d => d.HasClass("biblio_book_author"));
+            var authorLink = divBiblioBookAuthor?.SelectSingleNode(".//a");
+            return authorLink?.InnerText.Trim();
+        }
+
+        private static IEnumerable<(string Name, int Index)> ExtractBookSeries(HtmlNode divInfo1)
+        {
+            var divBiblioBookSequences = divInfo1.SelectNodes(".//div")?
+                .Where(d => d.HasClass("biblio_book_sequences"))
+                .ToList();
+
+            if (divBiblioBookSequences == null)
+                yield break;
+
+            foreach (var divBiblioBookSequence in divBiblioBookSequences)
+            {
+                var spanSeries = divBiblioBookSequence.SelectNodes("./span")?
+                    .FirstOrDefault(n => n.HasClass("serie_item"));
+                if (spanSeries == null) continue;
+
+                var spanNumber = spanSeries.SelectNodes("./span")?.FirstOrDefault(n => n.HasClass("number"));
+                if (spanNumber != null)
+                {
+                    var numberString = spanNumber.InnerText.Replace("#", string.Empty);
+                    int.TryParse(numberString, out var index);
+                    string series = spanSeries.InnerText.Replace(spanNumber.InnerText, string.Empty).Trim();
+                    yield return (series, index);
+                }
+                else
+                    yield return (spanSeries.InnerText.Trim(), 0);
+            }
+        }
+
+        private static List<string> ExtractBookGenres(HtmlNode divInfo1)
+        {
+            var divBiblioBookInfo =
+                divInfo1?.SelectNodes(".//div")?.FirstOrDefault(d => d.HasClass("biblio_book_info"));
+            var liGenres = divBiblioBookInfo?.SelectNodes(".//li")
+                ?.FirstOrDefault(n => n.Descendants().First().InnerText == "Жанр:");
+
+            return liGenres?.SelectNodes("./a")?.Select(n => n.InnerText.Trim()).ToList();
+        }
+
+        private static string ExtractBookDescription(HtmlNode divInfo2)
+        {
+            var divBiblioBookDescrPublishers = divInfo2?.SelectNodes(".//div")
+                ?.FirstOrDefault(n => n.HasClass("biblio_book_descr_publishers"));
+
+            return divBiblioBookDescrPublishers?.InnerText.Trim();
+        }
+
+        private static DateTime? ExtractBookPublishDate(HtmlNode divBiblioBookInfoDetailed)
+        {
+            if (divBiblioBookInfoDetailed == null) return null;
+
+            const string key = "Дата написания:";
+            var liDatePublished = divBiblioBookInfoDetailed.SelectNodes("//li")
+                ?.FirstOrDefault(n => n.Descendants().First().InnerText == key);
+
+            if (liDatePublished == null) return null;
+
+            var date = Regex.Match(liDatePublished.InnerText, @"\d+").Value;
+            int.TryParse(date, out var year);
+            return new DateTime(year, 1, 1);
+        }
+
+        private static int? ExtractBookPagesCount(HtmlNode divBiblioBookInfoDetailed)
+        {
+            if (divBiblioBookInfoDetailed == null) return null;
+
+            const string key = "Объем:";
+            var liPagesCount = divBiblioBookInfoDetailed.SelectNodes("//li")
+                ?.FirstOrDefault(n => n.Descendants().First().InnerText == key);
+
+            if (liPagesCount == null) return null;
+
+            var pagesCountString = Regex.Match(liPagesCount.InnerText, @"\d+").Value;
+            int.TryParse(pagesCountString, out var pagesCount);
+            return pagesCount;
         }
 
         //https://github.com/SixLabors/ImageSharp
@@ -181,11 +240,22 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             var response = await client.GetAsync(imageUri);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
-                throw new Exception($"The image ({imageUri}) is not found.");
+            {
+                //log this
+                //throw new Exception($"The image ({imageUri}) is not found.");
+                return null;
+            }
+
             if (response.StatusCode == HttpStatusCode.Forbidden)
-                throw new Exception($"Access to the image ({imageUri}) is forbidden.");
+            {
+                //log this
+                //throw new Exception($"Access to the image ({imageUri}) is forbidden.");
+                return null;
+            }
 
             return await response.Content.ReadAsByteArrayAsync();
         }
+
+        #endregion
     }
 }

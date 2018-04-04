@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Database\Migrations\" />
+    <Folder Include="Validation" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
