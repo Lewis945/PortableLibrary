@@ -14,12 +14,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// <summary>
     /// https://www.litres.ru
     /// </summary>
-    public class LitresExternalProvider : IExternalServiceProvider<LitresBookModel>
+    public class LitresExternalProvider : BaseExternalProvider, IExternalServiceProvider<LitresBookModel>
     {
         #region Properties
 
-        public string ServiceUri => "https://www.litres.ru";
-        public string ServiceName => "Litres";
+        public override string ServiceUri => "https://www.litres.ru";
+        public override string ServiceName => "Litres";
 
         #endregion
 
@@ -231,29 +231,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             var pagesCountString = Regex.Match(liPagesCount.InnerText, @"\d+").Value;
             int.TryParse(pagesCountString, out var pagesCount);
             return pagesCount;
-        }
-
-        //https://github.com/SixLabors/ImageSharp
-        private async Task<byte[]> GetImageAsByteArray(string imageUri)
-        {
-            var client = new HttpClient {BaseAddress = new Uri(ServiceUri)};
-            var response = await client.GetAsync(imageUri);
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                //log this
-                //throw new Exception($"The image ({imageUri}) is not found.");
-                return null;
-            }
-
-            if (response.StatusCode == HttpStatusCode.Forbidden)
-            {
-                //log this
-                //throw new Exception($"Access to the image ({imageUri}) is forbidden.");
-                return null;
-            }
-
-            return await response.Content.ReadAsByteArrayAsync();
         }
 
         #endregion
