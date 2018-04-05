@@ -308,9 +308,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
                 var spanEnglishTitle =
                     tdTitles.SelectSingleNode("./div")?.SelectSingleNode("./span");
-                episode.OriginalTitle = HttpUtility.HtmlDecode(spanEnglishTitle?.InnerText.Trim());
+                var originalTitle = spanEnglishTitle?.InnerText.Trim();
+                episode.OriginalTitle = HttpUtility.HtmlDecode(originalTitle);
 
-                string title = text.Replace(episode.OriginalTitle, string.Empty).Trim();
+                string title = text.Replace(originalTitle, string.Empty).Trim();
                 episode.Title = HttpUtility.HtmlDecode(title);
             }
 

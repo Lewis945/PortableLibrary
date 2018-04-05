@@ -9,6 +9,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 {
     public class LostFilmExternalProviderTests
     {
+        #region Tests
+
         [Fact]
         public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency()
         {
@@ -313,5 +315,140 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 
             #endregion
         }
+
+        [Fact]
+        public async Task Should_Extract_Anger_Management()
+        {
+            var service = new LostFilmExternalProvider();
+
+            var model = await service.Extract("https://www.lostfilm.tv/series/Anger_Management");
+
+            #region Tv Show
+
+            Assert.Equal("static.lostfilm.tv/Images/172/Posters/poster.jpg",
+                model.ImageUri, true);
+
+            Assert.Equal("Управление гневом", model.Title, true);
+            Assert.Equal("Anger Management", model.OriginalTitle, true);
+
+            Assert.True(model.IsComplete);
+
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Комедия", item, true)
+            );
+
+            string modelDescription = Regex.Replace(model.Description, @"\t|\n|\r|\s", string.Empty);
+
+            string testDescription ="Чарли, перед возвращением в стан своей бейсбольной команды прошел курс " +
+                "управления гневом, прежде чем доказать себе и окружающим, что он настоящий лидер команды. " +
+                "В результате он приводит команду к победе, после чего покидает ее. Выходит, пока Чарли " +
+                "борется со своим гневом, в его жизни процветает хаос. Всё осложняется его отношениями с " +
+                "собственным терапевтом и лучшим другом, бывшей женой, чьи позитивные взгляды на будущее, " +
+                "но при этом плохой выбор мужчин, расстраивают Чарли и их 13-летнюю дочь, имеющую " +
+                "психические расстройства.";
+
+            testDescription = Regex.Replace(testDescription, @"\t|\n|\r|\s", string.Empty);
+
+            Assert.Equal(testDescription, modelDescription, true);
+
+            Assert.NotNull(model.Seasons);
+            Assert.Equal(2, model.Seasons.Count);
+
+            #endregion
+
+            #region Season 1
+
+            var season1 = model.Seasons.First(s => s.Index == 1);
+            Assert.Equal(10, season1.TotalEpisodesCount);
+
+            Assert.NotNull(season1.Episodes);
+            Assert.Equal(10, season1.Episodes.Count);
+
+            #region Episode 1
+
+            var s1e1 = season1.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Чарли снова проходит терапию", s1e1.Title, true);
+            Assert.Equal("Charlie Goes Back to Therapy", s1e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2012, 7, 2), s1e1.DateReleased);
+            Assert.Equal(new DateTime(2012, 6, 28), s1e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 5
+
+            var s1e5 = season1.Episodes.First(e => e.Index == 5);
+
+            Assert.Equal("Чарли доказывает, что терапия — штука честная", s1e5.Title, true);
+            Assert.Equal("Charlie Tries to Prove Therapy Is Legit", s1e5.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2012, 7, 22), s1e5.DateReleased);
+            Assert.Equal(new DateTime(2012, 7, 19), s1e5.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 10
+
+            var s1e10 = season1.Episodes.First(e => e.Index == 10);
+
+            Assert.Equal("Чарли потянуло на романтику", s1e10.Title, true);
+            Assert.Equal("Charlie Gets Romantic", s1e10.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2012, 8, 25), s1e10.DateReleased);
+            Assert.Equal(new DateTime(2012, 8, 23), s1e10.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 2
+
+            var season2 = model.Seasons.First(s => s.Index == 2);
+            Assert.Equal(90, season2.TotalEpisodesCount);
+
+            Assert.NotNull(season2.Episodes);
+            Assert.Equal(90, season2.Episodes.Count);
+
+            #region Episode 1
+
+            var s2e1 = season2.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Как Чарли психанул на предрожденчике", s2e1.Title, true);
+            Assert.Equal("Charlie Loses it at a Baby Shower", s2e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2013, 1, 21), s2e1.DateReleased);
+            Assert.Equal(new DateTime(2013, 1, 17), s2e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 50
+
+            var s2e50 = season2.Episodes.First(e => e.Index == 50);
+
+            Assert.Equal("Чарли и Шон соревнуются из-за девушки", s2e50.Title, true);
+            Assert.Equal("Charlie and Sean Fight Over a Girl", s2e50.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2014, 3, 4), s2e50.DateReleased);
+            Assert.Equal(new DateTime(2014, 2, 27), s2e50.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 100
+
+            var s2e90 = season2.Episodes.First(e => e.Index == 90);
+
+            Assert.Equal("Чарли и сотая серия", s2e90.Title, true);
+            Assert.Equal("Charlie & the 100th Episode", s2e90.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2015, 1, 19), s2e90.DateReleased);
+            Assert.Equal(new DateTime(2014, 12, 22), s2e90.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+        }
+
+        #endregion
     }
 }

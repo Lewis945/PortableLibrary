@@ -15,6 +15,6 @@ namespace PortableLibrary.Core.Database.Entities.BooksLibrary
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BooksLibraryId { get; set; }
 
-        public ICollection<LibraryBook> Books { get; set; }
+        public virtual ICollection<LibraryBook> Books { get; set; }
     }
 }

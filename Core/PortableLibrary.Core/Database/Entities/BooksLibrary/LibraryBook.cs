@@ -12,7 +12,6 @@ namespace PortableLibrary.Core.Database.Entities.BooksLibrary
         {
             Genres = new List<LibraryBookGenre>();
             Categories = new List<LibraryBookCategory>();
-            ExternalServices = new List<LibraryBookExternalService>();
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -37,6 +36,5 @@ namespace PortableLibrary.Core.Database.Entities.BooksLibrary
 
         public virtual ICollection<LibraryBookGenre> Genres { get; set; }
         public virtual ICollection<LibraryBookCategory> Categories { get; set; }
-        public virtual ICollection<LibraryBookExternalService> ExternalServices { get; set; }
     }
 }

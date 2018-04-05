@@ -49,8 +49,7 @@ namespace PortableLibraryCoreTests.Infrastructure.SimpleServices
         #region Private Methods
 
         private DbContextOptions<T> GetDatabaseOptions<T>(string dbName)
-            where T : DbContext
-            =>
+            where T : DbContext =>
                 new DbContextOptionsBuilder<T>()
                     .UseInMemoryDatabase(databaseName: dbName)
                     .Options;
