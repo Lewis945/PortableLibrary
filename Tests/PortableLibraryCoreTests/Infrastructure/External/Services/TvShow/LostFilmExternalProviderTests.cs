@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PortableLibrary.Core.Infrastructure.External.Services.TvShow;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using PortableLibrary.Core.Infrastructure.External.Services.TvShow;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
@@ -51,7 +51,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
                 " напомнит вам об этом забытом ощущении шока и восторга. А запутанный, полный головоломок и " +
                 "интриг сюжет, завораживающая цветовая гамма, колоритные гипертрофированные персонажи и " +
                 "вызывающая параноидальные настроения музыка только укрепят чувство несуразности происходящего." +
-                " Сюжет" +
+                "Сюжет" +
                 "Очередной унылый день отельного коридорного Тодда Бротцмана (Элайджа Вуд) " +
                 "начинается с крика разъяренного домовладельца, крушащего его машину за неуплату аренды. " +
                 "Больная редким неврологическим заболеванием сестра просит денег на лечение, а на работе " +
@@ -447,6 +447,545 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
             #endregion
 
             #endregion
+        }
+
+        [Fact]
+        public async Task Should_Extract_Friends()
+        {
+            var service = new LostFilmExternalProvider();
+
+            var model = await service.Extract("https://www.lostfilm.tv/series/Friends");
+
+            #region Tv Show
+
+            Assert.Equal("static.lostfilm.tv/Images/72/Posters/poster.jpg",
+                model.ImageUri, true);
+
+            Assert.Equal("Друзья", model.Title, true);
+            Assert.Equal("Friends", model.OriginalTitle, true);
+
+            Assert.True(model.IsComplete);
+
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Комедия", item, true),
+                item => Assert.Equal("Семейный", item, true)
+            );
+
+            string modelDescription = Regex.Replace(model.Description, @"\t|\n|\r|\s", string.Empty);
+
+            string testDescription = "«Друзья» — это ситком, который с середины 90-х и на долгие годы задал " +
+                "тон всем комедийным телешоу о том, как в одной компании могут уживаться, дружить, любить, " +
+                "строить карьеры, бездельничать и бесконечно шутить самые разные по характеру молодые люди. " +
+                "Начиная с первого эпизода и на протяжении всех десяти лет трансляции качество юмора в этом " +
+                "шоу приносило ему стабильно высокие рейтинги. Сплоченная команда сценаристов в поте лица " +
+                "трудилась над тем, чтобы шутка была почти в каждой реплике. Уморительные, абсурдные, " +
+                "нарочито несмешные, искрометные, добродушные, язвительные — все виды шуток, существующие " +
+                "в природе, вы найдете в «Друзьях». Но не только в этом секрет бешеной популярности, " +
+                "культового статуса сериала и причисление его к классике жанра. «Друзья» показывают нам " +
+                "нас такими, какими мы хотим себя видеть, — молодыми, беззаботными, неунывающими, полными " +
+                "надежд и еще не успевшими разочароваться в жизни. Также стоит отметить, что ситком послужил " +
+                "толчком для карьер всех главных актеров, которых долгое время поклонники называли " +
+                "исключительно по именам их персонажей. За десять лет успешных показов «Друзья» заработали " +
+                "почти семь десятков наград, включая шесть премий «Эмми»." +
+                "СЮЖЕТ" +
+                "Их шестеро.Они молоды, красивы, " +
+                "живут в большом городе, ходят на работу, вместе отмечают праздники и переживают потери, а " +
+                "свободное время любят проводить в одном и том же кафе за обсуждением последних новостей. " +
+                "Росс(Дэвид Швиммер) — палеонтолог, которого бросила жена, и он очень из-за этого страдает. " +
+                "Его младшая сестра Моника(Кортни Кокс) собирается на свидание с очаровательным кавалером и " +
+                "смущается от подколов друзей на тему того, что он снова окажется не «тем самым». " +
+                "Чендлер(Мэттью Перри) пришел в кафе, чтобы рассказать всем о том, что ему приснился «голый» сон." +
+                "Джоуи(Мэтт ЛеБлан) советует бедолаге Россу избавиться от душевных мук посредством похода на " +
+                "стриптиз, а Фиби(Лиза Кудроу) с готовностью принялась чистить расстроенному другу карму, " +
+                "совершая пассы руками над его головой. Внезапно в кафе врывается Рэйчел(Дженнифер Энистон) в " +
+                "свадебном платье — прямо во время свадебной церемонии девушка поняла, что голова ее жениха " +
+                "слишком похожа на брюкву, и вообще она этого мужчину ни капельки не любит, поэтому подхватила " +
+                "подол белоснежного наряда и сбежала... к друзьям в кафе. Чуть позже, уже в квартире у Моники, " +
+                "Рэйчел поругается по телефону с отцом и решит немного пожить у подруги.Тем временем Росс, " +
+                "влюбленный в Рэйчел с детства, наберется храбрости и пригласит ее как-нибудь куда - нибудь " +
+                "сходить.С этого и начнется череда забавных, но жизненных приключений шестерых героев. Монике, " +
+                "Россу, Рэйчел, Джоуи, Чендлеру и Фиби предстоит пережить лучшие и худшие моменты, неоднократно " +
+                "подставлять друг другу плечо, делиться советами, едой и деньгами, дарить любовь и спорить." +
+                "И все это они будут делать исключительно вместе, ведь они — настоящие друзья.";
+
+            testDescription = Regex.Replace(testDescription, @"\t|\n|\r|\s", string.Empty);
+
+            Assert.Equal(testDescription, modelDescription, true);
+
+            Assert.NotNull(model.Seasons);
+            Assert.Equal(10, model.Seasons.Count);
+
+            #endregion
+
+            #region Season 1
+
+            var season1 = model.Seasons.First(s => s.Index == 1);
+            Assert.Equal(24, season1.TotalEpisodesCount);
+
+            Assert.NotNull(season1.Episodes);
+            Assert.Equal(24, season1.Episodes.Count);
+
+            #region Episode 1
+
+            var s1e1 = season1.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия, где Моника берет новую соседку", s1e1.Title, true);
+            Assert.Equal("The One Where Monica Gets A Roommate", s1e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 14), s1e1.DateReleased);
+            Assert.Equal(new DateTime(1994, 9, 22), s1e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s1e12 = season1.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия с дюжиной лазаний", s1e12.Title, true);
+            Assert.Equal("The One With The Dozen Lasagnas", s1e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 14), s1e12.DateReleased);
+            Assert.Equal(new DateTime(1995, 1, 12), s1e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s1e24 = season1.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия, где Рейчел понимает", s1e24.Title, true);
+            Assert.Equal("The One Where Rachel Finds Out", s1e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 14), s1e24.DateReleased);
+            Assert.Equal(new DateTime(1995, 5, 18), s1e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 2
+
+            var season2 = model.Seasons.First(s => s.Index == 2);
+            Assert.Equal(24, season2.TotalEpisodesCount);
+
+            Assert.NotNull(season2.Episodes);
+            Assert.Equal(24, season2.Episodes.Count);
+
+            #region Episode 1
+
+            var s2e1 = season2.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия с новой подругой Росса", s2e1.Title, true);
+            Assert.Equal("The One With Ross's New Girlfriend", s2e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 15), s2e1.DateReleased);
+            Assert.Equal(new DateTime(1995, 9, 21), s2e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s2e12 = season2.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия после Суперкубка. Часть 1", s2e12.Title, true);
+            Assert.Equal("The One After The Super Bowl (1)", s2e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 15), s2e12.DateReleased);
+            Assert.Equal(new DateTime(1996, 1, 28), s2e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s2e24 = season2.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия со свадьбой Барри и Минди", s2e24.Title, true);
+            Assert.Equal("The One With Barry And Mindy's Wedding", s2e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 15), s2e24.DateReleased);
+            Assert.Equal(new DateTime(1996, 5, 16), s2e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 3
+
+            var season3 = model.Seasons.First(s => s.Index == 3);
+            Assert.Equal(25, season3.TotalEpisodesCount);
+
+            Assert.NotNull(season3.Episodes);
+            Assert.Equal(25, season3.Episodes.Count);
+
+            #region Episode 1
+
+            var s3e1 = season3.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия с фантазией о принцессе Лейе", s3e1.Title, true);
+            Assert.Equal("The One With The Princess Leia Fantasy", s3e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 18), s3e1.DateReleased);
+            Assert.Equal(new DateTime(1996, 9, 16), s3e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s3e12 = season3.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия с ревностью всех", s3e12.Title, true);
+            Assert.Equal("The One With All The Jealousy", s3e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 18), s3e12.DateReleased);
+            Assert.Equal(new DateTime(1997, 1, 16), s3e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 25
+
+            var s3e25 = season3.Episodes.First(e => e.Index == 25);
+
+            Assert.Equal("Серия на пляже", s3e25.Title, true);
+            Assert.Equal("The One At The Beach", s3e25.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 18), s3e25.DateReleased);
+            Assert.Equal(new DateTime(1997, 5, 15), s3e25.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 4
+
+            var season4 = model.Seasons.First(s => s.Index == 4);
+            Assert.Equal(24, season4.TotalEpisodesCount);
+
+            Assert.NotNull(season4.Episodes);
+            Assert.Equal(24, season4.Episodes.Count);
+
+            #region Episode 1
+
+            var s4e1 = season4.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия с медузой", s4e1.Title, true);
+            Assert.Equal("The One With The Jellyfish", s4e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 19), s4e1.DateReleased);
+            Assert.Equal(new DateTime(1997, 9, 25), s4e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s4e12 = season4.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия с эмбрионами", s4e12.Title, true);
+            Assert.Equal("The One With The Embryos", s4e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 19), s4e12.DateReleased);
+            Assert.Equal(new DateTime(1998, 1, 15), s4e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s4e24 = season4.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия со свадьбой Росса. Часть 2", s4e24.Title, true);
+            Assert.Equal("The One With Ross's Wedding (2)", s4e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 19), s4e24.DateReleased);
+            Assert.Equal(new DateTime(1998, 5, 7), s4e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 5
+
+            var season5 = model.Seasons.First(s => s.Index == 5);
+            Assert.Equal(24, season5.TotalEpisodesCount);
+
+            Assert.NotNull(season5.Episodes);
+            Assert.Equal(24, season5.Episodes.Count);
+
+            #region Episode 1
+
+            var s5e1 = season5.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия после того, как Росс назвал имя Рэйчел", s5e1.Title, true);
+            Assert.Equal("The One After Ross Says Rachel", s5e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 22), s5e1.DateReleased);
+            Assert.Equal(new DateTime(1998, 9, 24), s5e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s5e12 = season5.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия с рабочим смехом Чендлера", s5e12.Title, true);
+            Assert.Equal("The One With Chandler's Work Laugh", s5e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 22), s5e12.DateReleased);
+            Assert.Equal(new DateTime(1999, 1, 21), s5e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s5e24 = season5.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия в Вегасе. Часть 2", s5e24.Title, true);
+            Assert.Equal("The One In Vegas (2)", s5e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 22), s5e24.DateReleased);
+            Assert.Equal(new DateTime(1999, 5, 20), s5e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 6
+
+            var season6 = model.Seasons.First(s => s.Index == 6);
+            Assert.Equal(25, season6.TotalEpisodesCount);
+
+            Assert.NotNull(season6.Episodes);
+            Assert.Equal(25, season6.Episodes.Count);
+
+            #region Episode 1
+
+            var s6e1 = season6.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия после Вегаса", s6e1.Title, true);
+            Assert.Equal("The One After Vegas", s6e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 25), s6e1.DateReleased);
+            Assert.Equal(new DateTime(1999, 9, 23), s6e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s6e12 = season6.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия c шуткой", s6e12.Title, true);
+            Assert.Equal("The One With The Joke", s6e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 25), s6e12.DateReleased);
+            Assert.Equal(new DateTime(2000, 1, 13), s6e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 25
+
+            var s6e25 = season6.Episodes.First(e => e.Index == 25);
+
+            Assert.Equal("Серия с предложением. Часть 2", s6e25.Title, true);
+            Assert.Equal("The One With The Proposal (2)", s6e25.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 25), s6e25.DateReleased);
+            Assert.Equal(new DateTime(2000, 5, 18), s6e25.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 7
+
+            var season7 = model.Seasons.First(s => s.Index == 7);
+            Assert.Equal(24, season7.TotalEpisodesCount);
+
+            Assert.NotNull(season7.Episodes);
+            Assert.Equal(24, season7.Episodes.Count);
+
+            #region Episode 1
+
+            var s7e1 = season7.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия с вечеринкой Моники", s7e1.Title, true);
+            Assert.Equal("The One With Monica's Thunder", s7e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 27), s7e1.DateReleased);
+            Assert.Equal(new DateTime(2000, 10, 12), s7e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s7e12 = season7.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия, в которой никто не спит", s7e12.Title, true);
+            Assert.Equal("The One Where They're Up All Night", s7e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 27), s7e12.DateReleased);
+            Assert.Equal(new DateTime(2001, 1, 11), s7e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s7e24 = season7.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия со свадьбой Моники и Чендлера. Часть 2", s7e24.Title, true);
+            Assert.Equal("The One With Chandler And Monica's Wedding (2)", s7e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2006, 12, 27), s7e24.DateReleased);
+            Assert.Equal(new DateTime(2001, 5, 17), s7e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 8
+
+            var season8 = model.Seasons.First(s => s.Index == 8);
+            Assert.Equal(24, season8.TotalEpisodesCount);
+
+            Assert.NotNull(season8.Episodes);
+            Assert.Equal(24, season8.Episodes.Count);
+
+            #region Episode 1
+
+            var s8e1 = season8.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия после слов «Я согласен»", s8e1.Title, true);
+            Assert.Equal("The One After I Do", s8e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 3), s8e1.DateReleased);
+            Assert.Equal(new DateTime(2001, 9, 27), s8e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s8e12 = season8.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия, в которой Джо идет на свидание с Рэйчел", s8e12.Title, true);
+            Assert.Equal("The One Where Joey Dates Rachel", s8e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 3), s8e12.DateReleased);
+            Assert.Equal(new DateTime(2002, 1, 10), s8e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s8e24 = season8.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия, в которой рождается ребёнок. Часть 2", s8e24.Title, true);
+            Assert.Equal("The One Where Rachel Has A Baby (2)", s8e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 3), s8e24.DateReleased);
+            Assert.Equal(new DateTime(2002, 5, 16), s8e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 9
+
+            var season9 = model.Seasons.First(s => s.Index == 9);
+            Assert.Equal(24, season9.TotalEpisodesCount);
+
+            Assert.NotNull(season9.Episodes);
+            Assert.Equal(24, season9.Episodes.Count);
+
+            #region Episode 1
+
+            var s9e1 = season9.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия, в которой никто не делает предложения", s9e1.Title, true);
+            Assert.Equal("The One Where No One Proposes", s9e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 8), s9e1.DateReleased);
+            Assert.Equal(new DateTime(2002, 9, 26), s9e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 12
+
+            var s9e12 = season9.Episodes.First(e => e.Index == 12);
+
+            Assert.Equal("Серия с крысами Фиби", s9e12.Title, true);
+            Assert.Equal("The One With Phoebe's Rats", s9e12.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 8), s9e12.DateReleased);
+            Assert.Equal(new DateTime(2003, 1, 16), s9e12.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 24
+
+            var s9e24 = season9.Episodes.First(e => e.Index == 24);
+
+            Assert.Equal("Серия на Барбадосе. Часть 2", s9e24.Title, true);
+            Assert.Equal("The One In Barbados (2)", s9e24.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 8), s9e24.DateReleased);
+            Assert.Equal(new DateTime(2003, 5, 15), s9e24.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+
+            #region Season 10
+
+            var season10 = model.Seasons.First(s => s.Index == 10);
+            Assert.Equal(18, season10.TotalEpisodesCount);
+
+            Assert.NotNull(season10.Episodes);
+            Assert.Equal(18, season10.Episodes.Count);
+
+            #region Episode 1
+
+            var s10e1 = season10.Episodes.First(e => e.Index == 1);
+
+            Assert.Equal("Серия после поцелуя Джо и Рейчел", s10e1.Title, true);
+            Assert.Equal("The One After Joey And Rachel Kiss", s10e1.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 10), s10e1.DateReleased);
+            Assert.Equal(new DateTime(2003, 9, 25), s10e1.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 9
+
+            var s9e9 = season10.Episodes.First(e => e.Index == 9);
+
+            Assert.Equal("Серия с суррогатной матерью", s9e9.Title, true);
+            Assert.Equal("The One With The Birth Mother", s9e9.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 10), s9e9.DateReleased);
+            Assert.Equal(new DateTime(2004, 1, 8), s9e9.DateOriginalReleased);
+
+            #endregion
+
+            #region Episode 18
+
+            var s9e18 = season10.Episodes.First(e => e.Index == 18);
+
+            Assert.Equal("Последняя серия. Часть 2", s9e18.Title, true);
+            Assert.Equal("The Last One: Part 2", s9e18.OriginalTitle, true);
+
+            Assert.Equal(new DateTime(2007, 1, 10), s9e18.DateReleased);
+            Assert.Equal(new DateTime(2004, 5, 5), s9e18.DateOriginalReleased);
+
+            #endregion
+
+            #endregion
+        }
+
+        [Fact]
+        public async Task Should_Extract_Desperate_Housewives()
+        {
+            var service = new LostFilmExternalProvider();
+
+            var model = await service.Extract("https://www.lostfilm.tv/series/Desperate_Housewives");
+
+            
         }
 
         #endregion

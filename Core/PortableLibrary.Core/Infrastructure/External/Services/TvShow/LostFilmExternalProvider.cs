@@ -98,11 +98,13 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
                 .FirstOrDefault(n => n.HasClass("title-ru"));
 
             string title = HttpUtility.HtmlDecode(divTitleRu?.InnerText.Trim());
+            title = Regex.Replace(title, @"\s+", " ");
 
             var divTitleEn = divFirstTitleBlock?.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("title-en"));
 
             string originalTitle = HttpUtility.HtmlDecode(divTitleEn?.InnerText.Trim());
+            originalTitle = Regex.Replace(originalTitle, @"\s+", " ");
 
             return (title, originalTitle);
         }
@@ -160,11 +162,13 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
                 if (addDescendants)
                 {
                     var innerText = descendant.InnerText.ToLowerInvariant().Trim();
-                    var match = Regex.Match(innerText, @"^\w+:{1}$");
+                    var match = Regex.Match(innerText, @"^[\w\s]+:{1}$");
                     if (descendant.NodeType == HtmlNodeType.Text && match.Success)
                         break;
 
-                    filteredDescendant.Add(descendant);
+                    match = Regex.Match(innerText, @"^[\w\s]+$");
+                    if (match.Success)
+                        filteredDescendant.Add(descendant);
                 }
 
                 if (descendant.NodeType == HtmlNodeType.Text && descendant.InnerText.Trim().Equals(genreKey))
@@ -194,7 +198,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             if (divInnerBody == null)
                 return null;
 
-            return HttpUtility.HtmlDecode(divInnerBody.InnerText.Trim());
+            string description = HttpUtility.HtmlDecode(divInnerBody.InnerText.Trim());
+            description = Regex.Replace(description, @"\s+", " ");
+            return description;
         }
 
         private List<LostFilmTvShowSeasonModel> ExtractSeasons(HtmlWeb web, string uri)
@@ -230,7 +236,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             if (h2Title != null)
             {
                 string title = h2Title.InnerText.Trim();
-                season.Title = HttpUtility.HtmlDecode(title);
+                title = HttpUtility.HtmlDecode(title);
+                title = Regex.Replace(title, @"\s+", " ");
+                season.Title = title;
 
                 string indexString = Regex.Match(title, @"\d+").Value;
                 int.TryParse(indexString, out var index);
@@ -309,10 +317,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
                 var spanEnglishTitle =
                     tdTitles.SelectSingleNode("./div")?.SelectSingleNode("./span");
                 var originalTitle = spanEnglishTitle?.InnerText.Trim();
-                episode.OriginalTitle = HttpUtility.HtmlDecode(originalTitle);
+                originalTitle = HttpUtility.HtmlDecode(originalTitle);
+                originalTitle = Regex.Replace(originalTitle, @"\s+", " ");
+
+                episode.OriginalTitle = originalTitle;
 
                 string title = text.Replace(originalTitle, string.Empty).Trim();
-                episode.Title = HttpUtility.HtmlDecode(title);
+                title = HttpUtility.HtmlDecode(title);
+                title = Regex.Replace(title, @"\s+", " ");
+                episode.Title = title;
             }
 
             var tdDates = tdsEpisode.FirstOrDefault(n => n.HasClass("delta"));
