@@ -18,6 +18,8 @@ namespace PortableLibrary.Core.Database
 
         public DbSet<BooksLibrary> BookLibraries { get; set; }
         public DbSet<LibraryBook> LibrariesBooks { get; set; }
+        public DbSet<ExternalBook> ExternalBooks { get; set; }
+        public DbSet<LibraryBook2ExternalBook> LibraryBooks2ExternalBooks { get; set; }
 
         public DbSet<TvShowsLibrary> TvShowsLibraries { get; set; }
         public DbSet<LibraryTvShow> LibrariesTvShows { get; set; }
