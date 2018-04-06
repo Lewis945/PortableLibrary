@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
+using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models;
 
@@ -97,14 +98,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             var divTitleRu = divFirstTitleBlock?.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("title-ru"));
 
-            string title = HttpUtility.HtmlDecode(divTitleRu?.InnerText.Trim());
-            title = title != null ? Regex.Replace(title, @"\s+", " ") : null;
+            string title = HttpUtility.HtmlDecode(divTitleRu?.InnerText);
+            title = title.ClearString();
 
             var divTitleEn = divFirstTitleBlock?.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("title-en"));
 
             string originalTitle = HttpUtility.HtmlDecode(divTitleEn?.InnerText.Trim());
-            originalTitle = originalTitle != null ? Regex.Replace(originalTitle, @"\s+", " ") : null;
+            originalTitle = originalTitle.ClearString();
 
             return (title, originalTitle);
         }
@@ -119,7 +120,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             string statusText = divStatus?.InnerText;
             statusText = statusText?.Replace(statusKey, string.Empty).Trim();
             statusText = HttpUtility.HtmlDecode(statusText);
-
+            statusText = statusText.ClearString();
+            
             return statusText?.Equals("Завершен");
         }
 
@@ -177,7 +179,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
             var aNodes = divGenres.SelectNodes(".//a");
             var genresNodes = aNodes?.Where(n => filteredDescendant.Contains(n)).ToList();
-            var genres = genresNodes?.Select(n => HttpUtility.HtmlDecode(n.InnerText.Trim())).ToList();
+            var genres = genresNodes?.Select(n => HttpUtility.HtmlDecode(n.InnerText.ClearString())).ToList();
             return genres;
         }
 
@@ -199,7 +201,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
                 return null;
 
             string description = HttpUtility.HtmlDecode(divInnerBody.InnerText.Trim());
-            description = description != null ? Regex.Replace(description, @"\s+", " ") : null;
+            description = description.ClearString();
             return description;
         }
 
@@ -237,7 +239,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             {
                 string title = h2Title.InnerText.Trim();
                 title = HttpUtility.HtmlDecode(title);
-                title = title != null ? Regex.Replace(title, @"\s+", " ") : null;
+                title = title.ClearString();
                 season.Title = title;
 
                 string indexString = title != null ? Regex.Match(title, @"\d+").Value : null;
@@ -258,7 +260,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
             if (spanEpisodes != null)
             {
-                string episodeCountText = spanEpisodes.InnerText.Trim();
+                string episodeCountText = spanEpisodes.InnerText.ClearString();
                 string episodeCountString = Regex.Match(episodeCountText, @"\d+").Value;
                 int.TryParse(episodeCountString, out var episodeCount);
                 season.TotalEpisodesCount = episodeCount;
@@ -300,7 +302,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             var tdSeason = tdsEpisode.FirstOrDefault(n => n.HasClass("beta"));
             if (tdSeason != null)
             {
-                string text = tdSeason.InnerText.Trim();
+                string text = tdSeason.InnerText.ClearString();
 
                 var match = Regex.Matches(text, @"\d+");
                 string episodeIndexString = match.Last()?.Value;
@@ -317,25 +319,23 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
                 var spanEnglishTitle =
                     tdTitles.SelectSingleNode("./div")?.SelectSingleNode("./span");
-                var originalTitle = spanEnglishTitle?.InnerText.Trim();
+                var originalTitle = spanEnglishTitle?.InnerText;
                 originalTitle = HttpUtility.HtmlDecode(originalTitle);
-                originalTitle = originalTitle != null ? Regex.Replace(originalTitle, @"\s+", " ") : null;
+                originalTitle = originalTitle.ClearString();
 
                 episode.OriginalTitle = originalTitle;
 
-                string title = text?.Replace(originalTitle, string.Empty).Trim();
-                title = title != null ? Regex.Replace(title, @"\s+", " ") : null;
+                string title = text?.Replace(originalTitle, string.Empty);
+                title = title.ClearString();
                 episode.Title = title;
             }
 
             var tdDates = tdsEpisode.FirstOrDefault(n => n.HasClass("delta"));
             if (tdDates != null)
             {
-                string text = tdDates.InnerText.Trim();
-
                 var spanEnglishDate = tdDates.SelectSingleNode("./span");
                 var dateOriginalReleasedString =
-                    HttpUtility.HtmlDecode(spanEnglishDate?.InnerText.Trim());
+                    HttpUtility.HtmlDecode(spanEnglishDate?.InnerText.ClearString());
                 dateOriginalReleasedString =
                     dateOriginalReleasedString != null
                         ? Regex.Match(dateOriginalReleasedString, @"[\d\.]+").Value
@@ -349,8 +349,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
                 episode.DateOriginalReleased = dateOriginalReleased;
 
+                string text = tdDates.InnerText.ClearString();
+
                 string dateReleasedString =
-                    text.Replace(dateOriginalReleasedString, string.Empty).Trim();
+                    text.Replace(dateOriginalReleasedString, string.Empty);
                 dateReleasedString = Regex.Match(dateReleasedString, @"[\d\.]+").Value;
 
                 DateTime.TryParseExact(dateReleasedString,
