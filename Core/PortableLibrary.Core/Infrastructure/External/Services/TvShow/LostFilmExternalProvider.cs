@@ -92,27 +92,27 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
         #region Private Methods
 
-        private (string Title, string OriginalTitle) ExtractTitles(HtmlNode divFirstTitleBlock)
+        private static (string Title, string OriginalTitle) ExtractTitles(HtmlNode divFirstTitleBlock)
         {
             var divTitleRu = divFirstTitleBlock?.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("title-ru"));
 
             string title = HttpUtility.HtmlDecode(divTitleRu?.InnerText.Trim());
-            title = Regex.Replace(title, @"\s+", " ");
+            title = title != null ? Regex.Replace(title, @"\s+", " ") : null;
 
             var divTitleEn = divFirstTitleBlock?.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("title-en"));
 
             string originalTitle = HttpUtility.HtmlDecode(divTitleEn?.InnerText.Trim());
-            originalTitle = Regex.Replace(originalTitle, @"\s+", " ");
+            originalTitle = originalTitle != null ? Regex.Replace(originalTitle, @"\s+", " ") : null;
 
             return (title, originalTitle);
         }
 
-        private bool? ExtractStatus(HtmlNode divFirstTitleBlock)
+        private static bool? ExtractStatus(HtmlNode divFirstTitleBlock)
         {
             var divStatus = divFirstTitleBlock?.SelectNodes(".//div")?
-               .FirstOrDefault(n => n.HasClass("status"));
+                .FirstOrDefault(n => n.HasClass("status"));
 
             const string statusKey = "Статус:";
 
@@ -123,7 +123,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             return statusText?.Equals("Завершен");
         }
 
-        private string ExtractImage(HtmlNode divSecondTitleBlock)
+        private static string ExtractImage(HtmlNode divSecondTitleBlock)
         {
             var divMainPoster = divSecondTitleBlock?.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("main_poster"));
@@ -141,10 +141,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             return imageUri;
         }
 
-        private List<string> ExtractGenres(HtmlNode divSecondTitleBlock)
+        private static List<string> ExtractGenres(HtmlNode divSecondTitleBlock)
         {
             var divDetailsPane = divSecondTitleBlock?.SelectNodes(".//div")?
-                 .FirstOrDefault(n => n.HasClass("details-pane"));
+                .FirstOrDefault(n => n.HasClass("details-pane"));
 
             const string genreKey = "Жанр:";
 
@@ -181,7 +181,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             return genres;
         }
 
-        private string ExtractDescription(HtmlDocument document)
+        private static string ExtractDescription(HtmlDocument document)
         {
             var divDescriptionTextBlock = document.DocumentNode.SelectNodes(".//div")?
                 .FirstOrDefault(n => n.HasClass("text-block") && n.HasClass("description"));
@@ -199,7 +199,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
                 return null;
 
             string description = HttpUtility.HtmlDecode(divInnerBody.InnerText.Trim());
-            description = Regex.Replace(description, @"\s+", " ");
+            description = description != null ? Regex.Replace(description, @"\s+", " ") : null;
             return description;
         }
 
@@ -237,10 +237,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             {
                 string title = h2Title.InnerText.Trim();
                 title = HttpUtility.HtmlDecode(title);
-                title = Regex.Replace(title, @"\s+", " ");
+                title = title != null ? Regex.Replace(title, @"\s+", " ") : null;
                 season.Title = title;
 
-                string indexString = Regex.Match(title, @"\d+").Value;
+                string indexString = title != null ? Regex.Match(title, @"\d+").Value : null;
                 int.TryParse(indexString, out var index);
                 season.Index = index;
             }
@@ -313,18 +313,18 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             if (tdTitles != null)
             {
                 string text = tdTitles.InnerText.Trim();
+                text = HttpUtility.HtmlDecode(text);
 
                 var spanEnglishTitle =
                     tdTitles.SelectSingleNode("./div")?.SelectSingleNode("./span");
                 var originalTitle = spanEnglishTitle?.InnerText.Trim();
                 originalTitle = HttpUtility.HtmlDecode(originalTitle);
-                originalTitle = Regex.Replace(originalTitle, @"\s+", " ");
+                originalTitle = originalTitle != null ? Regex.Replace(originalTitle, @"\s+", " ") : null;
 
                 episode.OriginalTitle = originalTitle;
 
-                string title = text.Replace(originalTitle, string.Empty).Trim();
-                title = HttpUtility.HtmlDecode(title);
-                title = Regex.Replace(title, @"\s+", " ");
+                string title = text?.Replace(originalTitle, string.Empty).Trim();
+                title = title != null ? Regex.Replace(title, @"\s+", " ") : null;
                 episode.Title = title;
             }
 
@@ -337,7 +337,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
                 var dateOriginalReleasedString =
                     HttpUtility.HtmlDecode(spanEnglishDate?.InnerText.Trim());
                 dateOriginalReleasedString =
-                    Regex.Match(dateOriginalReleasedString, @"[\d\.]+").Value;
+                    dateOriginalReleasedString != null
+                        ? Regex.Match(dateOriginalReleasedString, @"[\d\.]+").Value
+                        : null;
 
                 DateTime.TryParseExact(dateOriginalReleasedString,
                     "d.M.yyyy",
