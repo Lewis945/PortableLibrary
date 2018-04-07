@@ -7,6 +7,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 {
     public class FantasyWorldsExternalProviderTests
     {
+        #region Tests
+
         [Fact]
         public async Task Should_Extract_Gary_Garrison_The_Stainless_Steel_Rat_Goes_to_Hell()
         {
@@ -237,5 +239,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Null(model.DownloadLinks);
         }
+
+        #endregion
     }
 }

@@ -48,5 +48,32 @@ namespace PortableLibrary.Core.Extensions
             text = Regex.Replace(text, @"\s+", " ");
             return text;
         }
+
+        public static string RemoveNewLines(this string text)
+        {
+            if (text == null)
+                return null;
+
+            text = Regex.Replace(text, @"[\r\n]+", string.Empty);
+            return text;
+        }
+
+        public static string ExtractNumberSubstring(this string text)
+        {
+            if (text == null)
+                return null;
+
+            return Regex.Match(text, @"\d+").Value;
+        }
+
+        public static int? ParseNumber(this string text)
+        {
+            var numberSubstring = text.ExtractNumberSubstring();
+
+            if (int.TryParse(numberSubstring, out var number))
+                return number;
+
+            return default(int?);
+        }
     }
 }

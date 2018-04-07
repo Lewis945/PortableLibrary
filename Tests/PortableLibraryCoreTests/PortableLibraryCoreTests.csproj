@@ -11,9 +11,6 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Infrastructure\External" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Core\PortableLibrary.Core\PortableLibrary.Core.csproj" />
   </ItemGroup>
 </Project>
