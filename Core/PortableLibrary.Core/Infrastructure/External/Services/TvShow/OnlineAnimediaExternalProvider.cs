@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         public string ServiceUri => "http://online.animedia.tv";
         public string ServiceName => "AnimediaOnline";
 
-        public Task<OnlineAnimediaTvShowModel> Extract()
+        public Task<OnlineAnimediaTvShowModel> Extract(string uri)
         {
             throw new NotImplementedException();
         }

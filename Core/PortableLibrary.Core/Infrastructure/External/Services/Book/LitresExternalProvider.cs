@@ -25,11 +25,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region IExternalServiceProvider
 
-        public async Task<LitresBookModel> Extract()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<LitresBookModel> Extract(string uri)
         {
             var model = new LitresBookModel();

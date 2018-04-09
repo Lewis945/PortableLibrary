@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         public string ServiceUri => "https://online.anidub.com/";
         public string ServiceName => "AnidubOnline";
 
-        public Task<OnlineAnidubTvShowModel> Extract()
+        public Task<OnlineAnidubTvShowModel> Extract(string uri)
         {
             throw new NotImplementedException();
         }

@@ -13,7 +13,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Movie
         public string ServiceUri => "http://www.imdb.com";
         public string ServiceName => "Imdb";
 
-        public Task<ImdbMovieModel> Extract()
+        public Task<ImdbMovieModel> Extract(string uri)
         {
             throw new NotImplementedException();
         }

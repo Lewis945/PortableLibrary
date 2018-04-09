@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         public string ServiceUri => "http://baibako.tv/iplayer/";
         public string ServiceName => "BaibakoTv";
 
-        public Task<BaibakoTvShowModel> Extract()
+        public Task<BaibakoTvShowModel> Extract(string uri)
         {
             throw new NotImplementedException();
         }

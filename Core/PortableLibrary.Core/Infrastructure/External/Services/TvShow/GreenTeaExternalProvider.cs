@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         public string ServiceUri => "http://green-tea.tv/";
         public string ServiceName => "GreenTeaTv";
 
-        public Task<GreenTeaTvShowModel> Extract()
+        public Task<GreenTeaTvShowModel> Extract(string uri)
         {
             throw new NotImplementedException();
         }

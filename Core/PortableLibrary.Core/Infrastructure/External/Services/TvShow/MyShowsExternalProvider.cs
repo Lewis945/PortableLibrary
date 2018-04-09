@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         public string ServiceUri => "https://en.myshows.me/";
         public string ServiceName => "MyShowsMe";
 
-        public Task<MyShowsTvShowModel> Extract()
+        public Task<MyShowsTvShowModel> Extract(string uri)
         {
             throw new NotImplementedException();
         }

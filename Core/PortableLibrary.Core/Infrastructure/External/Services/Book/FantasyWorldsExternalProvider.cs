@@ -25,11 +25,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region IExternalServiceProvider
 
-        public Task<FantasyWorldsBookModel> Extract()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<FantasyWorldsBookModel> Extract(string uri)
         {
             var model = new FantasyWorldsBookModel();

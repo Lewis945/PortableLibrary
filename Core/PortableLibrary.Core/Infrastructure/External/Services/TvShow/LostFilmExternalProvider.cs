@@ -26,11 +26,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
         #region IExternalServiceProvider
 
-        public Task<LostFilmTvShowModel> Extract()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<LostFilmTvShowModel> Extract(string uri)
         {
             var model = new LostFilmTvShowModel();
