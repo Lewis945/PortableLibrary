@@ -98,11 +98,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                 #endregion
 
-                #region Extract Series
-
                 var aSeries = GetSeriesLink(divMainInfoBlockDetail);
 
+                #region Extract Series
+
                 model.Series = ExtractSeries(aSeries);
+
+                #endregion
+
+                #region Extract Tracking Uri
+
                 model.TrackingUri = ExtractTrackingUri(aSeries);
 
                 #endregion

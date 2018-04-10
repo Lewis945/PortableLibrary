@@ -41,7 +41,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Мир Барлионы", model.Serie, true);
 
-            //Assert.Equal(2, model.Index);
+            Assert.Equal("https://www.e-reading.club/series.aspx/1002172/Mir_Barliony.html", model.TrackingUri);
+
+            Assert.Equal(1, model.Index);
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("боевик", item, true),
@@ -77,7 +79,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Война за выживание", model.Serie, true);
 
-            //Assert.Equal(2, model.Index);
+            Assert.Equal("https://www.e-reading.club/series.aspx/3334/Voyna_za_vyzhivanie.html", model.TrackingUri);
+
+            Assert.Equal(2, model.Index);
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("фэнтези", item, true)
@@ -103,9 +107,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                                    item.Uri.Equals("https://www.e-reading.club/epub.php/86632/Зыков_-_Конклав_Бессмертных._Проба_сил.epub")),
                item => Assert.True(item.Type.Equals("mobi") &&
                                    item.Uri.Equals("https://www.e-reading.club/mobi.php/86632/Зыков_-_Конклав_Бессмертных._Проба_сил.mobi")),
-                item => Assert.True(item.Type.Equals("txt") &&
+               item => Assert.True(item.Type.Equals("txt") &&
                                    item.Uri.Equals("https://www.e-reading.club/txt.php/86632/Зыков_-_Конклав_Бессмертных._Проба_сил.txt")),
-                 item => Assert.True(item.Type.Equals("html") &&
+               item => Assert.True(item.Type.Equals("html") &&
                                    item.Uri.Equals("https://www.e-reading.club/bookreader.php/save/86632/Зыков_-_Конклав_Бессмертных._Проба_сил.html"))
            );
         }
@@ -126,7 +130,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Билл - герой Галактики", model.Serie, true);
 
-            //Assert.Equal(2, model.Index);
+            Assert.Equal("https://www.e-reading.club/series.aspx/763/Bill_-_geroy_Galaktiki.html", model.TrackingUri);
+
+            Assert.Equal(1, model.Index);
 
             Assert.Null(model.Genres);
 
@@ -161,7 +167,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Билл - герой Галактики", model.Serie, true);
 
-            //Assert.Equal(2, model.Index);
+            Assert.Equal("https://www.e-reading.club/series.aspx/763/Bill_-_geroy_Galaktiki.html", model.TrackingUri);
+
+            Assert.Equal(2, model.Index);
 
             Assert.Null(model.Genres);
 
@@ -195,7 +203,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Ремесло", model.Serie, true);
 
-            //Assert.Equal(2, model.Index);
+            Assert.Equal("https://www.e-reading.club/series.aspx/1607/Remeslo.html", model.TrackingUri);
+
+            Assert.Equal(1, model.Index);
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("фэнтези", item, true)
@@ -221,9 +231,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                                    item.Uri.Equals("https://www.e-reading.club/epub.php/30001/Кош_-_Огненный_факультет.epub")),
                item => Assert.True(item.Type.Equals("mobi") &&
                                    item.Uri.Equals("https://www.e-reading.club/mobi.php/30001/Кош_-_Огненный_факультет.mobi")),
-                item => Assert.True(item.Type.Equals("txt") &&
+               item => Assert.True(item.Type.Equals("txt") &&
                                    item.Uri.Equals("https://www.e-reading.club/txt.php/30001/Кош_-_Огненный_факультет.txt")),
-                 item => Assert.True(item.Type.Equals("html") &&
+               item => Assert.True(item.Type.Equals("html") &&
                                    item.Uri.Equals("https://www.e-reading.club/bookreader.php/save/30001/Кош_-_Огненный_факультет.html"))
            );
         }
@@ -244,7 +254,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Ремесло", model.Serie, true);
 
-            //Assert.Equal(2, model.Index);
+            Assert.Equal("https://www.e-reading.club/series.aspx/1607/Remeslo.html", model.TrackingUri);
+
+            Assert.Equal(2, model.Index);
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("фэнтези", item, true)
@@ -279,9 +291,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                                    item.Uri.Equals("https://www.e-reading.club/epub.php/30000/Кош_-_Огненный_патруль.epub")),
                item => Assert.True(item.Type.Equals("mobi") &&
                                    item.Uri.Equals("https://www.e-reading.club/mobi.php/30000/Кош_-_Огненный_патруль.mobi")),
-                item => Assert.True(item.Type.Equals("txt") &&
+               item => Assert.True(item.Type.Equals("txt") &&
                                    item.Uri.Equals("https://www.e-reading.club/txt.php/30000/Кош_-_Огненный_патруль.txt")),
-                 item => Assert.True(item.Type.Equals("html") &&
+               item => Assert.True(item.Type.Equals("html") &&
                                    item.Uri.Equals("https://www.e-reading.club/bookreader.php/save/30000/Кош_-_Огненный_патруль.html"))
            );
         }

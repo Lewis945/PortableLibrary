@@ -139,6 +139,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
                                 }
 
                                 #endregion
+
+                                #region Extract Tracking Uri & Index
+
+                                model.TrackingUri = ExtractTrackingUri(tdData, seriesKey);
+
+                                model.Index = await ExtractBookIndex(model.TrackingUri, model.Title);
+
+                                #endregion
                             }
                         }
                     }
@@ -216,6 +224,64 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             }
 
             return items;
+        }
+
+        private string ExtractTrackingUri(HtmlNode tdData, string key)
+        {
+            var trsAll = tdData.SelectNodes(".//tr");
+
+            if (trsAll == null) return null;
+
+            var trSerie = trsAll.Where(tr =>
+            {
+                var trText = tr.InnerText;
+                trText = trText.ClearString().RemoveNewLines();
+                var match = trText.StartsWith(key);
+                return match;
+            })
+            .FirstOrDefault();
+
+            var aSerie = trSerie?.SelectSingleNode(".//a");
+
+            var href = aSerie?.Attributes["href"]?.Value;
+
+            return href;
+        }
+
+        private async Task<int?> ExtractBookIndex(string trackingUri, string title)
+        {
+            var web = new HtmlWeb();
+
+            var seriesDocument = await GetDocument(trackingUri);
+
+            var tableBooklList = seriesDocument.DocumentNode.SelectNodes(".//table")?
+                .FirstOrDefault(n => n.HasClass("booklist"));
+
+            var trs = tableBooklList?.SelectNodes(".//tr");
+
+            if (trs == null)
+                return null;
+
+            var regex = new Regex(@"^(?<index>[\d]+\.).*");
+
+            foreach (var tr in trs)
+            {
+                var aLinks = tr.SelectNodes(".//a");
+                var hasBook = aLinks?.Any(a => a.InnerText.Contains(title)) ?? false;
+
+                if (!hasBook)
+                    continue;
+
+                var match = regex.Match(tr.InnerText);
+
+                if (!match.Success)
+                    continue;
+
+                string indexString = match.Groups["index"]?.Value.ClearString();
+                return indexString.ParseNumber();
+            }
+
+            return null;
         }
 
         private List<(string Name, string Value)> GetDownloadLinks(HtmlNode tdFirst)

@@ -10,7 +10,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Models.Book
         public List<string> OtherTitles { get; set; }
 
         public string ImageUri { get; set; }
-        
+        public string TrackingUri { get; set; }
+
         public string Author { get; set; }
         public string Description { get; set; }
         

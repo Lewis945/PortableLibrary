@@ -11,10 +11,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Models.Book
         public string Description { get; set; }
 
         public int? ReleaseYear { get; set; }
+        public int? Index { get; set; }
 
         public List<string> Genres { get; set; }
 
         public string ImageUri { get; set; }
+        public string TrackingUri { get; set; }
 
         public List<(string Type, string Uri)> DownloadLinks { get; set; }
     }

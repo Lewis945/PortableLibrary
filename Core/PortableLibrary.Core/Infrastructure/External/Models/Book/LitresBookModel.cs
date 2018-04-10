@@ -11,6 +11,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Models.Book
         public string Description { get; set; }
 
         public string ImageUri { get; set; }
+        public string TrackingUri { get; set; }
 
         public string AuthorSeries { get; set; }
 
