@@ -1,14 +1,11 @@
-﻿using PortableLibrary.Core.Infrastructure.External.Services.Book;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.External.Services.Book;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 {
-    public class FantLibExternalProviderTests
+    public class FantLabExternalProviderTests
     {
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Facultet()
@@ -23,6 +20,12 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("Огненный Факультет", model.Title, true);
             Assert.Equal("Огненный Факультет", model.OriginalTitle, true);
             Assert.Null(model.OtherTitles);
+
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Фэнтези", item, true),
+                item => Assert.Equal("Героическое фэнтези", item, true),
+                item => Assert.Equal("Science Fantasy", item, true)
+            );
 
             Assert.Equal("Алекс Кош", model.Author, true);
 
@@ -62,6 +65,12 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("Огненный Орден", model.OriginalTitle, true);
             Assert.Null(model.OtherTitles);
 
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Фэнтези", item, true),
+                item => Assert.Equal("Героическое фэнтези", item, true),
+                item => Assert.Equal("Science Fantasy", item, true)
+            );
+
             Assert.Equal("Алекс Кош", model.Author, true);
 
             Assert.Equal("Ремесло", model.Series, true);
@@ -99,8 +108,14 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Рождение Стальной Крысы", model.Title, true);
             Assert.Equal("A Stainless Steel Rat is Born", model.OriginalTitle, true);
+
             Assert.Collection(model.OtherTitles,
-               item => Assert.Equal("Крыса из нержавеющей стали появляется на свет", item, true)
+                item => Assert.Equal("Крыса из нержавеющей стали появляется на свет", item, true)
+            );
+
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Фантастика", item, true),
+                item => Assert.Equal("Гуманитарная («мягкая») НФ", item, true)
             );
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);
@@ -142,10 +157,16 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("Стальная Крыса", model.Title, true);
             Assert.Equal("The Stainless Steel Rat", model.OriginalTitle, true);
+
             Assert.Collection(model.OtherTitles,
-               item => Assert.Equal("Крыса из нержавеющей стали", item, true),
-               item => Assert.Equal("Приключения Джима Ди Гриза", item, true),
-               item => Assert.Equal("Джим-стальная крыса", item, true)
+                item => Assert.Equal("Крыса из нержавеющей стали", item, true),
+                item => Assert.Equal("Приключения Джима Ди Гриза", item, true),
+                item => Assert.Equal("Джим-стальная крыса", item, true)
+            );
+
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Фантастика", item, true),
+                item => Assert.Equal("Гуманитарная («мягкая») НФ", item, true)
             );
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);
@@ -187,6 +208,12 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("Чужак. Охотник", model.OriginalTitle, true);
             Assert.Null(model.OtherTitles);
 
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Фэнтези", item, true),
+                item => Assert.Equal("Героическое фэнтези", item, true),
+                item => Assert.Equal("Боевик", item, true)
+            );
+
             Assert.Equal("Игорь Дравин", model.Author, true);
 
             Assert.Equal("Чужак", model.Series, true);
@@ -226,6 +253,12 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("Чужак. Мэтр", model.Title, true);
             Assert.Equal("Чужак. Мэтр", model.OriginalTitle, true);
             Assert.Null(model.OtherTitles);
+
+            Assert.Collection(model.Genres,
+                item => Assert.Equal("Фэнтези", item, true),
+                item => Assert.Equal("Героическое фэнтези", item, true),
+                item => Assert.Equal("Боевик", item, true)
+            );
 
             Assert.Equal("Игорь Дравин", model.Author, true);
 

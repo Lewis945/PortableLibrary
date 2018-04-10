@@ -8,6 +8,7 @@ using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
+using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
@@ -30,7 +31,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             var model = new FantLabBookModel();
 
             var web = new HtmlWeb();
-            var document = await web.LoadFromWebAsync(uri);
+
+            var document = await Retry.Execute(() => web.LoadFromWebAsync(uri), TimeSpan.FromSeconds(10));
 
             //main-info-block-detail
             var divMainInfoBlockDetail = document.DocumentNode.SelectNodes(".//div")?
@@ -70,10 +72,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                     #region Extract Description 
 
-                        model.Description = ExtractDescription(spans);
+                    model.Description = ExtractDescription(spans);
 
                     #endregion
                 }
+
+                #region Extract Genres
+
+                model.Genres = ExtractGenres(document.DocumentNode);
+
+                #endregion
 
                 #region Extract Series
 
@@ -81,6 +89,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                 model.Series = ExtractSeries(aSeries);
                 model.TrackingUri = ExtractTrackingUri(aSeries);
+
+                #endregion
+
+                #region Extract Index
+
+                model.Index = await ExtractIndex(web, model.TrackingUri, model.Title);
 
                 #endregion
 
@@ -143,6 +157,26 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
         {
             var spanDescription = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "description");
             return spanDescription?.InnerText.ClearString();
+        }
+
+        private List<string> ExtractGenres(HtmlNode document)
+        {
+            var divWorkClassIf = document.SelectNodes(".//div")?
+                .FirstOrDefault(n => n.Id == "workclassif");
+
+            if (divWorkClassIf == null)
+                return null;
+
+            const string genreKey = "Жанры/поджанры:";
+
+            var liGenres = divWorkClassIf.SelectNodes(".//li")
+                ?.FirstOrDefault(n => n.InnerText.ClearString().StartsWith(genreKey));
+
+            var genres = liGenres?.SelectNodes(".//a")?
+                .Select(a => a.InnerText.ClearString())
+                .ToList();
+
+            return genres;
         }
 
         private HtmlNode GetSeriesLink(HtmlNode divMainInfoBlockDetail)

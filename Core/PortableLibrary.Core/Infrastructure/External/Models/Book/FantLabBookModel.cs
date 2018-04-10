@@ -8,7 +8,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Models.Book
         public string Title { get; set; }
         public string OriginalTitle { get; set; }
         public List<string> OtherTitles { get; set; }
-
+        
+        public List<string> Genres{ get; set; }
+        
         public string ImageUri { get; set; }
         public string TrackingUri { get; set; }
 
