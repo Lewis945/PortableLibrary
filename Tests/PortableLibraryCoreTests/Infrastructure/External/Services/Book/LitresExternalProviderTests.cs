@@ -1,16 +1,33 @@
-﻿using System;
+﻿using PortableLibrary.Core.Infrastructure.External.Services.Book;
+using PortableLibrary.Core.Utilities;
 using System.Threading.Tasks;
-using PortableLibrary.Core.Infrastructure.External.Services.Book;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 {
     public class LitresExternalProviderTests
     {
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public LitresExternalProviderTests()
+        {
+            _retryService = new RetryService();
+        }
+
+        #endregion
+
+        #region Tests
+
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Soyuz_Proklyatuh()
         {
-            var service = new LitresExternalProvider();
+            var service = new LitresExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.litres.ru/aleks-kosh/souz-proklyatyh/");
 
@@ -52,7 +69,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Igry_Masok()
         {
-            var service = new LitresExternalProvider();
+            var service = new LitresExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.litres.ru/aleks-kosh/igry-masok/");
 
@@ -90,7 +107,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Gary_Garrison_Rozhdenie_Stalnoy_Krusu()
         {
-            var service = new LitresExternalProvider();
+            var service = new LitresExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.litres.ru/garri-garrison/rozhdenie-stalnoy-krysy/");
 
@@ -127,7 +144,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Dem_Mihaylov_Grom_Nebesnuy()
         {
-            var service = new LitresExternalProvider();
+            var service = new LitresExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.litres.ru/dem-mihaylov/grom-nebesnyy/");
 
@@ -162,5 +179,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(2015, model.ReleaseYear);
         }
+
+        #endregion
     }
 }

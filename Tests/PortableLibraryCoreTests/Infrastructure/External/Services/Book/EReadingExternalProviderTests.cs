@@ -1,7 +1,5 @@
 ﻿using PortableLibrary.Core.Infrastructure.External.Services.Book;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using PortableLibrary.Core.Utilities;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
@@ -10,12 +8,27 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 {
     public class EReadingExternalProviderTests
     {
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public EReadingExternalProviderTests()
+        {
+            _retryService = new RetryService();
+        }
+
+        #endregion
+
         #region Tests
 
         [Fact]
         public async Task Should_Extract_Vasiliy_Mahanenko_Barleona()
         {
-            var service = new EReadingExternalProvider();
+            var service = new EReadingExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.e-reading.club/book.php?book=1016974");
 
@@ -51,7 +64,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Zukov_Vitaliy_Konklav_Besmertnih_Proba_Sil()
         {
-            var service = new EReadingExternalProvider();
+            var service = new EReadingExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.e-reading.club/book.php?book=86632");
 
@@ -100,7 +113,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Gary_Garrison_Bill_Galactic_Hero()
         {
-            var service = new EReadingExternalProvider();
+            var service = new EReadingExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.e-reading.club/book.php?book=13794");
 
@@ -135,7 +148,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Gary_Garrison_Bill_Galactic_Hero_2()
         {
-            var service = new EReadingExternalProvider();
+            var service = new EReadingExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.e-reading.club/book.php?book=13798");
 
@@ -169,7 +182,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Fakultet()
         {
-            var service = new EReadingExternalProvider();
+            var service = new EReadingExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.e-reading.club/book.php?book=30001");
 
@@ -218,7 +231,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Patrul()
         {
-            var service = new EReadingExternalProvider();
+            var service = new EReadingExternalProvider(_retryService);
 
             var model = await service.Extract("https://www.e-reading.club/book.php?book=30000");
 

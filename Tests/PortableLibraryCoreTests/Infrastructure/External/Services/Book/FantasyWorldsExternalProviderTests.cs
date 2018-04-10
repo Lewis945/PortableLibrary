@@ -1,18 +1,34 @@
-﻿using System.Text.RegularExpressions;
+﻿using PortableLibrary.Core.Infrastructure.External.Services.Book;
+using PortableLibrary.Core.Utilities;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using PortableLibrary.Core.Infrastructure.External.Services.Book;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 {
     public class FantasyWorldsExternalProviderTests
     {
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public FantasyWorldsExternalProviderTests()
+        {
+            _retryService = new RetryService();
+        }
+
+        #endregion
+
         #region Tests
 
         [Fact]
         public async Task Should_Extract_Gary_Garrison_The_Stainless_Steel_Rat_Goes_to_Hell()
         {
-            var service = new FantasyWorldsExternalProvider();
+            var service = new FantasyWorldsExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantasy-worlds.org/lib/id3422/");
 
@@ -50,7 +66,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Orden()
         {
-            var service = new FantasyWorldsExternalProvider();
+            var service = new FantasyWorldsExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantasy-worlds.org/lib/id14932/");
 
@@ -105,7 +121,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Soyuz_Proklyatuh()
         {
-            var service = new FantasyWorldsExternalProvider();
+            var service = new FantasyWorldsExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantasy-worlds.org/lib/id25365/");
 
@@ -151,7 +167,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_John_R_R_Tolkien_The_Fellowship_of_the_Ring()
         {
-            var service = new FantasyWorldsExternalProvider();
+            var service = new FantasyWorldsExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantasy-worlds.org/lib/id25800/");
 
@@ -200,7 +216,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Ray_Bradbury_Fahrenheit_451()
         {
-            var service = new FantasyWorldsExternalProvider();
+            var service = new FantasyWorldsExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantasy-worlds.org/lib/id13732/");
 

@@ -8,6 +8,7 @@ using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
+using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
@@ -23,6 +24,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #endregion
 
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public FantasyWorldsExternalProvider(IRetryService retryService)
+        {
+            _retryService = retryService;
+        }
+
+        #endregion
+
         #region IExternalServiceProvider
 
         public async Task<FantasyWorldsBookModel> Extract(string uri)
@@ -30,7 +46,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             var model = new FantasyWorldsBookModel();
 
             var web = new HtmlWeb();
-            var document = web.Load(uri);
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
 
             //news_body
             var divNewsBody = document.DocumentNode.SelectNodes(".//table")?
@@ -137,7 +153,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             //^(?<key>.+):{1}(?<value>.+)$
             var regex = new Regex(@"^(?<key>[\w\s]+):{1}(?<value>.+)$");
 
-            var items = text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None)
+            var items = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
                 .Select(l => HttpUtility.HtmlDecode(l.Trim()))
                 .Where(l => l != null && regex.IsMatch(l))
                 .Select(l =>

@@ -9,6 +9,7 @@ using HtmlAgilityPack;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
+using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
@@ -24,6 +25,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #endregion
 
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public LitresExternalProvider(IRetryService retryService)
+        {
+            _retryService = retryService;
+        }
+
+        #endregion
+
         #region IExternalServiceProvider
 
         public async Task<LitresBookModel> Extract(string uri)
@@ -31,7 +47,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             var model = new LitresBookModel();
 
             var web = new HtmlWeb();
-            var document = web.Load(uri);
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
 
             //biblio_book_top block_table
             var divInfo1 = document.DocumentNode.SelectNodes(".//div")?

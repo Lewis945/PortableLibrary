@@ -9,6 +9,7 @@ using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
+using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
@@ -24,10 +25,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #endregion
 
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
         #region .ctor
 
-        public EReadingExternalProvider()
+        public EReadingExternalProvider(IRetryService retryService)
         {
+            _retryService = retryService;
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
@@ -150,12 +158,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region Private Methods
 
-        private static async Task<HtmlDocument> GetDocument(string uri)
+        private async Task<HtmlDocument> GetDocument(string uri)
         {
             var win1251 = Encoding.GetEncoding("windows-1251");
 
-            var wc = new WebClient {Encoding = win1251};
-            string str = await wc.DownloadStringTaskAsync(uri);
+            var wc = new WebClient { Encoding = win1251 };
+            string str = await _retryService.ExecuteAsync(() => wc.DownloadStringTaskAsync(uri));
             var document = new HtmlDocument();
             document.LoadHtml(str);
             return document;

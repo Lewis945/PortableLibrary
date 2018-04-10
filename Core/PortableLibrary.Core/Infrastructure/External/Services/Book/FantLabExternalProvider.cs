@@ -24,6 +24,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #endregion
 
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public FantLabExternalProvider(IRetryService retryService)
+        {
+            _retryService = retryService;
+        }
+
+        #endregion
+
         #region IExternalServiceProvider
 
         public async Task<FantLabBookModel> Extract(string uri)
@@ -32,7 +47,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
             var web = new HtmlWeb();
 
-            var document = await Retry.Execute(() => web.LoadFromWebAsync(uri), TimeSpan.FromSeconds(10));
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
 
             //main-info-block-detail
             var divMainInfoBlockDetail = document.DocumentNode.SelectNodes(".//div")?
@@ -212,7 +227,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         private async Task<int?> ExtractIndex(HtmlWeb web, string trackingUri, string title)
         {
-            var seriesDocument = await web.LoadFromWebAsync(trackingUri);
+            var seriesDocument = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(trackingUri));
 
             var divsBooks = seriesDocument.DocumentNode.SelectNodes(".//div")?
                 .Where(n => n.HasClass("dots"))
@@ -255,7 +270,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
             link = ServiceUri.AppendUriPath(link);
 
-            var editionDocument = await web.LoadFromWebAsync(link);
+            var editionDocument = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(link));
 
             var img = editionDocument.DocumentNode?.SelectNodes(".//img")?
                 .FirstOrDefault(n => n.Attributes["itemprop"]?.Value == "image");

@@ -1,16 +1,34 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using PortableLibrary.Core.Infrastructure.External.Services.Book;
+using PortableLibrary.Core.Utilities;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 {
     public class FantLabExternalProviderTests
     {
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public FantLabExternalProviderTests()
+        {
+            _retryService = new RetryService();
+        }
+
+        #endregion
+
+        #region Tests
+
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Facultet()
         {
-            var service = new FantLabExternalProvider();
+            var service = new FantLabExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantlab.ru/work43493");
 
@@ -54,7 +72,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Orden()
         {
-            var service = new FantLabExternalProvider();
+            var service = new FantLabExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantlab.ru/work43496");
 
@@ -99,7 +117,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Gary_Garrison_A_Stainless_Steel_Rat_is_Born()
         {
-            var service = new FantLabExternalProvider();
+            var service = new FantLabExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantlab.ru/work2455");
 
@@ -148,7 +166,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Gary_Garrison_The_Stainless_Steel_Rat()
         {
-            var service = new FantLabExternalProvider();
+            var service = new FantLabExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantlab.ru/work2458");
 
@@ -197,7 +215,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Igor_Dravin_Chuzhak_Ohotnik()
         {
-            var service = new FantLabExternalProvider();
+            var service = new FantLabExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantlab.ru/work229786");
 
@@ -243,7 +261,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         [Fact]
         public async Task Should_Extract_Igor_Dravin_Chuzhak_Metr()
         {
-            var service = new FantLabExternalProvider();
+            var service = new FantLabExternalProvider(_retryService);
 
             var model = await service.Extract("https://fantlab.ru/work233376");
 
@@ -287,5 +305,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(2011, model.ReleaseYear);
         }
+
+        #endregion
     }
 }
