@@ -46,7 +46,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(340, model.PagesCount);
 
-            Assert.Equal(new DateTime(2016, 1, 1), model.DatePublished);
+            Assert.Equal(2016, model.ReleaseYear);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(520, model.PagesCount);
 
-            Assert.Equal(new DateTime(2009, 1, 1), model.DatePublished);
+            Assert.Equal(2009, model.ReleaseYear);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(230, model.PagesCount);
 
-            Assert.Equal(new DateTime(1985, 1, 1), model.DatePublished);
+            Assert.Equal(1985, model.ReleaseYear);
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(310, model.PagesCount);
 
-            Assert.Equal(new DateTime(2015, 1, 1), model.DatePublished);
+            Assert.Equal(2015, model.ReleaseYear);
         }
     }
 }

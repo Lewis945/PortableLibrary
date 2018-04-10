@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -6,17 +7,23 @@ using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
-using PortableLibrary.Core.Infrastructure.External.Models;
+using PortableLibrary.Core.Infrastructure.External.Models.Book;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
     /// <summary>
     /// https://fantlab.ru
     /// </summary>
-    public class FantLabExternalProvider : IExternalServiceProvider<FantLabBookModel>
+    public class FantLabExternalProvider : BaseExternalProvider, IExternalServiceProvider<FantLabBookModel>
     {
-        public string ServiceUri => "https://fantlab.ru";
-        public string ServiceName => "FantLib";
+        #region Properties
+
+        public override string ServiceUri => "https://fantlab.ru";
+        public override string ServiceName => "FantLib";
+
+        #endregion
+
+        #region IExternalServiceProvider
 
         public async Task<FantLabBookModel> Extract(string uri)
         {
@@ -34,7 +41,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
                 var spans = divMainInfoBlockDetail.SelectNodes(".//span");
                 if (spans != null)
                 {
-                    #region Extract Title
+                    #region Extract Titles
 
                     var spanName = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "name");
                     if (spanName != null)
@@ -43,155 +50,190 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                         var ps = spanName.ParentNode?.ParentNode?.SelectNodes(".//p");
 
-                        var pOriginalTitle = ps?.FirstOrDefault();
-                        if (pOriginalTitle != null && pOriginalTitle.ChildNodes.Count == 1 &&
-                            pOriginalTitle.FirstChild?.NodeType == HtmlNodeType.Text)
-                        {
-                            model.OriginalTitle = pOriginalTitle.InnerText.ClearString();
-                        }
-                        else
-                        {
-                            model.OriginalTitle = model.Title;
-                        }
-
-                        const string otherTitlesKey = "Другие названия:";
-                        var pOtherTitle = ps?.FirstOrDefault(p => p.InnerText.ClearString().StartsWith(otherTitlesKey));
-                        if (pOtherTitle != null)
-                        {
-                            var otherTitlesString = pOtherTitle.InnerText.Replace(otherTitlesKey, string.Empty).ClearString();
-                            var otherTitles = otherTitlesString.Split(';').Select(s => s.Trim());
-                            model.OtherTitles = otherTitles.ToList();
-                        }
+                        model.OriginalTitle = ExtractOriginalTitle(ps, model.Title);
+                        model.OtherTitles = ExtractOtherTitle(ps);
                     }
 
                     #endregion
 
                     #region Extract Author
 
-                    var spanAuthor = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "author");
-                    if (spanAuthor != null)
-                    {
-                        model.Author = spanAuthor.InnerText.ClearString();
-                    }
+                    model.Author = ExtractAuthor(spans);
 
                     #endregion
 
                     #region Extract Release Year
 
-                    var spanDateReleased = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "datePublished");
-                    if (spanDateReleased != null)
-                    {
-                        model.ReleaseYear = spanDateReleased.InnerText.ParseNumber();
-                    }
+                    model.ReleaseYear = ExtractReleaseYear(spans);
 
                     #endregion
 
                     #region Extract Description 
 
-                    var spanDescription = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "description");
-                    if (spanDescription != null)
-                    {
-                        model.Description = spanDescription.InnerText.ClearString();
-                    }
+                        model.Description = ExtractDescription(spans);
 
                     #endregion
                 }
 
                 #region Extract Series
 
-                var divsLnTextx = divMainInfoBlockDetail.SelectNodes(".//div")?.Where(n => n.HasClass("ln-text"));
-                if (divsLnTextx != null)
-                {
-                    var divLnTextx = divsLnTextx.FirstOrDefault(n =>
-                    {
-                        var decodeInnerText = HttpUtility.HtmlDecode(n.InnerText)?.ClearString();
-                        var result = decodeInnerText.StartsWith("— цикл");
-                        return result;
-                    });
+                var aSeries = GetSeriesLink(divMainInfoBlockDetail);
 
-                    if (divLnTextx != null)
-                    {
-                        var asSeries = divLnTextx.SelectNodes(".//a");
-                        if (asSeries != null)
-                        {
-                            var aSeries = asSeries.LastOrDefault();
-
-                            var series = aSeries?.InnerText;
-                            series = Regex.Match(series, @"[\w\s\d]+").Value;
-                            model.Series = series;
-
-                            var href = aSeries?.Attributes["href"]?.Value;
-                            if (!string.IsNullOrWhiteSpace(href))
-                            {
-                                model.TrackingUri = ServiceUri.AppendUriPath(href);
-
-                                #region Extract Index
-
-                                var seriesDocument = await web.LoadFromWebAsync(model.TrackingUri);
-
-                                var divsBooks = seriesDocument.DocumentNode.SelectNodes(".//div")?
-                                    .Where(n => n.HasClass("dots"));
-                                if (divsBooks != null)
-                                {
-                                    int counter = 1;
-                                    foreach (var divBook in divsBooks)
-                                    {
-                                        var aBook = divBook.SelectSingleNode(".//a");
-                                        if (aBook != null)
-                                        {
-                                            if (aBook.InnerText.ClearString() == model.Title)
-                                            {
-                                                model.Index = counter;
-                                                break;
-                                            }
-                                        }
-                                        counter++;
-                                    }
-                                }
-
-                                #endregion
-                            }
-                        }
-                    }
-                }
+                model.Series = ExtractSeries(aSeries);
+                model.TrackingUri = ExtractTrackingUri(aSeries);
 
                 #endregion
 
                 #region Extract Image
 
-                //editions_block
-                var divEditionsBlock = divMainInfoBlockDetail.SelectNodes(".//div")?.FirstOrDefault(n => n.HasClass("editions_block"));
-                if (divEditionsBlock != null)
-                {
-                    var aFirstEdition = divEditionsBlock.SelectNodes(".//a")?.FirstOrDefault();
-                    if (aFirstEdition != null)
-                    {
-                        var link = aFirstEdition.Attributes["href"]?.Value;
-                        if (!string.IsNullOrWhiteSpace(link))
-                        {
-                            link = ServiceUri.AppendUriPath(link);
-
-                            var editionDocument = await web.LoadFromWebAsync(link);
-
-                            var img = editionDocument.DocumentNode.SelectNodes(".//img")?
-                                .FirstOrDefault(n => n.Attributes["itemprop"]?.Value == "image");
-                            if (img != null)
-                            {
-                                var imageUri = img.Attributes["src"]?.Value;
-                                if (!string.IsNullOrWhiteSpace(imageUri))
-                                {
-                                    imageUri = $"https:{imageUri}";
-                                    model.ImageUri = imageUri;
-                                }
-                            }
-                        }
-                    }
-                }
+                model.ImageUri = await ExtractImage(web, divMainInfoBlockDetail);
 
                 #endregion
             }
 
             return model;
         }
+
+        #endregion
+
+        #region Private Methods
+
+        private string ExtractOriginalTitle(HtmlNodeCollection ps, string title)
+        {
+            var pOriginalTitle = ps?.FirstOrDefault();
+            if (pOriginalTitle != null && pOriginalTitle.ChildNodes.Count == 1 &&
+                pOriginalTitle.FirstChild?.NodeType == HtmlNodeType.Text)
+                return pOriginalTitle.InnerText.ClearString();
+
+            return title;
+        }
+
+        private List<string> ExtractOtherTitle(HtmlNodeCollection ps)
+        {
+            const string otherTitlesKey = "Другие названия:";
+            var pOtherTitle = ps?.FirstOrDefault(p => p.InnerText.ClearString().StartsWith(otherTitlesKey));
+            if (pOtherTitle == null)
+                return null;
+
+            var otherTitlesString = pOtherTitle.InnerText.Replace(otherTitlesKey, string.Empty)
+                .ClearString();
+            var otherTitles = otherTitlesString.Split(';')
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList();
+
+            return otherTitles.Count > 0 ? otherTitles : null;
+        }
+
+        private string ExtractAuthor(HtmlNodeCollection spans)
+        {
+            var spanAuthor = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "author");
+            return spanAuthor?.InnerText.ClearString();
+        }
+
+        private int? ExtractReleaseYear(HtmlNodeCollection spans)
+        {
+            var spanDateReleased =
+                spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "datePublished");
+
+            return spanDateReleased?.InnerText.ParseNumber();
+        }
+
+        private string ExtractDescription(HtmlNodeCollection spans)
+        {
+            var spanDescription = spans.FirstOrDefault(s => s.Attributes["itemprop"]?.Value == "description");
+            return spanDescription?.InnerText.ClearString();
+        }
+
+        private HtmlNode GetSeriesLink(HtmlNode divMainInfoBlockDetail)
+        {
+            var divsLnTextx = divMainInfoBlockDetail.SelectNodes(".//div")?.Where(n => n.HasClass("ln-text"));
+            var divLnTextx = divsLnTextx?.FirstOrDefault(n =>
+            {
+                var decodeInnerText = HttpUtility.HtmlDecode(n.InnerText)?.ClearString();
+                var result = decodeInnerText?.StartsWith("— цикл") ?? false;
+                return result;
+            });
+
+            var asSeries = divLnTextx?.SelectNodes(".//a");
+            var aSeries = asSeries?.LastOrDefault();
+            return aSeries;
+        }
+
+        private string ExtractSeries(HtmlNode aSeries)
+        {
+            var series = aSeries?.InnerText;
+            if (series == null)
+                return null;
+
+            series = Regex.Match(series, @"[\w\s\d]+").Value;
+            return series;
+        }
+
+        private string ExtractTrackingUri(HtmlNode aSeries)
+        {
+            var href = aSeries?.Attributes["href"]?.Value;
+            return string.IsNullOrWhiteSpace(href) ? null : ServiceUri.AppendUriPath(href);
+        }
+
+        private async Task<int?> ExtractIndex(HtmlWeb web, string trackingUri, string title)
+        {
+            var seriesDocument = await web.LoadFromWebAsync(trackingUri);
+
+            var divsBooks = seriesDocument.DocumentNode.SelectNodes(".//div")?
+                .Where(n => n.HasClass("dots"))
+                .ToList();
+
+            if (divsBooks == null)
+                return null;
+
+            int counter = 0;
+
+            foreach (var divBook in divsBooks)
+            {
+                counter++;
+
+                var aBook = divBook.SelectSingleNode(".//a");
+                if (aBook == null)
+                    continue;
+
+                if (!string.Equals(aBook.InnerText.ClearString(), title, StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
+                return counter;
+            }
+
+            return null;
+        }
+
+        private async Task<string> ExtractImage(HtmlWeb web, HtmlNode divMainInfoBlockDetail)
+        {
+            //editions_block
+            var divEditionsBlock = divMainInfoBlockDetail.SelectNodes(".//div")?
+                .FirstOrDefault(n => n.HasClass("editions_block"));
+
+            var aFirstEdition = divEditionsBlock?.SelectNodes(".//a")?.FirstOrDefault();
+
+            var link = aFirstEdition?.Attributes["href"]?.Value;
+
+            if (string.IsNullOrWhiteSpace(link))
+                return null;
+
+            link = ServiceUri.AppendUriPath(link);
+
+            var editionDocument = await web.LoadFromWebAsync(link);
+
+            var img = editionDocument.DocumentNode?.SelectNodes(".//img")?
+                .FirstOrDefault(n => n.Attributes["itemprop"]?.Value == "image");
+            var imageUri = img?.Attributes["src"]?.Value;
+
+            if (string.IsNullOrWhiteSpace(imageUri))
+                return null;
+
+            imageUri = $"https:{imageUri}";
+            return imageUri;
+        }
+
+        #endregion
     }
 }

@@ -7,7 +7,7 @@ using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
-using PortableLibrary.Core.Infrastructure.External.Models;
+using PortableLibrary.Core.Infrastructure.External.Models.Book;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
@@ -46,128 +46,60 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
             if (ps != null && ps.Any())
             {
-                var pFirst = ps.FirstOrDefault();
-                var text = pFirst?.InnerText;
+                var items = ExtractBookData(ps);
 
-                //^(?<key>[\w\s]+):{1}(?<value>[\w\s,;\.]+)$
-                //^(?<key>.+):{1}(?<value>.+)$
-                var regex = new Regex(@"^(?<key>[\w\s]+):{1}(?<value>.+)$");
-
-                var items = text?.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None)
-                    .Select(l => HttpUtility.HtmlDecode(l.Trim()))
-                    .Where(l => l != null && regex.IsMatch(l))
-                    .Select(l =>
-                    {
-                        var match = regex.Match(l);
-                        var key = match.Groups["key"].Value.ClearString();
-                        var value = match.Groups["value"].Value.ClearString();
-
-                        return new
-                        {
-                            Key = key,
-                            Value = value
-                        };
-                    })
-                    .ToList();
-
-                #region Extract Title
-
-                const string titleKey = "Название";
-
-                var title = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, titleKey, StringComparison.InvariantCultureIgnoreCase));
-                model.Title = title?.Value.ClearString();
-
-                #endregion
-
-                #region Extract Original Title
-
-                const string originalTitleKey = "Оригинальное название";
-
-                var originalTitle = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, originalTitleKey, StringComparison.InvariantCultureIgnoreCase));
-                model.OriginalTitle = originalTitle?.Value.ClearString();
-
-                if (string.IsNullOrWhiteSpace(model.OriginalTitle))
-                    model.OriginalTitle = model.Title;
-                
-                #endregion
-
-                #region Extract Other Titles
-
-                const string otherTitlesKey = "Другие названия";
-
-                var otherTitles = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, otherTitlesKey, StringComparison.InvariantCultureIgnoreCase));
-                model.OtherTitles = otherTitles?.Value.Split(';').Select(t => t.ClearString()).ToList();
-
-                #endregion
-
-                #region Extract Author
-
-                const string authorKey = "Автор";
-
-                var author = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, authorKey, StringComparison.InvariantCultureIgnoreCase));
-                model.Author = author?.Value.ClearString();
-
-                #endregion
-
-                #region Extract Series
-
-                const string seriesKey = "Серия";
-
-                var series = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, seriesKey, StringComparison.InvariantCultureIgnoreCase));
-
-                List<string> seriesList = null;
-                if (series != null)
+                if (items != null)
                 {
-                    seriesList = new List<string>();
-                    if (series.Value.Contains(':'))
-                    {
-                        var allSeries = series.Value.Split(':');
-                        seriesList.AddRange(allSeries.Select(s => s.ClearString()));
-                    }
-                    else
-                        seriesList.Add(series.Value);
+                    #region Extract Title
+
+                    model.Title = ExtractTitle(items);
+
+                    #endregion
+
+                    #region Extract Original Title
+
+                    model.OriginalTitle = ExtractOriginalTitle(items, model.Title);
+
+                    #endregion
+
+                    #region Extract Other Titles
+
+                    model.OtherTitles = ExtractOtherTitles(items);
+
+                    #endregion
+
+                    #region Extract Author
+
+                    model.Author = ExtractAuthor(items);
+
+                    #endregion
+
+                    #region Extract Series
+
+                    const string seriesKey = "Серия";
+
+                    model.Series = ExtractSeries(items);
+
+                    #endregion
+
+                    #region Extract Index
+
+                    model.Index = ExtractIndex(items);
+
+                    #endregion
+
+                    #region Extract Release Year
+
+                    model.ReleaseYear = ExtractReleaseYear(items);
+
+                    #endregion
                 }
-
-                model.Series = seriesList;
-
-                #endregion
-
-                #region Extract Index
-
-                const string indexKey = "Номер книги в серии";
-
-                var indexString = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, indexKey, StringComparison.InvariantCultureIgnoreCase));
-                var indexParseResult = int.TryParse(indexString?.Value.ClearString(), out var index);
-                model.Index = indexParseResult ? index : (int?) null;
-
-                #endregion
-
-                #region Extract Release Year
-
-                const string yearKey = "Год";
-
-                var yearString = items?.FirstOrDefault(i =>
-                    string.Equals(i.Key, yearKey, StringComparison.InvariantCultureIgnoreCase));
-                var yearParseResult = int.TryParse(yearString?.Value.ClearString(), out var year);
-                model.ReleaseYear = yearParseResult ? year : (int?) null;
-
-                #endregion
 
                 var pSecond = ps.Skip(1).FirstOrDefault();
 
                 #region Extract Description
 
-                var spanDescription = pSecond?.SelectSingleNode("./span");
-
-                var description = spanDescription?.InnerText.ClearString();
-                description = HttpUtility.HtmlDecode(description);
-                model.Description = description;
+                model.Description = ExtractDescription(ps);
 
                 #endregion
 
@@ -175,44 +107,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                 #region Extract Dowload Links
 
-                var aBookLink = pThird?.SelectSingleNode("./a");
-                var href = aBookLink?.Attributes["href"].Value;
-
-                List<(string Key, string Value)> links = null;
-                if (!string.IsNullOrWhiteSpace(href))
-                {
-                    href = ServiceUri.AppendUriPath(href);
-
-                    var selectOptions = pThird?.SelectSingleNode(".//select");
-                    var options = selectOptions?.SelectNodes("./option")?.Select(n => n.Attributes["value"].Value)
-                        .ToList();
-
-                    links = new List<(string Key, string Value)>();
-                    if (options != null && options.Any())
-                    {
-                        links.AddRange(options.Select((option, i) =>
-                            i == 0 ? (option, href) : (option, href.AppendUriPath(option))));
-                    }
-                }
-
-                model.DownloadLinks = links;
+                model.DownloadLinks = ExtractDowloadLinks(ps);
 
                 #endregion
             }
 
             #region Extract Image
 
-            var tdFirst = tds.FirstOrDefault();
-
-            var img = tdFirst?.SelectSingleNode(".//img");
-            var imageUri = img?.Attributes["src"].Value;
-            if (!string.IsNullOrWhiteSpace(imageUri))
-                imageUri = ServiceUri.AppendUriPath(imageUri);
-
-            model.ImageUri = imageUri;
-
-            var imageByteArray = await GetImageAsByteArray(imageUri);
-            model.ImageByteArray = imageByteArray;
+            model.ImageUri = ExtractImage(tds);
 
             #endregion
 
@@ -222,6 +124,188 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
         #endregion
 
         #region Private Methods
+
+        private List<(string Key, string Value)> ExtractBookData(HtmlNodeCollection ps)
+        {
+            var pFirst = ps.FirstOrDefault();
+            var text = pFirst?.InnerText;
+
+            if (text == null)
+                return null;
+
+            //^(?<key>[\w\s]+):{1}(?<value>[\w\s,;\.]+)$
+            //^(?<key>.+):{1}(?<value>.+)$
+            var regex = new Regex(@"^(?<key>[\w\s]+):{1}(?<value>.+)$");
+
+            var items = text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None)
+                .Select(l => HttpUtility.HtmlDecode(l.Trim()))
+                .Where(l => l != null && regex.IsMatch(l))
+                .Select(l =>
+                {
+                    var match = regex.Match(l);
+                    var key = match.Groups["key"]?.Value.ClearString();
+                    var value = match.Groups["value"]?.Value.ClearString();
+
+                    return (Key: key, Value: value);
+                })
+                .Where(l => l.Key != null && l.Value != null)
+                .ToList();
+
+            return items;
+        }
+
+        private string ExtractTitle(List<(string Key, string Value)> items)
+        {
+            const string titleKey = "Название";
+
+            var title = items.FirstOrDefault(i =>
+                string.Equals(i.Key, titleKey, StringComparison.InvariantCultureIgnoreCase));
+
+            return string.IsNullOrWhiteSpace(title.Value) ? null : title.Value.ClearString();
+        }
+
+        private string ExtractOriginalTitle(List<(string Key, string Value)> items, string title)
+        {
+            const string originalTitleKey = "Оригинальное название";
+
+            var originalTitle = items.FirstOrDefault(i =>
+                string.Equals(i.Key, originalTitleKey, StringComparison.InvariantCultureIgnoreCase));
+
+            return string.IsNullOrWhiteSpace(originalTitle.Value) ? title : originalTitle.Value.ClearString();
+        }
+
+        private List<string> ExtractOtherTitles(List<(string Key, string Value)> items)
+        {
+            const string otherTitlesKey = "Другие названия";
+
+            var otherTitlesTuple = items.FirstOrDefault(i =>
+                string.Equals(i.Key, otherTitlesKey, StringComparison.InvariantCultureIgnoreCase));
+
+            if (string.IsNullOrWhiteSpace(otherTitlesTuple.Value))
+                return null;
+
+            var otherTitles = otherTitlesTuple.Value.Split(';')
+                .Select(t => t.ClearString())
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .ToList();
+
+            return otherTitles;
+        }
+
+        private string ExtractAuthor(List<(string Key, string Value)> items)
+        {
+            const string authorKey = "Автор";
+
+            var author = items.FirstOrDefault(i =>
+                string.Equals(i.Key, authorKey, StringComparison.InvariantCultureIgnoreCase));
+
+            return string.IsNullOrWhiteSpace(author.Value) ? null : author.Value.ClearString();
+        }
+
+        private List<string> ExtractSeries(List<(string Key, string Value)> items)
+        {
+            const string seriesKey = "Серия";
+
+            var seriesTuple = items.FirstOrDefault(i =>
+                string.Equals(i.Key, seriesKey, StringComparison.InvariantCultureIgnoreCase));
+
+            var series = seriesTuple.Value;
+
+            if (string.IsNullOrWhiteSpace(series))
+                return null;
+
+            var seriesList = new List<string>();
+            if (series.Contains(':'))
+            {
+                var allSeries = series.Split(':');
+                seriesList.AddRange(allSeries.Select(s => s.ClearString()).Where(s => !string.IsNullOrWhiteSpace(s)));
+            }
+            else
+                seriesList.Add(series);
+
+            return seriesList;
+        }
+
+        private int? ExtractIndex(List<(string Key, string Value)> items)
+        {
+            const string indexKey = "Номер книги в серии";
+
+            var indexString = items.FirstOrDefault(i =>
+                string.Equals(i.Key, indexKey, StringComparison.InvariantCultureIgnoreCase));
+
+            if (!int.TryParse(indexString.Value.ClearString(), out var index))
+                return null;
+
+            return index;
+        }
+
+        private int? ExtractReleaseYear(List<(string Key, string Value)> items)
+        {
+            const string yearKey = "Год";
+
+            var yearString = items.FirstOrDefault(i =>
+                string.Equals(i.Key, yearKey, StringComparison.InvariantCultureIgnoreCase));
+
+            if (!int.TryParse(yearString.Value.ClearString(), out var year))
+                return null;
+
+            return year;
+        }
+
+        private string ExtractDescription(HtmlNodeCollection ps)
+        {
+            var pSecond = ps.Skip(1).FirstOrDefault();
+
+            var spanDescription = pSecond?.SelectSingleNode("./span");
+
+            if (spanDescription == null)
+                return null;
+
+            var description = spanDescription.InnerText.ClearString();
+            description = HttpUtility.HtmlDecode(description);
+            return description;
+        }
+
+        private string ExtractImage(HtmlNodeCollection tds)
+        {
+            var tdFirst = tds.FirstOrDefault();
+
+            var img = tdFirst?.SelectSingleNode(".//img");
+            var imageUri = img?.Attributes["src"]?.Value;
+            if (string.IsNullOrWhiteSpace(imageUri))
+                return null;
+
+            imageUri = ServiceUri.AppendUriPath(imageUri);
+            return imageUri;
+        }
+
+        private List<(string Key, string Value)> ExtractDowloadLinks(HtmlNodeCollection ps)
+        {
+            var pThird = ps.Skip(2).FirstOrDefault();
+
+            var aBookLink = pThird?.SelectSingleNode("./a");
+            var href = aBookLink?.Attributes["href"]?.Value;
+
+            if (string.IsNullOrWhiteSpace(href))
+                return null;
+
+            href = ServiceUri.AppendUriPath(href);
+
+            var selectOptions = pThird.SelectSingleNode(".//select");
+            var options = selectOptions?.SelectNodes("./option")?
+                .Select(n => n.Attributes["value"]?.Value)
+                .Where(o => o != null)
+                .ToList();
+
+            if (options == null || !options.Any())
+                return null;
+
+            var links = options
+                .Select((option, i) => i == 0 ? (option, href) : (option, href.AppendUriPath(option)))
+                .ToList();
+
+            return links;
+        }
 
         #endregion
     }

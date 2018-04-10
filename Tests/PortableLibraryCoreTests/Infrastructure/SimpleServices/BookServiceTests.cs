@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.BooksLibrary;
 using PortableLibrary.Core.Extensions;
@@ -11,6 +13,22 @@ namespace PortableLibraryCoreTests.Infrastructure.SimpleServices
 {
     public class BookServiceTests
     {
+        #region Fields
+
+        private readonly Mapper _mapper;
+
+        #endregion
+
+        #region .ctor
+
+        public BookServiceTests()
+        {
+            var config = new MapperConfiguration(cfg => { cfg.AddProfile<ExternalBooksProfile>(); });
+            _mapper = new Mapper(config);
+        }
+
+        #endregion
+
         #region Tests
 
         [Fact]
@@ -50,9 +68,9 @@ namespace PortableLibraryCoreTests.Infrastructure.SimpleServices
 
         private DbContextOptions<T> GetDatabaseOptions<T>(string dbName)
             where T : DbContext =>
-                new DbContextOptionsBuilder<T>()
-                    .UseInMemoryDatabase(databaseName: dbName)
-                    .Options;
+            new DbContextOptionsBuilder<T>()
+                .UseInMemoryDatabase(databaseName: dbName)
+                .Options;
 
         #endregion
     }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models;
+using PortableLibrary.Core.Infrastructure.External.Models.Book;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 {
@@ -41,10 +42,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
                 #region Extract book's cover image
 
                 var imageUri = ExtractImage(divInfo1);
-                var imageByteArray = await GetImageAsByteArray(imageUri);
 
                 model.ImageUri = imageUri;
-                model.ImageByteArray = imageByteArray;
 
                 #endregion
 
@@ -99,7 +98,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                 #region Extract book's publish date
 
-                model.DatePublished = ExtractBookPublishDate(divBiblioBookInfoDetailed);
+                model.ReleaseYear = ExtractBookReleaseYear(divBiblioBookInfoDetailed);
 
                 #endregion
 
@@ -198,7 +197,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return divBiblioBookDescrPublishers?.InnerText.Trim();
         }
 
-        private static DateTime? ExtractBookPublishDate(HtmlNode divBiblioBookInfoDetailed)
+        private static int? ExtractBookReleaseYear(HtmlNode divBiblioBookInfoDetailed)
         {
             if (divBiblioBookInfoDetailed == null) return null;
 
@@ -209,8 +208,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             if (liDatePublished == null) return null;
 
             var date = Regex.Match(liDatePublished.InnerText, @"\d+").Value;
-            int.TryParse(date, out var year);
-            return new DateTime(year, 1, 1);
+            if (!int.TryParse(date, out var year))
+                return null;
+            return year;
         }
 
         private static int? ExtractBookPagesCount(HtmlNode divBiblioBookInfoDetailed)

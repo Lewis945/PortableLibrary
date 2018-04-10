@@ -43,10 +43,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                 "играющие в самом тяжелом режиме с включенными ощущениями.",
                 model.Description, true);
 
-            Assert.Null(model.Year);
+            Assert.Null(model.ReleaseYear);
 
             Assert.Null(model.DownloadLinks);
-            Assert.Null(model.DownloadBooks);
         }
 
         [Fact]
@@ -80,7 +79,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                 "пора сделать первый шаг и попробовать силы в схватке с врагом.",
                 model.Description, true);
 
-            Assert.Equal(2008, model.Year);
+            Assert.Equal(2008, model.ReleaseYear);
 
             Assert.Collection(model.DownloadLinks,
                item => Assert.True(item.Type.Equals("fb2") &&
@@ -128,10 +127,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                 "выжить, но и стать тем, кого весь обитаемый космос знает как Билла - героя Галактики.",
                 model.Description, true);
 
-            Assert.Equal(1965, model.Year);
+            Assert.Equal(1965, model.ReleaseYear);
 
             Assert.Null(model.DownloadLinks);
-            Assert.Null(model.DownloadBooks);
         }
 
         [Fact]
@@ -163,10 +161,9 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                 "и на планете закупоренных мозгов.",
                 model.Description, true);
 
-            Assert.Equal(1989, model.Year);
+            Assert.Equal(1989, model.ReleaseYear);
 
             Assert.Null(model.DownloadLinks);
-            Assert.Null(model.DownloadBooks);
         }
 
         [Fact]
@@ -200,7 +197,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                 "ОГНЕННЫЙ ФАКУЛЬТЕТ.",
                 model.Description, true);
 
-            Assert.Equal(2005, model.Year);
+            Assert.Equal(2005, model.ReleaseYear);
 
             Assert.Collection(model.DownloadLinks,
                item => Assert.True(item.Type.Equals("fb2") &&
@@ -258,7 +255,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal(testDescription, modelDescription, true);
 
-            Assert.Equal(2006, model.Year);
+            Assert.Equal(2006, model.ReleaseYear);
 
             Assert.Collection(model.DownloadLinks,
                item => Assert.True(item.Type.Equals("fb2") &&
