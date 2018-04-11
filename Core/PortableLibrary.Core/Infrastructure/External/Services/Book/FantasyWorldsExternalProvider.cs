@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
-using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
 using PortableLibrary.Core.Utilities;
 
@@ -141,6 +140,48 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             #endregion
 
             return model;
+        }
+
+        public async Task<List<FantasyWorldsTrackedBookModel>> ExtractBooksToTrack(string uri)
+        {
+            var web = new HtmlWeb();
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
+
+            var divBooklList = document.DocumentNode.SelectNodes(".//div")?
+                .FirstOrDefault(n => n.HasClass("rightBlock"));
+
+            var uls = divBooklList?.SelectNodes(".//ul");
+
+            var ul = uls?.LastOrDefault();
+
+            var lis = ul?.SelectNodes(".//li");
+
+            if (lis == null)
+                return null;
+
+            var books = new List<FantasyWorldsTrackedBookModel>();
+
+            foreach (var li in lis)
+            {
+                var aBook = li.SelectNodes("./a")?.FirstOrDefault();
+
+                if (aBook == null)
+                    continue;
+
+                var indexNode = li.FirstChild;
+                string indexString = indexNode?.InnerText.ClearString();
+                var index = indexString.ParseNumber();
+
+                string title = aBook.InnerText.ClearString();
+
+                books.Add(new FantasyWorldsTrackedBookModel
+                {
+                    Title = title,
+                    Index = index
+                });
+            }
+
+            return books;
         }
 
         #endregion

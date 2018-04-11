@@ -23,10 +23,10 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
         #endregion
 
-        #region Tests
+        #region Extract Book Tests
 
         [Fact]
-        public async Task Should_Extract_Gary_Garrison_The_Stainless_Steel_Rat_Goes_to_Hell()
+        public async Task Should_Extract_Book_Gary_Garrison_The_Stainless_Steel_Rat_Goes_to_Hell()
         {
             var service = new FantasyWorldsExternalProvider(_retryService);
 
@@ -66,7 +66,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_Alex_Kosh_Ogneniy_Orden()
+        public async Task Should_Extract_Book_Alex_Kosh_Ogneniy_Orden()
         {
             var service = new FantasyWorldsExternalProvider(_retryService);
 
@@ -123,7 +123,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_Alex_Kosh_Soyuz_Proklyatuh()
+        public async Task Should_Extract_Book_Alex_Kosh_Soyuz_Proklyatuh()
         {
             var service = new FantasyWorldsExternalProvider(_retryService);
 
@@ -171,7 +171,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_John_R_R_Tolkien_The_Fellowship_of_the_Ring()
+        public async Task Should_Extract_Book_John_R_R_Tolkien_The_Fellowship_of_the_Ring()
         {
             var service = new FantasyWorldsExternalProvider(_retryService);
 
@@ -222,7 +222,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_Ray_Bradbury_Fahrenheit_451()
+        public async Task Should_Extract_Book_Ray_Bradbury_Fahrenheit_451()
         {
             var service = new FantasyWorldsExternalProvider(_retryService);
 
@@ -264,6 +264,168 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal(1953, model.ReleaseYear);
 
             Assert.Null(model.DownloadLinks);
+        }
+
+        #endregion
+
+        #region Extract Books to Track Tests
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Gary_Garrison_Krusa_iz_Nerzhveyushey_Stali()
+        {
+            var service = new FantasyWorldsExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantasy-worlds.org/series/id655/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Рождение Стальной Крысы", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса идет в армию", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Крыса из нержавеющей стали", item.Title, true);
+                    Assert.Equal(3, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Месть крысы из нержавеющей стали", item.Title, true);
+                    Assert.Equal(4, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Крыса из нержавеющей стали спасает мир", item.Title, true);
+                    Assert.Equal(5, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Ты нужен Стальной Крысе", item.Title, true);
+                    Assert.Equal(6, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальную Крысу – в президенты!", item.Title, true);
+                    Assert.Equal(7, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса поет блюз", item.Title, true);
+                    Assert.Equal(8, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Золотые годы Стальной Крысы", item.Title, true);
+                    Assert.Equal(9, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса отправляется в ад", item.Title, true);
+                    Assert.Equal(9, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса на манеже", item.Title, true);
+                    Assert.Equal(10, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Новые приключения Стальной Крысы", item.Title, true);
+                    Assert.Equal(12, item.Index);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Alex_Kosh_Remeslo()
+        {
+            var service = new FantasyWorldsExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantasy-worlds.org/series/id872/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Огненный факультет", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Огненный патруль", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Огненный орден", item.Title, true);
+                    Assert.Equal(3, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Огненный Легион", item.Title, true);
+                    Assert.Equal(4, item.Index);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Alex_Kosh_Odinochka()
+        {
+            var service = new FantasyWorldsExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantasy-worlds.org/series/id4111/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Дорога мечей", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Союз проклятых", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_John_R_R_Tolkien_The_Fellowship_of_the_Ring()
+        {
+            var service = new FantasyWorldsExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantasy-worlds.org/series/id1740/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Властелин колец", item.Title, true);
+                    Assert.Null(item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Хранители Кольца", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Две твердыни", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Возвращение короля", item.Title, true);
+                    Assert.Equal(3, item.Index);
+                }
+            );
         }
 
         #endregion
