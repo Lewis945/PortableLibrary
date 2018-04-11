@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
-using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
 using PortableLibrary.Core.Utilities;
 
@@ -39,7 +38,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region IExternalServiceProvider
 
-        public async Task<LitresBookModel> Extract(string uri)
+        public async Task<LitresBookModel> ExtractBook(string uri)
         {
             var model = new LitresBookModel();
 
@@ -122,6 +121,40 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             }
 
             return model;
+        }
+
+        public async Task<List<LitresTrackedBookModel>> ExtractBooksToTrack(string uri)
+        {
+            var web = new HtmlWeb();
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
+
+            var divSerie = document.DocumentNode.SelectNodes(".//div")?
+                .FirstOrDefault(n => n.HasClass("serie"));
+
+            var divsBookTitle = divSerie?.SelectNodes(".//div").Where(n => n.HasClass("booktitle"));
+
+            if (divsBookTitle == null)
+                return null;
+
+            var books = new List<LitresTrackedBookModel>();
+
+            int counter = 1;
+            foreach (var divBookTitle in divsBookTitle)
+            {
+                var aTitle = divBookTitle.SelectNodes(".//a")?.FirstOrDefault(n => n.HasClass("title"));
+
+                var title = aTitle?.InnerText.ClearString();
+
+                books.Add(new LitresTrackedBookModel
+                {
+                    Title = title,
+                    Index = counter
+                });
+
+                counter++;
+            }
+
+            return books;
         }
 
         #endregion

@@ -22,14 +22,14 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
         #endregion
 
-        #region Tests
+        #region Extract Book Tests
 
         [Fact]
-        public async Task Should_Extract_Alex_Kosh_Soyuz_Proklyatuh()
+        public async Task Should_Extract_Book_Alex_Kosh_Soyuz_Proklyatuh()
         {
             var service = new LitresExternalProvider(_retryService);
 
-            var model = await service.Extract("https://www.litres.ru/aleks-kosh/souz-proklyatyh/");
+            var model = await service.ExtractBook("https://www.litres.ru/aleks-kosh/souz-proklyatyh/");
 
             Assert.Equal("https://cv4.litres.ru/sbc/25539349_cover-elektronnaya-kniga-aleks-kosh-souz-proklyatyh.jpg",
                 model.ImageUri, true);
@@ -69,17 +69,17 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_Alex_Kosh_Igry_Masok()
+        public async Task Should_Extract_Book_Alex_Kosh_Igry_Masok()
         {
             var service = new LitresExternalProvider(_retryService);
 
-            var model = await service.Extract("https://www.litres.ru/aleks-kosh/igry-masok/");
+            var model = await service.ExtractBook("https://www.litres.ru/aleks-kosh/igry-masok/");
 
             Assert.Equal("https://cv9.litres.ru/sbc/00827592_cover-elektronnaya-kniga-aleks-kosh-igry-masok.jpg",
                 model.ImageUri, true);
 
             Assert.Null(model.TrackingUri);
-            
+
             Assert.Equal("Игры Масок", model.Title, true);
 
             Assert.Equal("Алекс Кош", model.Author, true);
@@ -109,18 +109,18 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_Gary_Garrison_Rozhdenie_Stalnoy_Krusu()
+        public async Task Should_Extract_Book_Gary_Garrison_Rozhdenie_Stalnoy_Krusu()
         {
             var service = new LitresExternalProvider(_retryService);
 
-            var model = await service.Extract("https://www.litres.ru/garri-garrison/rozhdenie-stalnoy-krysy/");
+            var model = await service.ExtractBook("https://www.litres.ru/garri-garrison/rozhdenie-stalnoy-krysy/");
 
             Assert.Equal(
                 "https://cv8.litres.ru/sbc/07036886_cover-elektronnaya-kniga-garri-garrison-rozhdenie-stalnoy-krysy.jpg",
                 model.ImageUri, true);
 
             Assert.Equal("https://www.litres.ru/serii-knig/stalnaya-krysa/", model.TrackingUri, true);
-            
+
             Assert.Equal("Рождение Стальной Крысы", model.Title, true);
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);
@@ -148,17 +148,17 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         }
 
         [Fact]
-        public async Task Should_Extract_Dem_Mihaylov_Grom_Nebesnuy()
+        public async Task Should_Extract_Book_Dem_Mihaylov_Grom_Nebesnuy()
         {
             var service = new LitresExternalProvider(_retryService);
 
-            var model = await service.Extract("https://www.litres.ru/dem-mihaylov/grom-nebesnyy/");
+            var model = await service.ExtractBook("https://www.litres.ru/dem-mihaylov/grom-nebesnyy/");
 
             Assert.Equal("https://cv3.litres.ru/sbc/12100038_cover-elektronnaya-kniga-dem-mihaylov-grom-nebesnyy.jpg",
                 model.ImageUri, true);
 
             Assert.Equal("https://www.litres.ru/serii-knig/gospodstvo-klana-nespyaschih/", model.TrackingUri, true);
-            
+
             Assert.Equal("Гром небесный", model.Title, true);
 
             Assert.Equal("Дем Михайлов", model.Author, true);
@@ -188,6 +188,152 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal(2015, model.ReleaseYear);
         }
 
+        #endregion
+
+        #region Extract Books to Track Tests
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Alex_Kosh_Odinochka()
+        {
+            var service = new LitresExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://www.litres.ru/serii-knig/odinochka-441373/");
+
+            Assert.NotNull(model);
+            
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Одиночка. Дорога мечей", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Союз проклятых", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                }
+            );
+        }
+        
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Gary_Garrison_Stalnay_Krusa()
+        {
+            var service = new LitresExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://www.litres.ru/serii-knig/stalnaya-krysa/");
+
+            Assert.NotNull(model);
+            
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Рождение Стальной Крысы", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса идет в армию", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса", item.Title, true);
+                    Assert.Equal(3, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Месть Стальной Крысы", item.Title, true);
+                    Assert.Equal(4, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса спасает мир", item.Title, true);
+                    Assert.Equal(5, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Ты нужен Стальной Крысе", item.Title, true);
+                    Assert.Equal(6, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальную Крысу – в президенты!", item.Title, true);
+                    Assert.Equal(7, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса поет блюз", item.Title, true);
+                    Assert.Equal(8, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Золотые годы Стальной Крысы", item.Title, true);
+                    Assert.Equal(9, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса отправляется в ад", item.Title, true);
+                    Assert.Equal(10, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса на манеже", item.Title, true);
+                    Assert.Equal(11, item.Index);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Dem_Mihaylov_Gospodstvo_Klana_Nespyashih()
+        {
+            var service = new LitresExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://www.litres.ru/serii-knig/gospodstvo-klana-nespyaschih/");
+
+            Assert.NotNull(model);
+            
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Господство кланов", item.Title, true);
+                    Assert.Equal(1, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Судьба клана", item.Title, true);
+                    Assert.Equal(2, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Ярость богов", item.Title, true);
+                    Assert.Equal(3, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Гром небесный", item.Title, true);
+                    Assert.Equal(4, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Ультиматум", item.Title, true);
+                    Assert.Equal(5, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Запределье", item.Title, true);
+                    Assert.Equal(6, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Ярость Гуорры", item.Title, true);
+                    Assert.Equal(7, item.Index);
+                }
+            );
+        }
+        
         #endregion
     }
 }
