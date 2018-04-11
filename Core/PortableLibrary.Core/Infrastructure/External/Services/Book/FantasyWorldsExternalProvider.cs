@@ -109,6 +109,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
                     model.ReleaseYear = ExtractReleaseYear(items);
 
                     #endregion
+
+                    #region Extract Tracking Uri
+
+                    model.TrackingUri = ExtractTrackingUri(ps, seriesKey, model.Series?.LastOrDefault());
+
+                    #endregion
                 }
 
                 var pSecond = ps.Skip(1).FirstOrDefault();
@@ -141,7 +147,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region Private Methods
 
-        private List<(string Key, string Value)> ExtractBookData(HtmlNodeCollection ps)
+        private static List<(string Key, string Value)> ExtractBookData(HtmlNodeCollection ps)
         {
             var pFirst = ps.FirstOrDefault();
             var text = pFirst?.InnerText;
@@ -153,7 +159,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             //^(?<key>.+):{1}(?<value>.+)$
             var regex = new Regex(@"^(?<key>[\w\s]+):{1}(?<value>.+)$");
 
-            var items = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+            var items = text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None)
                 .Select(l => HttpUtility.HtmlDecode(l.Trim()))
                 .Where(l => l != null && regex.IsMatch(l))
                 .Select(l =>
@@ -170,7 +176,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return items;
         }
 
-        private string ExtractTitle(List<(string Key, string Value)> items)
+        private static string ExtractTitle(IEnumerable<(string Key, string Value)> items)
         {
             const string titleKey = "Название";
 
@@ -180,7 +186,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return string.IsNullOrWhiteSpace(title.Value) ? null : title.Value.ClearString();
         }
 
-        private string ExtractOriginalTitle(List<(string Key, string Value)> items, string title)
+        private static string ExtractOriginalTitle(IEnumerable<(string Key, string Value)> items, string title)
         {
             const string originalTitleKey = "Оригинальное название";
 
@@ -190,7 +196,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return string.IsNullOrWhiteSpace(originalTitle.Value) ? title : originalTitle.Value.ClearString();
         }
 
-        private List<string> ExtractOtherTitles(List<(string Key, string Value)> items)
+        private static List<string> ExtractOtherTitles(IEnumerable<(string Key, string Value)> items)
         {
             const string otherTitlesKey = "Другие названия";
 
@@ -208,7 +214,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return otherTitles;
         }
 
-        private string ExtractAuthor(List<(string Key, string Value)> items)
+        private static string ExtractAuthor(IEnumerable<(string Key, string Value)> items)
         {
             const string authorKey = "Автор";
 
@@ -218,7 +224,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return string.IsNullOrWhiteSpace(author.Value) ? null : author.Value.ClearString();
         }
 
-        private List<string> ExtractSeries(List<(string Key, string Value)> items)
+        private static List<string> ExtractSeries(IEnumerable<(string Key, string Value)> items)
         {
             const string seriesKey = "Серия";
 
@@ -242,7 +248,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return seriesList;
         }
 
-        private int? ExtractIndex(List<(string Key, string Value)> items)
+        private static int? ExtractIndex(IEnumerable<(string Key, string Value)> items)
         {
             const string indexKey = "Номер книги в серии";
 
@@ -255,7 +261,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return index;
         }
 
-        private int? ExtractReleaseYear(List<(string Key, string Value)> items)
+        private static int? ExtractReleaseYear(IEnumerable<(string Key, string Value)> items)
         {
             const string yearKey = "Год";
 
@@ -268,7 +274,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return year;
         }
 
-        private string ExtractDescription(HtmlNodeCollection ps)
+        private static string ExtractDescription(HtmlNodeCollection ps)
         {
             var pSecond = ps.Skip(1).FirstOrDefault();
 
@@ -293,6 +299,28 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
             imageUri = ServiceUri.AppendUriPath(imageUri);
             return imageUri;
+        }
+
+        private string ExtractTrackingUri(HtmlNodeCollection ps, string seriesKey, string serieTitle)
+        {
+            if (string.IsNullOrWhiteSpace(serieTitle))
+                return null;
+
+            var bs = ps.SelectMany(p => p.SelectNodes(".//b") ?? new HtmlNodeCollection(null));
+
+            var bSeries = bs.FirstOrDefault(b =>
+                b.InnerText?.ToLowerInvariant().Contains(seriesKey.ToLowerInvariant()) ?? false);
+
+            var pDescription = bSeries?.ParentNode;
+
+            var aNodes = pDescription?.SelectNodes(".//a");
+
+            var aSerie = aNodes?.FirstOrDefault(an =>
+                string.Equals(an.InnerText, serieTitle, StringComparison.InvariantCultureIgnoreCase));
+
+            var href = aSerie?.Attributes["href"]?.Value;
+
+            return href == null ? null : ServiceUri.AppendUriPath(href);
         }
 
         private List<(string Key, string Value)> ExtractDowloadLinks(HtmlNodeCollection ps)

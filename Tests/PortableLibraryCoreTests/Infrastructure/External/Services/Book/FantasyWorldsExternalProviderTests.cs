@@ -1,7 +1,7 @@
-﻿using PortableLibrary.Core.Infrastructure.External.Services.Book;
-using PortableLibrary.Core.Utilities;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.External.Services.Book;
+using PortableLibrary.Core.Utilities;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
@@ -34,6 +34,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("https://fantasy-worlds.org/img/preview/34/3422.jpg",
                 model.ImageUri, true);
+
+            Assert.Equal("https://fantasy-worlds.org/series/id655/", model.TrackingUri, true);
 
             Assert.Equal("Стальная Крыса отправляется в ад", model.Title, true);
             Assert.Equal("The Stainless Steel Rat Goes to Hell", model.OriginalTitle, true);
@@ -72,6 +74,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("https://fantasy-worlds.org/img/preview/149/14932.jpg",
                 model.ImageUri, true);
+
+            Assert.Equal("https://fantasy-worlds.org/series/id872/", model.TrackingUri, true);
 
             Assert.Equal("Огненный орден", model.Title, true);
             Assert.Equal("Огненный орден", model.OriginalTitle, true);
@@ -128,6 +132,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("https://fantasy-worlds.org/img/preview/253/25365.jpg",
                 model.ImageUri, true);
 
+            Assert.Equal("https://fantasy-worlds.org/series/id4111/", model.TrackingUri, true);
+
             Assert.Equal("Союз проклятых", model.Title, true);
             Assert.Equal("Союз проклятых", model.OriginalTitle, true);
 
@@ -173,6 +179,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("https://fantasy-worlds.org/img/preview/258/25800.jpg",
                 model.ImageUri, true);
+
+            Assert.Equal("https://fantasy-worlds.org/series/id1740/", model.TrackingUri, true);
 
             Assert.Equal("Хранители Кольца", model.Title, true);
             Assert.Equal("The Fellowship of the Ring", model.OriginalTitle, true);
@@ -222,6 +230,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("https://fantasy-worlds.org/img/preview/137/13732.jpg",
                 model.ImageUri, true);
+
+            Assert.Null(model.TrackingUri);
 
             Assert.Equal("451° по Фаренгейту", model.Title, true);
             Assert.Equal("Fahrenheit 451", model.OriginalTitle, true);

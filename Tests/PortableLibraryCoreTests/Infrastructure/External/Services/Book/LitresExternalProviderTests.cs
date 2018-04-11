@@ -1,6 +1,6 @@
-﻿using PortableLibrary.Core.Infrastructure.External.Services.Book;
+﻿using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.External.Services.Book;
 using PortableLibrary.Core.Utilities;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
@@ -33,6 +33,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
             Assert.Equal("https://cv4.litres.ru/sbc/25539349_cover-elektronnaya-kniga-aleks-kosh-souz-proklyatyh.jpg",
                 model.ImageUri, true);
+
+            Assert.Equal("https://www.litres.ru/serii-knig/odinochka-441373/", model.TrackingUri, true);
 
             Assert.Equal("Союз проклятых", model.Title, true);
 
@@ -76,6 +78,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("https://cv9.litres.ru/sbc/00827592_cover-elektronnaya-kniga-aleks-kosh-igry-masok.jpg",
                 model.ImageUri, true);
 
+            Assert.Null(model.TrackingUri);
+            
             Assert.Equal("Игры Масок", model.Title, true);
 
             Assert.Equal("Алекс Кош", model.Author, true);
@@ -115,6 +119,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
                 "https://cv8.litres.ru/sbc/07036886_cover-elektronnaya-kniga-garri-garrison-rozhdenie-stalnoy-krysy.jpg",
                 model.ImageUri, true);
 
+            Assert.Equal("https://www.litres.ru/serii-knig/stalnaya-krysa/", model.TrackingUri, true);
+            
             Assert.Equal("Рождение Стальной Крысы", model.Title, true);
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);
@@ -151,6 +157,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal("https://cv3.litres.ru/sbc/12100038_cover-elektronnaya-kniga-dem-mihaylov-grom-nebesnyy.jpg",
                 model.ImageUri, true);
 
+            Assert.Equal("https://www.litres.ru/serii-knig/gospodstvo-klana-nespyaschih/", model.TrackingUri, true);
+            
             Assert.Equal("Гром небесный", model.Title, true);
 
             Assert.Equal("Дем Михайлов", model.Author, true);

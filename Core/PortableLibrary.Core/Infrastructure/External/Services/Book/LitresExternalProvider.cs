@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services;
-using PortableLibrary.Core.Infrastructure.External.Models;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
 using PortableLibrary.Core.Utilities;
 
@@ -75,18 +72,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
                 #endregion
 
-                #region Extract book's series
+                #region Extract book's series, Index and Tracking Uri
 
                 var series = ExtractBookSeries(divInfo1).ToList();
 
-                var authorSeries = series.FirstOrDefault(s => s.Index > 0);
-                if (!authorSeries.Equals(default((string, int))))
-                {
-                    model.AuthorSeries = authorSeries.Name;
-                    model.Index = authorSeries.Index;
-                }
+                var authorSeries = series.FirstOrDefault(s => s.Index.HasValue);
 
-                var publisherSeries = series.Where(s => s.Index == 0).Select(s => s.Name).ToList();
+                model.AuthorSeries = string.IsNullOrWhiteSpace(authorSeries.Name) ? null : authorSeries.Name;
+                model.Index = authorSeries.Index.HasValue ? authorSeries.Index.Value : (int?) null;
+                model.TrackingUri = string.IsNullOrWhiteSpace(authorSeries.Uri) ? null : authorSeries.Uri;
+
+                var publisherSeries = series.Where(s => !s.Index.HasValue).Select(s => s.Name).ToList();
                 model.PublishersSeries = publisherSeries.Count > 0 ? publisherSeries : null;
 
                 #endregion
@@ -167,7 +163,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return authorLink?.InnerText.Trim();
         }
 
-        private static IEnumerable<(string Name, int Index)> ExtractBookSeries(HtmlNode divInfo1)
+        private IEnumerable<(string Name, string Uri, int? Index)> ExtractBookSeries(HtmlNode divInfo1)
         {
             var divBiblioBookSequences = divInfo1.SelectNodes(".//div")?
                 .Where(d => d.HasClass("biblio_book_sequences"))
@@ -180,18 +176,23 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             {
                 var spanSeries = divBiblioBookSequence.SelectNodes("./span")?
                     .FirstOrDefault(n => n.HasClass("serie_item"));
+
                 if (spanSeries == null) continue;
 
+                var aSerie = spanSeries.SelectNodes("./a")?
+                    .FirstOrDefault(n => n.HasClass("biblio_book_sequences__link"));
+
+                if (aSerie == null)
+                    yield break;
+
+                var href = aSerie.Attributes["href"]?.Value;
+                if (!string.IsNullOrWhiteSpace(href))
+                    href = ServiceUri.AppendUriPath(href);
+
                 var spanNumber = spanSeries.SelectNodes("./span")?.FirstOrDefault(n => n.HasClass("number"));
-                if (spanNumber != null)
-                {
-                    var numberString = spanNumber.InnerText.Replace("#", string.Empty);
-                    int.TryParse(numberString, out var index);
-                    string series = spanSeries.InnerText.Replace(spanNumber.InnerText, string.Empty).Trim();
-                    yield return (series, index);
-                }
-                else
-                    yield return (spanSeries.InnerText.Trim(), 0);
+                var index = spanNumber?.InnerText.ParseNumber();
+
+                yield return (aSerie.InnerText.Trim(), href, index);
             }
         }
 
