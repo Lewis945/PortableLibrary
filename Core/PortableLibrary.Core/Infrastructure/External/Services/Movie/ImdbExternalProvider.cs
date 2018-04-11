@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models;
+using PortableLibrary.Core.Infrastructure.External.Models.Movie;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Movie
 {

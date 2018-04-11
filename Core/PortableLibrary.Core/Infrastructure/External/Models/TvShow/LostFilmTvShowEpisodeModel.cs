@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PortableLibrary.Core.Infrastructure.External.Models
+namespace PortableLibrary.Core.Infrastructure.External.Models.TvShow
 {
     public class LostFilmTvShowEpisodeModel
     {
