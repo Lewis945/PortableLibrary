@@ -13,7 +13,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// <summary>
     /// https://www.litres.ru
     /// </summary>
-    public class LitresExternalProvider : BaseExternalProvider, IExternalServiceProvider<LitresBookModel>
+    public class LitresExternalProvider : BaseExternalProvider
     {
         #region Properties
 

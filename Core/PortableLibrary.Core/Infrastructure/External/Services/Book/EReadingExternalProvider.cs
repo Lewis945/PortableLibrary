@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
-using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
 using PortableLibrary.Core.Utilities;
 
@@ -16,7 +14,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// <summary>
     /// https://www.e-reading.club
     /// </summary>
-    public class EReadingExternalProvider : BaseExternalProvider, IExternalServiceProvider<EReadingBookModel>
+    public class EReadingExternalProvider : BaseExternalProvider
     {
         #region Properties
 
@@ -43,7 +41,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region IExternalServiceProvider
 
-        public async Task<EReadingBookModel> Extract(string uri)
+        public async Task<EReadingBookModel> ExtractBook(string uri)
         {
             var model = new EReadingBookModel();
 
@@ -162,6 +160,55 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             return model;
         }
 
+        public async Task<List<EReadingTrackedBookModel>> ExtractBooksToTrack(string uri)
+        {
+            var seriesDocument = await GetDocument(uri);
+
+            var tableBooklList = seriesDocument.DocumentNode.SelectNodes(".//table")?
+                .FirstOrDefault(n => n.HasClass("booklist"));
+
+            var trs = tableBooklList?.SelectNodes(".//tr");
+
+            if (trs == null)
+                return null;
+
+            var regex = new Regex(@"^(?<index>[\d]+\.).*");
+
+            var books = new List<EReadingTrackedBookModel>();
+
+            foreach (var tr in trs)
+            {
+                var divBook = tr.SelectNodes(".//div")?.FirstOrDefault();
+
+                if (divBook == null)
+                    continue;
+
+                var aLinks = divBook.SelectNodes(".//a");
+                var aBook = aLinks?.LastOrDefault();
+
+                if (aBook == null)
+                    continue;
+
+                var match = regex.Match(tr.InnerText.ClearString());
+
+                if (!match.Success)
+                    continue;
+
+                string indexString = match.Groups["index"]?.Value.ClearString();
+                var index = indexString.ParseNumber();
+
+                string title = aBook.InnerText.ClearString();
+
+                books.Add(new EReadingTrackedBookModel
+                {
+                    Title = title,
+                    Index = index
+                });
+            }
+
+            return books;
+        }
+
         #endregion
 
         #region Private Methods
@@ -169,12 +216,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
         private async Task<HtmlDocument> GetDocument(string uri)
         {
             var win1251 = Encoding.GetEncoding("windows-1251");
-
-            var wc = new WebClient { Encoding = win1251 };
-            string str = await _retryService.ExecuteAsync(() => wc.DownloadStringTaskAsync(uri));
-            var document = new HtmlDocument();
-            document.LoadHtml(str);
-            return document;
+            var web = new HtmlWeb();
+            return await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri, win1251));
         }
 
         private string GetImageUri(HtmlNodeCollection tdsInner)
@@ -233,13 +276,13 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             if (trsAll == null) return null;
 
             var trSerie = trsAll.Where(tr =>
-            {
-                var trText = tr.InnerText;
-                trText = trText.ClearString().RemoveNewLines();
-                var match = trText.StartsWith(key);
-                return match;
-            })
-            .FirstOrDefault();
+                {
+                    var trText = tr.InnerText;
+                    trText = trText.ClearString().RemoveNewLines();
+                    var match = trText.StartsWith(key);
+                    return match;
+                })
+                .FirstOrDefault();
 
             var aSerie = trSerie?.SelectSingleNode(".//a");
 
@@ -250,8 +293,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         private async Task<int?> ExtractBookIndex(string trackingUri, string title)
         {
-            var web = new HtmlWeb();
-
             var seriesDocument = await GetDocument(trackingUri);
 
             var tableBooklList = seriesDocument.DocumentNode.SelectNodes(".//table")?

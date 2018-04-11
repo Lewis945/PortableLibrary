@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// <summary>
     /// https://fantasy-worlds.org
     /// </summary>
-    public class FantasyWorldsExternalProvider : BaseExternalProvider, IExternalServiceProvider<FantasyWorldsBookModel>
+    public class FantasyWorldsExternalProvider : BaseExternalProvider
     {
         #region Properties
 

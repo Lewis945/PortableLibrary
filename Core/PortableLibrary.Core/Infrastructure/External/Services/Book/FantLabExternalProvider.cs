@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
     /// <summary>
     /// https://fantlab.ru
     /// </summary>
-    public class FantLabExternalProvider : BaseExternalProvider, IExternalServiceProvider<FantLabBookModel>
+    public class FantLabExternalProvider : BaseExternalProvider
     {
         #region Properties
 
