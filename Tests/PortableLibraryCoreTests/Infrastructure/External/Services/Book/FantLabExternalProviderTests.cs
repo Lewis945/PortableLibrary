@@ -23,14 +23,14 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
 
         #endregion
 
-        #region Tests
+        #region Extract Book Tests
 
         [Fact]
         public async Task Should_Extract_Alex_Kosh_Ogneniy_Facultet()
         {
             var service = new FantLabExternalProvider(_retryService);
 
-            var model = await service.Extract("https://fantlab.ru/work43493");
+            var model = await service.ExtractBook("https://fantlab.ru/work43493");
 
             Assert.Equal("https://data.fantlab.ru/images/editions/big/21842",
                 model.ImageUri, true);
@@ -74,7 +74,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         {
             var service = new FantLabExternalProvider(_retryService);
 
-            var model = await service.Extract("https://fantlab.ru/work43496");
+            var model = await service.ExtractBook("https://fantlab.ru/work43496");
 
             Assert.Equal("https://data.fantlab.ru/images/editions/big/58726",
                 model.ImageUri, true);
@@ -119,7 +119,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         {
             var service = new FantLabExternalProvider(_retryService);
 
-            var model = await service.Extract("https://fantlab.ru/work2455");
+            var model = await service.ExtractBook("https://fantlab.ru/work2455");
 
             Assert.Equal("https://data.fantlab.ru/images/editions/big/7440",
                 model.ImageUri, true);
@@ -168,7 +168,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         {
             var service = new FantLabExternalProvider(_retryService);
 
-            var model = await service.Extract("https://fantlab.ru/work2458");
+            var model = await service.ExtractBook("https://fantlab.ru/work2458");
 
             Assert.Equal("https://data.fantlab.ru/images/editions/big/1306",
                 model.ImageUri, true);
@@ -217,7 +217,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         {
             var service = new FantLabExternalProvider(_retryService);
 
-            var model = await service.Extract("https://fantlab.ru/work229786");
+            var model = await service.ExtractBook("https://fantlab.ru/work229786");
 
             Assert.Equal("https://data.fantlab.ru/images/editions/big/52167",
                 model.ImageUri, true);
@@ -263,7 +263,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
         {
             var service = new FantLabExternalProvider(_retryService);
 
-            var model = await service.Extract("https://fantlab.ru/work233376");
+            var model = await service.ExtractBook("https://fantlab.ru/work233376");
 
             Assert.Equal("https://data.fantlab.ru/images/editions/big/67871",
                 model.ImageUri, true);
@@ -306,6 +306,216 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.Book
             Assert.Equal(2011, model.ReleaseYear);
         }
 
+        #endregion
+
+        #region Extract Books to Track Tests
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Alex_Kosh_Remeslo()
+        {
+            var service = new FantLabExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantlab.ru/work43498/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Огненный факультет", item.Title, true);
+                    Assert.Equal("Огненный факультет", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Огненный патруль", item.Title, true);
+                    Assert.Equal("Огненный патруль", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Огненный орден", item.Title, true);
+                    Assert.Equal("Огненный орден", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Огненный Легион", item.Title, true);
+                    Assert.Equal("Огненный Легион", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Ремесло. Легенда о даре дракона", item.Title, true);
+                    Assert.Equal("Ремесло. Легенда о даре дракона", item.OriginalTitle, true);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Gary_Garrison_Steel_Rat()
+        {
+            var service = new FantLabExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantlab.ru/work2454/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Рождение Стальной Крысы", item.Title, true);
+                    Assert.Equal("A Stainless Steel Rat is Born", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса идет в армию", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat Gets Drafted", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса поет блюз", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat Sings the Blues", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Месть Стальной Крысы", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat's Revenge", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса спасает мир", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat Saves the World", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Ты нужен Стальной Крысе", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat Wants You!", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальную Крысу — в президенты!", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat For President", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса отправляется в ад", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat Goes to Hell", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Стальная Крыса на манеже", item.Title, true);
+                    Assert.Equal("Stainless Steel Rat Joins the Circus", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Новые приключения Стальной Крысы", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat Returns", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("The Stainless Steel Rat and the Pernicious Porcuswine", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat and the Pernicious Porcuswine", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Возвращение Стальной Крысы", item.Title, true);
+                    Assert.Equal("The Return of the Stainless Steel Rat", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Золотые годы Стальной Крысы", item.Title, true);
+                    Assert.Equal("The Golden Years of the Stainless Steel Rat", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Теперь ты — Стальная Крыса", item.Title, true);
+                    Assert.Equal("You Can Be the Stainless Steel Rat", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Четвёртый закон роботехники", item.Title, true);
+                    Assert.Equal("The Fourth Law of Robotics", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("The Stainless Steel Rat", item.Title, true);
+                    Assert.Equal("The Stainless Steel Rat", item.OriginalTitle, true);
+                }
+            );
+        }
+        
+        [Fact]
+        public async Task Should_Extract_Books_to_Track_Igor_Dravin_Remeslo()
+        {
+            var service = new FantLabExternalProvider(_retryService);
+
+            var model = await service.ExtractBooksToTrack(
+                "https://fantlab.ru/work226082/");
+
+            Assert.Collection(model,
+                item =>
+                {
+                    Assert.Equal("Как все начиналось", item.Title, true);
+                    Assert.Equal("Как все начиналось", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Ученик", item.Title, true);
+                    Assert.Equal("Чужак. Ученик", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Охотник", item.Title, true);
+                    Assert.Equal("Чужак. Охотник", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Барон", item.Title, true);
+                    Assert.Equal("Чужак. Барон", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Рейнджер", item.Title, true);
+                    Assert.Equal("Чужак. Рейнджер", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Боевик-универсал", item.Title, true);
+                    Assert.Equal("Чужак. Боевик-универсал", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Мэтр", item.Title, true);
+                    Assert.Equal("Чужак. Мэтр", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Тёмный", item.Title, true);
+                    Assert.Equal("Чужак. Тёмный", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Принц-консорт", item.Title, true);
+                    Assert.Equal("Чужак. Принц-консорт", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Маски сброшены", item.Title, true);
+                    Assert.Equal("Чужак. Маски сброшены", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Охота", item.Title, true);
+                    Assert.Equal("Чужак. Охота", item.OriginalTitle, true);
+                },
+                item =>
+                {
+                    Assert.Equal("Чужак. Миротворец", item.Title, true);
+                    Assert.Equal("Чужак. Миротворец", item.OriginalTitle, true);
+                }
+            );
+        }
+        
         #endregion
     }
 }

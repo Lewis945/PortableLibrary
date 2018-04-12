@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
-using PortableLibrary.Core.External.Services;
 using PortableLibrary.Core.Infrastructure.External.Models.Book;
 using PortableLibrary.Core.Utilities;
 
@@ -41,7 +40,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
 
         #region IExternalServiceProvider
 
-        public async Task<FantLabBookModel> Extract(string uri)
+        public async Task<FantLabBookModel> ExtractBook(string uri)
         {
             var model = new FantLabBookModel();
 
@@ -126,6 +125,40 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book
             }
 
             return model;
+        }
+
+        public async Task<List<FantLabTrackedBookModel>> ExtractBooksToTrack(string uri)
+        {
+            var web = new HtmlWeb();
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
+
+            var divsBooks = document.DocumentNode.SelectNodes(".//div")?
+                .Where(n => n.HasClass("dots"))
+                .ToList();
+
+            if (divsBooks == null)
+                return null;
+
+            var books = new List<FantLabTrackedBookModel>();
+
+            foreach (var divBook in divsBooks)
+            {
+                var asBook = divBook.SelectNodes(".//a");
+
+                var aTitle = asBook?.FirstOrDefault();
+                var aOriginalTitle = asBook?.Skip(1).FirstOrDefault();
+
+                var title = aTitle?.InnerText.ClearString();
+                var originalTitle = aOriginalTitle?.InnerText.ClearString();
+
+                books.Add(new FantLabTrackedBookModel
+                {
+                    Title = title,
+                    OriginalTitle = originalTitle ?? title
+                });
+            }
+
+            return books;
         }
 
         #endregion
