@@ -1,5 +1,4 @@
-﻿using PortableLibrary.Core.External.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// <summary>
     /// http://baibako.tv/iplayer/
     /// </summary>
-    public class BaibakoExternalProvider : IExternalServiceProvider<BaibakoTvShowModel>
+    public class BaibakoExternalProvider
     {
         public string ServiceUri => "http://baibako.tv/iplayer/";
         public string ServiceName => "BaibakoTv";

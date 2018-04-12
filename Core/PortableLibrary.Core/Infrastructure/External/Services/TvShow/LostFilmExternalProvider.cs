@@ -7,16 +7,15 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
-using PortableLibrary.Core.External.Services;
-using PortableLibrary.Core.Infrastructure.External.Models;
 using PortableLibrary.Core.Infrastructure.External.Models.TvShow;
+using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 {
     /// <summary>
     /// https://www.lostfilm.tv
     /// </summary>
-    public class LostFilmExternalProvider : BaseExternalProvider, IExternalServiceProvider<LostFilmTvShowModel>
+    public class LostFilmExternalProvider : BaseExternalProvider
     {
         #region Properties
 
@@ -25,14 +24,29 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
         #endregion
 
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public LostFilmExternalProvider(IRetryService retryService)
+        {
+            _retryService = retryService;
+        }
+
+        #endregion
+
         #region IExternalServiceProvider
 
-        public async Task<LostFilmTvShowModel> Extract(string uri)
+        public async Task<LostFilmTvShowModel> ExtractTvShow(string uri)
         {
             var model = new LostFilmTvShowModel();
 
             var web = new HtmlWeb();
-            var document = web.Load(uri);
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
 
             //first title-block
             var divFirstTitleBlock = document.DocumentNode.SelectNodes(".//div")?
@@ -117,7 +131,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             statusText = statusText?.Replace(statusKey, string.Empty).Trim();
             statusText = HttpUtility.HtmlDecode(statusText);
             statusText = statusText.ClearString();
-            
+
             return statusText?.Equals("Завершен");
         }
 

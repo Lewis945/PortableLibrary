@@ -1,5 +1,4 @@
-﻿using PortableLibrary.Core.External.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// <summary>
     /// https://en.myshows.me/
     /// </summary>
-    public class MyShowsExternalProvider : IExternalServiceProvider<MyShowsTvShowModel>
+    public class MyShowsExternalProvider
     {
         public string ServiceUri => "https://en.myshows.me/";
         public string ServiceName => "MyShowsMe";

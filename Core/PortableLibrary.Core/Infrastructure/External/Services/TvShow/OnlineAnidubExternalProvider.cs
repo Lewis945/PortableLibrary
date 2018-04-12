@@ -1,5 +1,4 @@
-﻿using PortableLibrary.Core.External.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// <summary>
     /// https://online.anidub.com/
     /// </summary>
-    public class OnlineAnidubExternalProvider : IExternalServiceProvider<OnlineAnidubTvShowModel>
+    public class OnlineAnidubExternalProvider 
     {
         public string ServiceUri => "https://online.anidub.com/";
         public string ServiceName => "AnidubOnline";

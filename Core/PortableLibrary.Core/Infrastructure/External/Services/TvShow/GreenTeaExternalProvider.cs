@@ -1,5 +1,4 @@
-﻿using PortableLibrary.Core.External.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
     /// <summary>
     /// http://green-tea.tv/
     /// </summary>
-    public class GreenTeaExternalProvider : IExternalServiceProvider<GreenTeaTvShowModel>
+    public class GreenTeaExternalProvider 
     {
         public string ServiceUri => "http://green-tea.tv/";
         public string ServiceName => "GreenTeaTv";
