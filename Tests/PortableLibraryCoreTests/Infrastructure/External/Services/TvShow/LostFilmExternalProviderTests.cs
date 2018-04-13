@@ -3,18 +3,34 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PortableLibrary.Core.Utilities;
 using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 {
     public class LostFilmExternalProviderTests
     {
-        #region Tests
+        #region Fields
+
+        private readonly IRetryService _retryService;
+
+        #endregion
+
+        #region .ctor
+
+        public LostFilmExternalProviderTests()
+        {
+            _retryService = new RetryService();
+        }
+
+        #endregion
+
+        #region Extract TvShow Tests
 
         [Fact]
         public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency()
         {
-            var service = new LostFilmExternalProvider();
+            var service = new LostFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Dirk_Gentlys_Holistic_Detective_Agency/");
 
@@ -319,7 +335,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         [Fact]
         public async Task Should_Extract_Anger_Management()
         {
-            var service = new LostFilmExternalProvider();
+            var service = new LostFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Anger_Management");
 
@@ -452,7 +468,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         [Fact]
         public async Task Should_Extract_Friends()
         {
-            var service = new LostFilmExternalProvider();
+            var service = new LostFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Friends");
 
@@ -981,7 +997,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         [Fact]
         public async Task Should_Extract_Desperate_Housewives()
         {
-            var service = new LostFilmExternalProvider();
+            var service = new LostFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Desperate_Housewives");
 
