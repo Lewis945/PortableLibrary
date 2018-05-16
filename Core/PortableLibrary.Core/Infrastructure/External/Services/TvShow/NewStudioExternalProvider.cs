@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.Infrastructure.External.Models.TvShow;
@@ -27,6 +28,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
         private readonly IRetryService _retryService;
 
+        private static readonly List<string> QualityList = new List<string>
+        {
+            "WEBDLRip",
+            "WEBDL 720p",
+            "WEBDL 1080p",
+            "HDTVRip",
+            "BDRip",
+            "BDRip 720p",
+            "BDRip 1080p"
+        };
+
         #endregion
 
         #region .ctor
@@ -42,93 +54,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         {
             var model = new NewStudioTvShowModel();
 
-            var web = new HtmlWeb();
-            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri, Encoding.UTF8));
+            var container = await GetContainerNodeAsync(uri);
 
-            var divAccordionInner = document.DocumentNode.SelectNodes(".//div")?
-                .FirstOrDefault(n => n.HasClass("accordion-inner"));
+            model.Seasons = ParsePage(container, model.Seasons);
 
-            var divsTopic = divAccordionInner?.SelectNodes(".//div")?.Where(n => n.HasClass("topic_id"));
+            var pagesUrls = ExtractOtherPagesUrls(container);
 
-            if (divsTopic == null)
-                return model;
-
-            var titleRegex =
-                new Regex(
-                    @"^(?<title>[\w\s\d_+!@-]+)\s\((?<season>[\w\s\d]+),(?<episode>[\w\s\d]+)\)\s/\s(?<engtitle>[\w\s\d_+!@-]+)\s.*\s((?<quality>\d{3,4}p)|.*)$");
-
-            foreach (var divTopic in divsTopic)
+            foreach (var pageUrl in pagesUrls)
             {
-                NewStudioTvShowSeasonModel season = null;
-                NewStudioTvShowEpisodeModel episode = null;
-
-                var aTopic = divTopic.SelectNodes(".//a")?.FirstOrDefault(n => n.HasClass("torTopic"));
-                if (aTopic != null)
-                {
-                    //Шерлок Холмс (Сезон 1, Серия 1) / Sherlock (2010) BDRip | Первый
-                    //Шерлок (Сезон 4) / Sherlock (2017) WEBDL 1080p
-                    var text = aTopic.InnerText.ClearString();
-                    var match = titleRegex.Match(text);
-
-                    var seasonString = match.Groups["season"]?.Value;
-                    seasonString = seasonString?.ExtractNumberSubstring();
-                    if (int.TryParse(seasonString, out var seasonIndex))
-                    {
-                        season = model.Seasons?.FirstOrDefault(s => s.Index == seasonIndex);
-                        if (season == null)
-                        {
-                            if (model.Seasons == null)
-                                model.Seasons = new List<NewStudioTvShowSeasonModel>();
-
-                            season = new NewStudioTvShowSeasonModel {Index = seasonIndex};
-                            model.Seasons.Add(season);
-                        }
-                    }
-
-                    var episodeString = match.Groups["episode"]?.Value;
-                    episodeString = episodeString?.ExtractNumberSubstring();
-                    if (season != null && int.TryParse(episodeString, out var episodeIndex))
-                    {
-                        if (season.Episodes == null)
-                            season.Episodes = new List<NewStudioTvShowEpisodeModel>();
-
-                        var title = match.Groups["title"]?.Value;
-                        var originalTitle = match.Groups["engtitle"]?.Value;
-                        var quality = match.Groups["quality"]?.Value;
-
-                        episode = season.Episodes.FirstOrDefault(e => e.Index == episodeIndex);
-
-                        if (episode != null && (string.IsNullOrWhiteSpace(episode.Quality) ||
-                                                (episode.Quality == "720p" && quality == "1080p")))
-                        {
-                            season.Episodes.Remove(episode);
-                            episode = null;
-                        }
-
-                        if (episode == null)
-                        {
-                            episode = new NewStudioTvShowEpisodeModel
-                            {
-                                Index = episodeIndex,
-                                TvShowTitle = title,
-                                OriginalTvShowSeasonTitle = originalTitle,
-                                Quality = quality
-                            };
-                            season.Episodes.Add(episode);
-                        }
-                    }
-                }
-
-                var divLastPost = divTopic.SelectNodes(".//div")?.FirstOrDefault(n => n.HasClass("lastpostt"));
-                if (divLastPost != null)
-                {
-                    //2013-11-25 16:11
-                    var text = divLastPost.InnerText.ClearString();
-                    if (episode != null && DateTime.TryParse(text, out var date))
-                    {
-                        episode.DateReleased = date;
-                    }
-                }
+                container = await GetContainerNodeAsync(pageUrl);
+                ParsePage(container, model.Seasons);
             }
 
             if (model.Seasons == null)
@@ -153,6 +88,139 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             model.OriginalTitle = mostOccuredOriginalTitle;
 
             return model;
+        }
+
+        private async Task<HtmlNode> GetContainerNodeAsync(string uri)
+        {
+            var web = new HtmlWeb();
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri, Encoding.UTF8));
+            var divAccordionInner = document.DocumentNode.SelectNodes(".//div")?
+                .FirstOrDefault(n => n.HasClass("accordion-inner"));
+            return divAccordionInner;
+        }
+
+        private IEnumerable<string> ExtractOtherPagesUrls(HtmlNode container)
+        {
+            var divPagination = container?.SelectNodes("//div")?.Where(n => n.HasClass("pagination"))
+                .FirstOrDefault();
+
+            var lis = divPagination?.SelectNodes(".//li");
+
+            if (lis == null)
+                yield break;
+
+            foreach (var li in lis)
+            {
+                var aLinks = li.SelectNodes(".//a");
+
+                var aLink = aLinks?.FirstOrDefault(a =>
+                    !string.IsNullOrWhiteSpace(a.InnerText.ClearString().ExtractNumberSubstring()));
+
+                if (aLink == null)
+                    continue;
+
+                var value = aLink.Attributes["href"].Value;
+                value = ServiceUri.AppendUriPath(value);
+                value = HttpUtility.HtmlDecode(value);
+                yield return value;
+            }
+        }
+
+        private static List<NewStudioTvShowSeasonModel> ParsePage(HtmlNode container,
+            List<NewStudioTvShowSeasonModel> seasons)
+        {
+            var divsTopic = container?.SelectNodes(".//div")?.Where(n => n.HasClass("topic_id"));
+
+            if (divsTopic == null)
+                return null;
+
+            var titleRegex =
+                new Regex(
+                    @"^(?<title>[\w\s\d_+'!@-]+)\s\((?<season>[\w\s\d]+),(?<episode>[\w\s\d]+)\)\s/\s(?<engtitle>[\w\s\d_+'!@-]+)\s.*\s((?<quality>[a-zA-Z]{3,}\s(\d{3,4}p)?).*|[\s.]*)$");
+
+            foreach (var divTopic in divsTopic)
+            {
+                NewStudioTvShowSeasonModel season = null;
+                NewStudioTvShowEpisodeModel episode = null;
+
+                var aTopic = divTopic.SelectNodes(".//a")?.FirstOrDefault(n => n.HasClass("torTopic"));
+                if (aTopic != null)
+                {
+                    //Шерлок Холмс (Сезон 1, Серия 1) / Sherlock (2010) BDRip | Первый
+                    //Шерлок (Сезон 4) / Sherlock (2017) WEBDL 1080p
+                    var text = aTopic.InnerText.ClearString();
+                    text = HttpUtility.HtmlDecode(text);
+                    if (string.IsNullOrWhiteSpace(text))
+                        continue;
+
+                    var match = titleRegex.Match(text);
+
+                    var seasonString = match.Groups["season"]?.Value;
+                    seasonString = seasonString?.ExtractNumberSubstring();
+                    if (int.TryParse(seasonString, out var seasonIndex))
+                    {
+                        season = seasons?.FirstOrDefault(s => s.Index == seasonIndex);
+                        if (season == null)
+                        {
+                            if (seasons == null)
+                                seasons = new List<NewStudioTvShowSeasonModel>();
+
+                            season = new NewStudioTvShowSeasonModel {Index = seasonIndex};
+                            seasons.Add(season);
+                        }
+                    }
+
+                    var episodeString = match.Groups["episode"]?.Value;
+                    episodeString = episodeString?.ExtractNumberSubstring();
+                    if (season != null && int.TryParse(episodeString, out var episodeIndex))
+                    {
+                        if (season.Episodes == null)
+                            season.Episodes = new List<NewStudioTvShowEpisodeModel>();
+
+                        var title = match.Groups["title"]?.Value.ClearString();
+                        var originalTitle = match.Groups["engtitle"]?.Value.ClearString();
+                        var quality = match.Groups["quality"]?.Value.ClearString();
+
+                        episode = season.Episodes.FirstOrDefault(e => e.Index == episodeIndex);
+
+                        if (episode != null)
+                        {
+                            var episode1 = episode;
+
+                            int episodeQualityIndex = QualityList.FindIndex(s => s == episode1.Quality);
+                            int qualityIndex = QualityList.FindIndex(s =>
+                                s.Equals(quality, StringComparison.InvariantCultureIgnoreCase));
+
+                            if (qualityIndex > episodeQualityIndex)
+                            {
+                                season.Episodes.Remove(episode);
+                                episode = null;
+                            }
+                        }
+
+                        if (episode == null)
+                        {
+                            var divLastPost = divTopic.SelectNodes(".//div")
+                                ?.FirstOrDefault(n => n.HasClass("lastpostt"));
+                            var dateText = divLastPost?.InnerText.ClearString();
+                            if (!DateTime.TryParse(dateText, out var date))
+                                continue;
+
+                            episode = new NewStudioTvShowEpisodeModel
+                            {
+                                Index = episodeIndex,
+                                TvShowTitle = title,
+                                OriginalTvShowSeasonTitle = originalTitle,
+                                Quality = quality,
+                                DateReleased = date
+                            };
+                            season.Episodes.Add(episode);
+                        }
+                    }
+                }
+            }
+
+            return seasons;
         }
     }
 }
