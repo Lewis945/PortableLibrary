@@ -31,7 +31,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new NewStudioExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("http://newstudio.tv/viewforum.php?f=152");
+            var model = await service.ExtractTvShowAsync("http://newstudio.tv/viewforum.php?f=152");
 
             #region Tv Show
 
@@ -180,7 +180,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new NewStudioExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("http://newstudio.tv/viewforum.php?f=137");
+            var model = await service.ExtractTvShowAsync("http://newstudio.tv/viewforum.php?f=137");
 
             #region Tv Show
 
@@ -336,7 +336,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new NewStudioExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("http://newstudio.tv/viewforum.php?f=520");
+            var model = await service.ExtractTvShowAsync("http://newstudio.tv/viewforum.php?f=520");
 
             #region Tv Show
 
@@ -450,7 +450,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new NewStudioExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("http://newstudio.tv/viewforum.php?f=454");
+            var model = await service.ExtractTvShowAsync("http://newstudio.tv/viewforum.php?f=454");
             
             #region Tv Show
 

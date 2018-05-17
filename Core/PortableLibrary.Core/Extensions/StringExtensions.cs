@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Web;
 
 namespace PortableLibrary.Core.Extensions
 {
@@ -44,6 +45,7 @@ namespace PortableLibrary.Core.Extensions
             if (text == null)
                 return null;
 
+            text = HttpUtility.HtmlDecode(text);
             text = text.Trim();
             text = Regex.Replace(text, @"\s+", " ");
             return text;
@@ -60,20 +62,14 @@ namespace PortableLibrary.Core.Extensions
 
         public static string ExtractNumberSubstring(this string text)
         {
-            if (text == null)
-                return null;
-
-            return Regex.Match(text, @"\d+").Value;
+            return text == null ? null : Regex.Match(text, @"\d+").Value;
         }
 
         public static int? ParseNumber(this string text)
         {
             var numberSubstring = text.ExtractNumberSubstring();
 
-            if (int.TryParse(numberSubstring, out var number))
-                return number;
-
-            return default(int?);
+            return int.TryParse(numberSubstring, out var number) ? number : default(int?);
         }
     }
 }

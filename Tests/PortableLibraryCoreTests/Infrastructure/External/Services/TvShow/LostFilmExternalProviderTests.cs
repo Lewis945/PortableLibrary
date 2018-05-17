@@ -32,7 +32,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new LostFilmExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow(
+            var model = await service.ExtractTvShowAsync(
                 "https://www.lostfilm.tv/series/Dirk_Gentlys_Holistic_Detective_Agency/");
 
             #region Tv Show
@@ -338,7 +338,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new LostFilmExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Anger_Management");
+            var model = await service.ExtractTvShowAsync("https://www.lostfilm.tv/series/Anger_Management");
 
             #region Tv Show
 
@@ -471,7 +471,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new LostFilmExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Friends");
+            var model = await service.ExtractTvShowAsync("https://www.lostfilm.tv/series/Friends");
 
             #region Tv Show
 
@@ -1000,7 +1000,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         {
             var service = new LostFilmExternalProvider(_retryService);
 
-            var model = await service.ExtractTvShow("https://www.lostfilm.tv/series/Desperate_Housewives");
+            var model = await service.ExtractTvShowAsync("https://www.lostfilm.tv/series/Desperate_Housewives");
 
             #region Tv Show
 

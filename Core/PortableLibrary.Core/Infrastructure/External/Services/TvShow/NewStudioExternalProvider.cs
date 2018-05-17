@@ -50,7 +50,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
         #endregion
 
-        public async Task<NewStudioTvShowModel> ExtractTvShow(string uri)
+        #region Public Methods
+
+        public async Task<NewStudioTvShowModel> ExtractTvShowAsync(string uri)
         {
             var model = new NewStudioTvShowModel();
 
@@ -63,7 +65,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             foreach (var pageUrl in pagesUrls)
             {
                 container = await GetContainerNodeAsync(pageUrl);
-                ParsePage(container, model.Seasons);
+                model.Seasons = ParsePage(container, model.Seasons);
             }
 
             if (model.Seasons == null)
@@ -89,6 +91,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
             return model;
         }
+
+        #endregion
+
+        #region Private Methods
 
         private async Task<HtmlNode> GetContainerNodeAsync(string uri)
         {
@@ -222,5 +228,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
             return seasons;
         }
+
+        #endregion
     }
 }

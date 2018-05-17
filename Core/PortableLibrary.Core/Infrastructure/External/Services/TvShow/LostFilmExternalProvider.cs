@@ -39,9 +39,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
         #endregion
 
-        #region IExternalServiceProvider
+        #region Public Methods
 
-        public async Task<LostFilmTvShowModel> ExtractTvShow(string uri)
+        public async Task<LostFilmTvShowModel> ExtractTvShowAsync(string uri)
         {
             var model = new LostFilmTvShowModel();
 
