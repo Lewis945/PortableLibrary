@@ -61,13 +61,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
             foreach (var pageUrl in pagesUrls)
             {
-                container = await GetSeasonContainerNodeAsync(pageUrl);
+                container = await GetSearchContainerNodeAsync(pageUrl);
                 await ParseSearchPageAsync(container, tvShowName, seasons);
             }
 
             foreach (var season in seasons.OrderBy(s => s.Key))
             {
                 var seasonObject = await ExtractTvShowSeasonAsync(season.Value);
+                if (model.Seasons == null)
+                    model.Seasons = new List<ColdFilmTvShowSeasonModel>();
                 model.Seasons.Add(seasonObject);
             }
 
@@ -146,7 +148,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
             if (firstPage.Value == lastPage.Value)
                 yield return $"{uri};p={firstPage.Value}";
 
-            foreach (var pageNumber in Enumerable.Range(firstPage.Value, lastPage.Value))
+            int count = lastPage.Value + 1 - firstPage.Value;
+            
+            foreach (var pageNumber in Enumerable.Range(firstPage.Value, count))
                 yield return $"{uri};p={pageNumber}";
         }
 
@@ -154,7 +158,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
         {
             var divPagination = container?.SelectSingleNode("//div[@id='pagesBlock1']");
 
-            var aLinks = divPagination?.SelectNodes(".//a").Where(a =>
+            var nodes = divPagination?.SelectNodes(".//a")?.ToList();
+            var aLinks = nodes?.Where(a =>
                 !string.IsNullOrWhiteSpace(a.InnerText.ClearString().ExtractNumberSubstring()));
 
             if (aLinks == null)
@@ -306,11 +311,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow
 
             var aSeasonItem = divSpeedbar?.SelectNodes(".//a")?.LastOrDefault();
 
-            var seasonTitle = aSeasonItem?.InnerText;
+            string seasonTitle = aSeasonItem?.InnerText;
             if (string.IsNullOrWhiteSpace(seasonTitle))
                 return null;
 
-            return seasonTitle.StartsWith(tvShowName) ? aSeasonItem.Attributes["href"]?.Value : null;
+            if (!seasonTitle.StartsWith(tvShowName))
+                return null;
+
+            string href = aSeasonItem.Attributes["href"]?.Value;
+            return string.IsNullOrWhiteSpace(href) ? null : ServiceUri.AppendUriPath(href);
         }
 
         #endregion
