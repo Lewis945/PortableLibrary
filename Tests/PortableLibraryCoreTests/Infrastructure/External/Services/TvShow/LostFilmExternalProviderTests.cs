@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 

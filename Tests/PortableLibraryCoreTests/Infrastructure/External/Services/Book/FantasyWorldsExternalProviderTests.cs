@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using PortableLibrary.Core.Infrastructure.External.Services.Book;
+using PortableLibrary.Core.Infrastructure.External.Services.Book.FantasyWorlds;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 

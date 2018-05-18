@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.ColdFilm;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 

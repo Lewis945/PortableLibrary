@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.Baibako;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 
@@ -75,7 +76,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 
             Assert.Equal("Области тьмы", s1E22.Title, true);
 
-            Assert.Equal(new DateTime(2016, 4, 21, 0, 0, 0, DateTimeKind.Utc), s1E22.DateReleased);
+            Assert.Equal(new DateTime(2016, 4, 28, 0, 0, 0, DateTimeKind.Utc), s1E22.DateReleased);
 
             #endregion
 

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.NewStudio;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 
