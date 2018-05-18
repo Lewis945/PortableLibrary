@@ -7,7 +7,7 @@ using Xunit;
 
 namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 {
-    public class ColFilmExternalProviderTests
+    public class ColdFilmExternalProviderTests
     {
         #region Fields
 
@@ -17,7 +17,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 
         #region .ctor
 
-        public ColFilmExternalProviderTests()
+        public ColdFilmExternalProviderTests()
         {
             _retryService = new RetryService();
         }
@@ -27,7 +27,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         #region Extract TvShow Tests
 
         [Fact]
-        public async Task Should_Extract_Grimm()
+        public async Task Should_Extract_Grimm_Tv_Show()
         {
             var service = new ColdFilmExternalProvider(_retryService);
 
