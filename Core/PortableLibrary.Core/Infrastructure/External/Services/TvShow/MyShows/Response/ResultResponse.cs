@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using PortableLibrary.Core.External.Models;
 
-namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
+namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Response
 {
-    public class MyShowsTvShowModel : IExternalModel
+    public class ResultResponse
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -22,8 +21,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
         public float Rating { get; set; }
         public int Runtime { get; set; }
 
-        public List<string> Genres { get; set; }
+        public int[] GenreIds { get; set; }
 
-        public List<MyShowsTvShowSeasonModel> Seasons { get; set; }
+        public IEnumerable<EpisodeResponse> Episodes { get; set; }
     }
 }
