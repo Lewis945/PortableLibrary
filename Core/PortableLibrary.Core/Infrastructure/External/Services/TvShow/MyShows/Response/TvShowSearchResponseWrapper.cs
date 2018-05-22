@@ -2,8 +2,8 @@
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Response
 {
-    public class TvShowSearchResponse : BaseResponse
+    public class TvShowSearchResponseWrapper : BaseResponse
     {
-        public IEnumerable<ResultResponse> Result { get; set; }
+        public IEnumerable<TvShowResponse> Result { get; set; }
     }
 }

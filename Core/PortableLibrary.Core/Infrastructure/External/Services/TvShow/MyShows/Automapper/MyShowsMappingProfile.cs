@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using AutoMapper;
+using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Response;
 
@@ -9,21 +12,44 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
     {
         public MyShowsMappingProfile()
         {
+            CreateMap<string, DateTimeOffset?>().ConvertUsing(new DateTimeOffsetTypeConverter());
+
             CreateMap<EpisodeResponse, MyShowsTvShowSeasonModel>()
-                .ForMember(m => m.SeasonIndex, c => c.MapFrom(e => e.SeasonNumber));
+                .ForMember(dest => dest.Index, opt => opt.MapFrom(src => src.SeasonNumber));
 
-            CreateMap<EpisodeResponse, MyShowsTvShowEpisodeModel>();
+            CreateMap<EpisodeResponse, MyShowsTvShowEpisodeModel>()
+                .ForMember(dest => dest.AirDate, opt => opt.MapFrom(src => src.AirDateUTC));
 
-            CreateMap<ResultResponse, MyShowsTvShowModel>()
+            CreateMap<TvShowResponse, MyShowsTvShowModel>()
+                .ForMember(dest => dest.Description,
+                    opt => opt.ResolveUsing((src, dest, destMember, res) =>
+                    {
+                        var textDescription = src.Description != null
+                            ? Regex.Replace(src.Description, "<[^>]*>", string.Empty)
+                            : string.Empty;
+                        return textDescription.ClearString();
+                    }))
+                .ForMember(dest => dest.Status,
+                    opt => opt.ResolveUsing((src, dest, destMember, res) =>
+                    {
+                        switch (src.Status)
+                        {
+                            case "Canceled/Ended":
+                                return TvShowStatus.CanceledOrEnded;
+                            case "Returning Series":
+                                return TvShowStatus.Ongoing;
+                            default:
+                                throw new ArgumentException("", nameof(src.Status));
+                        }
+                    }))
+//                .ForMember(dest => dest.Started,
+//                    opt => opt.MapFrom(src => src.Started))
                 .ForMember(dest => dest.Seasons,
                     opt => opt.MapFrom(src =>
                         src.Episodes.DistinctBy(e => e.SeasonNumber).OrderBy(e => e.SeasonNumber)));
 
-            CreateMap<TvShowResponse, MyShowsTvShowModel>()
+            CreateMap<TvShowResponseWrapper, MyShowsTvShowModel>()
                 .ConvertUsing<MyShowsTvShowModelConverter>();
-
-            CreateMap<TvShowSearchResponse, TvShowResponse>()
-                .ForMember(dest => dest.Result, opt => opt.MapFrom(src => src.Result.FirstOrDefault()));
         }
     }
 }

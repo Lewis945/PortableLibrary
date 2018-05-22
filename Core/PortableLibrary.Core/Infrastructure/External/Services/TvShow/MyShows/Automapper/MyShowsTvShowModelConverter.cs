@@ -5,9 +5,9 @@ using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Respo
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper
 {
-    public class MyShowsTvShowModelConverter : ITypeConverter<TvShowResponse, MyShowsTvShowModel>
+    public class MyShowsTvShowModelConverter : ITypeConverter<TvShowResponseWrapper, MyShowsTvShowModel>
     {
-        public MyShowsTvShowModel Convert(TvShowResponse source, MyShowsTvShowModel destination,
+        public MyShowsTvShowModel Convert(TvShowResponseWrapper source, MyShowsTvShowModel destination,
             ResolutionContext context)
         {
             var model = context.Mapper.Map<MyShowsTvShowModel>(source.Result);
@@ -15,7 +15,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
             foreach (var season in model.Seasons)
                 season.Episodes =
                     context.Mapper.Map<List<MyShowsTvShowEpisodeModel>>(
-                        source.Result.Episodes.Where(e => e.SeasonNumber == season.SeasonIndex));
+                        source.Result.Episodes.Where(e => e.SeasonNumber == season.Index));
 
             return model;
         }
