@@ -517,20 +517,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var season2 = model.Seasons.First(s => s.Index == 2);
 
             Assert.NotNull(season2.Episodes);
-            Assert.Equal(23, season2.Episodes.Count);
+            Assert.NotNull(season2.Specials);
+            Assert.Equal(22, season2.Episodes.Count);
+            Assert.Equal(1, season2.Specials.Count);
 
-            #region Episode 0
+            #region Special 1
 
-            var s2E0 = season2.Episodes.First(e => e.EpisodeNumber == 0);
+            var s2S1 = season2.Specials.First(e => e.ShortName == "s02 special-1");
 
-            Assert.Equal(2097143, s2E0.Id);
+            Assert.Equal(2097143, s2S1.Id);
 
-            Assert.Equal("Bad Hair Day", s2E0.Title, true);
-            Assert.Equal("s02 special-1", s2E0.ShortName, true);
+            Assert.Equal("Bad Hair Day", s2S1.Title, true);
 
-            Assert.Empty(s2E0.Image);
+            Assert.Empty(s2S1.Image);
 
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 1, 17, 2, 0, 0, DateTimeKind.Utc)), s2E0.AirDate);
+            Assert.Equal(new DateTimeOffset(new DateTime(2013, 1, 17, 2, 0, 0, DateTimeKind.Utc)), s2S1.AirDate);
 
             #endregion
 
@@ -589,35 +590,35 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var season3 = model.Seasons.First(s => s.Index == 3);
 
             Assert.NotNull(season3.Episodes);
-            Assert.Equal(24, season3.Episodes.Count);
+            Assert.NotNull(season3.Specials);
+            Assert.Equal(22, season3.Episodes.Count);
+            Assert.Equal(2, season3.Specials.Count);
 
-            #region Episode 0 Special 1
+            #region Special 1
 
-            var s3E01 = season3.Episodes.First(e => e.EpisodeNumber == 0 && e.ShortName == "s03 special-1");
+            var s3S1 = season3.Specials.First(e => e.ShortName == "s03 special-1");
 
-            Assert.Equal(2097144, s3E01.Id);
+            Assert.Equal(2097144, s3S1.Id);
 
-            Assert.Equal("Meltdown", s3E01.Title, true);
-            Assert.Equal("s03 special-1", s3E01.ShortName, true);
+            Assert.Equal("Meltdown", s3S1.Title, true);
 
-            Assert.Empty(s3E01.Image);
+            Assert.Empty(s3S1.Image);
 
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 10, 5, 2, 0, 0, DateTimeKind.Utc)), s3E01.AirDate);
+            Assert.Equal(new DateTimeOffset(new DateTime(2013, 10, 5, 2, 0, 0, DateTimeKind.Utc)), s3S1.AirDate);
 
             #endregion
 
-            #region Episode 0 Special 2
+            #region Special 2
 
-            var s3E02 = season3.Episodes.First(e => e.EpisodeNumber == 0 && e.ShortName == "s03 special-2");
+            var s3S2 = season3.Specials.First(e => e.ShortName == "s03 special-2");
 
-            Assert.Equal(2097145, s3E02.Id);
+            Assert.Equal(2097145, s3S2.Id);
 
-            Assert.Equal("Love is In the Air", s3E02.Title, true);
-            Assert.Equal("s03 special-2", s3E02.ShortName, true);
+            Assert.Equal("Love is In the Air", s3S2.Title, true);
 
-            Assert.Empty(s3E02.Image);
+            Assert.Empty(s3S2.Image);
 
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 1, 31, 14, 0, 0, DateTimeKind.Utc)), s3E02.AirDate);
+            Assert.Equal(new DateTimeOffset(new DateTime(2014, 1, 31, 14, 0, 0, DateTimeKind.Utc)), s3S2.AirDate);
 
             #endregion
 
@@ -1329,8 +1330,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var season7 = model.Seasons.First(s => s.Index == 7);
 
             Assert.NotNull(season7.Episodes);
-            Assert.Equal(25, season7.Episodes.Count);
-
+            Assert.NotNull(season7.Specials);
+            Assert.Equal(24, season7.Episodes.Count);
+            Assert.Equal(1, season7.Specials.Count);
+            
             #region Episode 1
 
             var s7E1 = season7.Episodes.First(e => e.EpisodeNumber == 1);
@@ -1492,8 +1495,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var season10 = model.Seasons.First(s => s.Index == 10);
 
             Assert.NotNull(season10.Episodes);
-            Assert.Equal(21, season10.Episodes.Count);
-
+            Assert.NotNull(season10.Specials);
+            Assert.Equal(18, season10.Episodes.Count);
+            Assert.Equal(3, season10.Specials.Count);
+            
             #region Episode 1
 
             var s10E1 = season10.Episodes.First(e => e.EpisodeNumber == 1);
@@ -1539,19 +1544,18 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #endregion
 
-            #region Episode 0 FRIENDS REUNION - Tribute To Director James Burrows
+            #region Special 3 FRIENDS REUNION - Tribute To Director James Burrows
 
-            var s10E0 = season10.Episodes.First(e => e.EpisodeNumber == 0);
+            var s10S3 = season10.Specials.First(e => e.ShortName == "s10 special-3");
 
-            Assert.Equal(15668758, s10E0.Id);
+            Assert.Equal(15668758, s10S3.Id);
 
-            Assert.Equal("FRIENDS REUNION - Tribute To Director James Burrows", s10E0.Title, true);
-            Assert.Equal("s10 special-3", s10E0.ShortName, true);
+            Assert.Equal("FRIENDS REUNION - Tribute To Director James Burrows", s10S3.Title, true);
 
             Assert.Equal("https://media.myshows.me/episodes/normal/6/4b/64b85d4cc7efeb5fbd2ac6452b34b4cc.jpg",
-                s10E0.Image, true);
+                s10S3.Image, true);
 
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc)), s10E0.AirDate);
+            Assert.Equal(new DateTimeOffset(new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc)), s10S3.AirDate);
 
             #endregion
 
@@ -1815,6 +1819,233 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #endregion
 
+            #endregion
+        }
+
+        #endregion
+        
+        #region Extract Steins;Gate Anime Show Tests
+
+        [Fact]
+        public async Task Should_Extract_Steins_Gate_Id_English()
+        {
+            var model = await _englishService.GetTvShowByIdAsync(15897);
+            ValidateSteinsGate(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Steins_Gate_Id_Russian()
+        {
+            var model = await _russianService.GetTvShowByIdAsync(15897);
+            ValidateSteinsGate(model, Language.Russian);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Steins_Gate_By_Uri()
+        {
+            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/15897/");
+            ValidateSteinsGate(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Steins_Gate_By_English_Title()
+        {
+            string fullTitle = GetSteinsGateTitle(Language.English);
+            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+
+            Assert.NotNull(model);
+            Assert.Equal(15897, model.Id);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Steins_Gate_By_Russian_Title()
+        {
+            string fullTitle = GetSteinsGateTitle(Language.Russian);
+            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+
+            Assert.NotNull(model);
+            Assert.Equal(15897, model.Id);
+        }
+
+        private static string GetSteinsGateTitle(Language language)
+        {
+            switch (language)
+            {
+                case Language.English:
+                    return "Steins;Gate";
+                case Language.Russian:
+                    return "Врата Штейна";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(language), language, null);
+            }
+        }
+
+        private void ValidateSteinsGate(MyShowsTvShowModel model, Language language)
+        {
+            #region Tv Show
+
+            string GetDescription()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return string.Empty;
+                    case Language.Russian:
+                        return
+                            "Акихабара &#151; интереснейшее место, где обитают самые разные люди &#151; от слегка " +
+                            "сдвинутых по фазе до больных на всю голову. Именно такая компания собралась в " +
+                            "«Лаборатории проблем времени», что над лавкой старых телевизоров. Возглавляет " +
+                            "ее «настоящий буйный», 18-летний Ринтаро Окабэ, сумасшедший ученый и борец с " +
+                            "мировым заговором. В серьезном деле нельзя без хакера &#151; вот и он, Итару " +
+                            "Хасида, конечно же, толстяк и истинный отаку. Добрая фея лаборатории &#151; " +
+                            "Маюри Сиина, подруга детства Ринтаро, официантка мейд-кафе и фанатка косплея, " +
+                            "а научную мощь бригады резко повысила юный гений Курису Макисэ, стосковавшаяся " +
+                            "по интеллектуальным приключениям и простому человеческому теплу.Конечно же, " +
+                            "ребятам удалось построить машину времени из микроволновки и барахла с ближайшей " +
+                            "распродажи. Великие открытия делают любители &#151; профессионалы строят «Титаники». " +
+                            "Вот только потом началось такое, что «парадокс дедушки» нервно удалился курить в " +
+                            "сторонку, а главный герой трижды проклял тот день, когда сдуру открыл «врата Штейна». " +
+                            "Он был готов рисковать своей жизнью, но не чужими&#133; Впрочем, сделанного, как " +
+                            "известно, не воротишь. Или&#133; все же можно?";
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(15897, model.Id);
+
+            Assert.Equal(GetSteinsGateTitle(language), model.Title, true);
+            Assert.Equal(GetSteinsGateTitle(Language.English), model.TitleOriginal, true);
+
+            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
+
+            Assert.Equal("JP", model.Country, true);
+
+            Assert.Equal("https://media.myshows.me/shows/normal/1/1b/1ba31529a26258159a5f2b6de7351a65.jpg", model.Image,
+                true);
+
+            Assert.True(model.Year.HasValue);
+            Assert.Equal(2011, model.Year.Value);
+
+            Assert.True(model.KinopoiskId.HasValue);
+            Assert.Equal(586251, model.KinopoiskId.Value);
+
+            Assert.True(model.TvrageId.HasValue);
+            Assert.Equal(28009, model.TvrageId.Value);
+
+            Assert.True(model.Runtime.HasValue);
+            Assert.Equal(25, model.Runtime.Value);
+
+            Assert.True(model.ImdbId.HasValue);
+            Assert.Equal(1910272, model.ImdbId.Value);
+
+            Assert.True(model.Rating.HasValue);
+            Assert.Equal(4.44m, model.Rating.Value, 2);
+
+            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
+
+            Assert.True(model.Started.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2011, 4, 6, 0, 0, 0, DateTimeKind.Utc)),
+                model.Started.Value);
+
+            Assert.True(model.Ended.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2015, 12, 2, 0, 0, 0, DateTimeKind.Utc)), model.Ended.Value);
+
+            IEnumerable<string> GetGenres()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return new List<string> {"Drama","Sci-Fi", "Fantasy", "Anime"};
+                    case Language.Russian:
+                        return new List<string> {"Драма", "Фантастика", "Фэнтези", "Аниме"};
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(GetGenres(), model.Genres);
+
+            Assert.NotNull(model.Seasons);
+            Assert.Equal(1, model.TotalSeasons);
+            Assert.Equal(1, model.Seasons.Count);
+
+            #endregion
+
+            #region Season 1
+
+            var season1 = model.Seasons.First(s => s.Index == 1);
+
+            Assert.NotNull(season1.Episodes);
+            Assert.NotNull(season1.Specials);
+            Assert.Equal(24, season1.Episodes.Count);
+            Assert.Equal(7, season1.Specials.Count);
+
+            #region Episode 1
+
+            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1021681, s1E1.Id);
+
+            Assert.Equal("Prologue of the Beginning and the End", s1E1.Title, true);
+            Assert.Equal("s01e01", s1E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/9/79/979790b845c14f22cbf65676b35def02.jpg",
+                s1E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2011, 4, 6, 3, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s1E12 = season1.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1100177, s1E12.Id);
+
+            Assert.Equal("Dogma of Static Limit", s1E12.Title, true);
+            Assert.Equal("s01e12", s1E12.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/4/7c/47cc636b76ca10d8507418f4557034d7.jpg",
+                s1E12.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2011, 6, 22, 3, 0, 0, DateTimeKind.Utc)), s1E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s1E24 = season1.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1197405, s1E24.Id);
+
+            Assert.Equal("The Prologue Begins With the End", s1E24.Title, true);
+            Assert.Equal("s01e24", s1E24.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/7/e3/7e33df48114661a3cd9f22388e23c104.jpg",
+                s1E24.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2011, 9, 14, 3, 0, 0, DateTimeKind.Utc)), s1E24.AirDate);
+
+            #endregion
+
+            #region Special 4
+          
+            var s1S4 = season1.Specials.First(e => e.ShortName == "s01 special-4");
+
+            Assert.Equal(2608194, s1S4.Id);
+
+            Assert.Equal("Soumei Eichi no Cognitive Computing Episode 4: Meeting Chapter", s1S4.Title, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/3/6b/36bec630c22324fe32c735d9a6f9c2ea.jpg",
+                s1S4.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2014, 10, 22, 4, 0, 0, DateTimeKind.Utc)), s1S4.AirDate);
+
+            #endregion
+            
             #endregion
         }
 

@@ -6,5 +6,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
     {
         public int Index { get; set; }
         public List<MyShowsTvShowEpisodeModel> Episodes { get; set; }
+        public List<MyShowsTvShowEpisodeModel> Specials { get; set; }
     }
 }
