@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.Http;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper;
@@ -35,6 +36,263 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 
         #endregion
 
+        #region Extract Dirk Gently's Holistic Detective Agency TvShow Tests
+
+        [Fact]
+        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Id_English()
+        {
+            var model = await _englishService.GetTvShowByIdAsync(49623);
+            ValidateDirkGentlysHolisticDetectiveAgency(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Id_Russian()
+        {
+            var model = await _russianService.GetTvShowByIdAsync(49623);
+            ValidateDirkGentlysHolisticDetectiveAgency(model, Language.Russian);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Uri()
+        {
+            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/49623/");
+            ValidateDirkGentlysHolisticDetectiveAgency(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_English_Title()
+        {
+            string fullTitle = GetDirkGentlysHolisticDetectiveAgencyTitle(Language.English);
+            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+
+            Assert.NotNull(model);
+            Assert.Equal(49623, model.Id);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Russian_Title()
+        {
+            string fullTitle = GetDirkGentlysHolisticDetectiveAgencyTitle(Language.Russian);
+            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+
+            Assert.NotNull(model);
+            Assert.Equal(49623, model.Id);
+        }
+
+        private static string GetDirkGentlysHolisticDetectiveAgencyTitle(Language language)
+        {
+            switch (language)
+            {
+                case Language.English:
+                    return "Dirk Gently's Holistic Detective Agency";
+                case Language.Russian:
+                    return "Холистическое детективное агентство Дирка Джентли";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(language), language, null);
+            }
+        }
+
+        private void ValidateDirkGentlysHolisticDetectiveAgency(MyShowsTvShowModel model, Language language)
+        {
+            #region Tv Show
+
+            Assert.Equal(49623, model.Id);
+
+            Assert.Equal(GetDirkGentlysHolisticDetectiveAgencyTitle(language), model.Title, true);
+            Assert.Equal(GetDirkGentlysHolisticDetectiveAgencyTitle(Language.English), model.TitleOriginal, true);
+
+            string GetDescription()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return string.Empty;
+                    case Language.Russian:
+                        return
+                            "Сериал, рассказывающий о приключениях частного детектива Джентли и его невольного " +
+                            "помощника Тодда. Каждый сезон они расследуют некую большую, казалось бы, совершенно " +
+                            "безумную тайну и сталкиваются со странными и временами опасными персонажами. " +
+                            "В каждой серии они приближаются к разгадке на несколько шагов, хотя их " +
+                            "расследование страдает от недостатка логики.";
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
+
+            Assert.Equal("US", model.Country, true);
+
+            Assert.Equal("https://media.myshows.me/shows/normal/9/9b/9b214e17391f62bd8e4d85df4e6b0b5a.jpg", model.Image,
+                true);
+
+            Assert.True(model.Year.HasValue);
+            Assert.Equal(2016, model.Year.Value);
+
+            Assert.True(model.KinopoiskId.HasValue);
+            Assert.Equal(968767, model.KinopoiskId.Value);
+
+            Assert.True(model.TvrageId.HasValue);
+            Assert.Equal(11405, model.TvrageId.Value);
+
+            Assert.True(model.Runtime.HasValue);
+            Assert.Equal(43, model.Runtime.Value);
+
+            Assert.True(model.ImdbId.HasValue);
+            Assert.Equal(4047038, model.ImdbId.Value);
+
+            Assert.True(model.Rating.HasValue);
+            Assert.Equal(4.52m, model.Rating.Value, 2);
+
+            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
+
+            Assert.True(model.Started.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2016, 10, 22, 0, 0, 0, DateTimeKind.Utc)),
+                model.Started.Value);
+
+            Assert.True(model.Ended.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2017, 12, 16, 0, 0, 0, DateTimeKind.Utc)), model.Ended.Value);
+
+            IEnumerable<string> GetGenres()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return new List<string> {"Comedy", "Sci-Fi", "Mystery"};
+                    case Language.Russian:
+                        return new List<string> {"Комедия", "Фантастика", "Детектив"};
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(GetGenres(), model.Genres);
+
+            Assert.NotNull(model.Seasons);
+            Assert.Equal(2, model.TotalSeasons);
+            Assert.Equal(2, model.Seasons.Count);
+
+            #endregion
+
+            #region Season 1
+
+            var season1 = model.Seasons.First(s => s.Index == 1);
+
+            Assert.NotNull(season1.Episodes);
+            Assert.Equal(8, season1.Episodes.Count);
+
+            #region Episode 1
+
+            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(15803466, s1E1.Id);
+
+            Assert.Equal("Horizons", s1E1.Title, true);
+            Assert.Equal("s01e01", s1E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/1/f2/1f24f4f38bc01a8f98d11dd7e7a01c53.jpg",
+                s1E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2016, 10, 22, 16, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+
+            #endregion
+
+            #region Episode 4
+
+            var s1E4 = season1.Episodes.First(e => e.EpisodeNumber == 4);
+
+            Assert.Equal(15807716, s1E4.Id);
+
+            Assert.Equal("Watkin", s1E4.Title, true);
+            Assert.Equal("s01e04", s1E4.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/2/42/242eb236a3b60e12adb592bbf6e04039.jpg",
+                s1E4.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2016, 11, 12, 17, 0, 0, DateTimeKind.Utc)), s1E4.AirDate);
+
+            #endregion
+
+            #region Episode 8
+
+            var s1E8 = season1.Episodes.First(e => e.EpisodeNumber == 8);
+
+            Assert.Equal(15807720, s1E8.Id);
+
+            Assert.Equal("Two Sane Guys Doing Normal Things", s1E8.Title, true);
+            Assert.Equal("s01e08", s1E8.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/d/34/d3464a7e1a065e107b3aa15cc358fff8.jpg",
+                s1E8.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2016, 12, 10, 17, 0, 0, DateTimeKind.Utc)), s1E8.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 2
+
+            var season2 = model.Seasons.First(s => s.Index == 2);
+
+            Assert.NotNull(season2.Episodes);
+            Assert.Equal(10, season2.Episodes.Count);
+
+            #region Episode 1
+
+            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(16232262, s2E1.Id);
+
+            Assert.Equal("Space Rabbit", s2E1.Title, true);
+            Assert.Equal("s02e01", s2E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/2/eb/2eb7af3e8251798935d8aac58b9db8c2.jpg",
+                s2E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2017, 10, 15, 1, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+
+            #endregion
+
+            #region Episode 5
+
+            var s2E5 = season2.Episodes.First(e => e.EpisodeNumber == 5);
+
+            Assert.Equal(16296021, s2E5.Id);
+
+            Assert.Equal("Shapes and Colors", s2E5.Title, true);
+            Assert.Equal("s02e05", s2E5.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/7/a6/7a6fcfa4e85eb0a9abd39e8765f25cc3.jpg",
+                s2E5.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2017, 11, 12, 2, 0, 0, DateTimeKind.Utc)), s2E5.AirDate);
+
+            #endregion
+
+            #region Episode 10
+
+            var s2E10 = season2.Episodes.First(e => e.EpisodeNumber == 10);
+
+            Assert.Equal(16322322, s2E10.Id);
+
+            Assert.Equal("Nice Jacket", s2E10.Title, true);
+            Assert.Equal("s02e10", s2E10.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/9/40/9404c94125cd0625fe77ca49477c06b4.jpg",
+                s2E10.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2017, 12, 17, 2, 0, 0, DateTimeKind.Utc)), s2E10.AirDate);
+
+            #endregion
+
+            #endregion
+        }
+
+        #endregion
+
         #region Extract Grimm TvShow Tests
 
         [Fact]
@@ -61,7 +319,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         [Fact]
         public async Task Should_Extract_Grimm_By_English_Title()
         {
-            const string fullTitle = "Grimm";
+            string fullTitle = GetGrimmTitle(Language.English);
             var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
             var model = models.FirstOrDefault(m => m.Title == fullTitle);
 
@@ -72,7 +330,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
         [Fact]
         public async Task Should_Extract_Grimm_By_Russian_Title()
         {
-            const string fullTitle = "Гримм";
+            string fullTitle = GetGrimmTitle(Language.Russian);
             var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
             var model = models.FirstOrDefault(m => m.Title == fullTitle);
 
@@ -80,22 +338,22 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
             Assert.Equal(17186, model.Id);
         }
 
+        private static string GetGrimmTitle(Language language)
+        {
+            switch (language)
+            {
+                case Language.English:
+                    return "Grimm";
+                case Language.Russian:
+                    return "Гримм";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(language), language, null);
+            }
+        }
+
         private void ValidateGrimm(MyShowsTvShowModel model, Language language)
         {
             #region Tv Show
-
-            string GetTitle()
-            {
-                switch (language)
-                {
-                    case Language.English:
-                        return "Grimm";
-                    case Language.Russian:
-                        return "Гримм";
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
-                }
-            }
 
             string GetDescription()
             {
@@ -139,8 +397,8 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
 
             Assert.Equal(17186, model.Id);
 
-            Assert.Equal(GetTitle(), model.Title, true);
-            Assert.Equal("Grimm", model.TitleOriginal, true);
+            Assert.Equal(GetGrimmTitle(language), model.Title, true);
+            Assert.Equal(GetGrimmTitle(Language.English), model.TitleOriginal, true);
 
             Assert.Equal(GetDescription(), model.Description, true);
 
@@ -412,7 +670,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
             #endregion
 
             #endregion
-            
+
             #region Season 4
 
             var season4 = model.Seasons.First(s => s.Index == 4);
@@ -437,7 +695,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
             #endregion
 
             #region Episode 11
-            
+
             var s4E11 = season4.Episodes.First(e => e.EpisodeNumber == 11);
 
             Assert.Equal(2599027, s4E11.Id);
@@ -469,7 +727,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
             #endregion
 
             #endregion
-            
+
             #region Season 5
 
             var season5 = model.Seasons.First(s => s.Index == 5);
@@ -526,7 +784,7 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
             #endregion
 
             #endregion
-            
+
             #region Season 6
 
             var season6 = model.Seasons.First(s => s.Index == 6);
@@ -579,6 +837,981 @@ namespace PortableLibraryCoreTests.Infrastructure.External.Services.TvShow
                 s6E13.Image, true);
 
             Assert.Equal(new DateTimeOffset(new DateTime(2017, 4, 1, 0, 0, 0, DateTimeKind.Utc)), s6E13.AirDate);
+
+            #endregion
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Extract Friends TvShow Tests
+
+        [Fact]
+        public async Task Should_Extract_Friends_By_Id_English()
+        {
+            var model = await _englishService.GetTvShowByIdAsync(20);
+            ValidateFriends(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Friends_By_Id_Russian()
+        {
+            var model = await _russianService.GetTvShowByIdAsync(20);
+            ValidateFriends(model, Language.Russian);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Friends_By_Uri()
+        {
+            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/20/");
+            ValidateFriends(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Friends_By_English_Title()
+        {
+            string fullTitle = GetFriendsTitle(Language.English);
+            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle && m.Year == 1994);
+
+            Assert.NotNull(model);
+            Assert.Equal(20, model.Id);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Friends_By_Russian_Title()
+        {
+            string fullTitle = GetFriendsTitle(Language.Russian);
+            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle && m.Year == 1994);
+
+            Assert.NotNull(model);
+            Assert.Equal(20, model.Id);
+        }
+
+        private static string GetFriendsTitle(Language language)
+        {
+            switch (language)
+            {
+                case Language.English:
+                    return "Friends";
+                case Language.Russian:
+                    return "Друзья";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(language), language, null);
+            }
+        }
+
+        private void ValidateFriends(MyShowsTvShowModel model, Language language)
+        {
+            #region Tv Show
+
+            Assert.Equal(20, model.Id);
+
+            Assert.Equal(GetFriendsTitle(language), model.Title, true);
+            Assert.Equal(GetFriendsTitle(Language.English), model.TitleOriginal, true);
+
+            string GetDescription()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return string.Empty;
+                    case Language.Russian:
+                        return
+                            "Культовый ситком о жизни шестерых друзей-соседей, признанный одним из лучших " +
+                            "комедийных сериалов в истории. В чем суть? Шестеро друзей – Моника, Фиби, Рэйчел, Росс, " +
+                            "Чендлер и Джо, - живут на Манхэттене в двух съемных квартирах и изо всех сил " +
+                            "пытаются жить нормальной жизнью: ссорятся, мирятся, влюбляются, выясняют отношения… " +
+                            "Сложно найти человека, который не видел ни одной серии «Друзей» - этот сериал " +
+                            "действительно положил начало целому жанру и до сих пор многими считается одним из " +
+                            "самых любимых. Действие происходит с середины девяностых по середину двухтысячных. " +
+                            "Несмотря на то, что некоторые сюжетные линии кажутся абсурдными, а поведение героев " +
+                            "далеко не всегда хотя бы отдаленно похоже на поступки нормальных людей, это отличное " +
+                            "зеркало целой эпохи, созданное с любовью и актуальное до сих пор.";
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
+
+            Assert.Equal("US", model.Country, true);
+
+            Assert.Equal("https://media.myshows.me/shows/normal/3/39/3902fe3a363a08eb23b02d0743a2461d.jpg", model.Image,
+                true);
+
+            Assert.True(model.Year.HasValue);
+            Assert.Equal(1994, model.Year.Value);
+
+            Assert.True(model.KinopoiskId.HasValue);
+            Assert.Equal(77044, model.KinopoiskId.Value);
+
+            Assert.True(model.TvrageId.HasValue);
+            Assert.Equal(3616, model.TvrageId.Value);
+
+            Assert.True(model.Runtime.HasValue);
+            Assert.Equal(22, model.Runtime.Value);
+
+            Assert.True(model.ImdbId.HasValue);
+            Assert.Equal(108778, model.ImdbId.Value);
+
+            Assert.True(model.Rating.HasValue);
+            Assert.Equal(4.75m, model.Rating.Value, 2);
+
+            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
+
+            Assert.True(model.Started.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(1994, 9, 22, 0, 0, 0, DateTimeKind.Utc)),
+                model.Started.Value);
+
+            Assert.True(model.Ended.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2004, 5, 6, 0, 0, 0, DateTimeKind.Utc)), model.Ended.Value);
+
+            IEnumerable<string> GetGenres()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return new List<string> {"Comedy"};
+                    case Language.Russian:
+                        return new List<string> {"Комедия"};
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(GetGenres(), model.Genres);
+
+            Assert.NotNull(model.Seasons);
+            Assert.Equal(10, model.TotalSeasons);
+            Assert.Equal(10, model.Seasons.Count);
+
+            #endregion
+
+            #region Season 1
+
+            var season1 = model.Seasons.First(s => s.Index == 1);
+
+            Assert.NotNull(season1.Episodes);
+            Assert.Equal(24, season1.Episodes.Count);
+
+            #region Episode 1
+
+            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(962, s1E1.Id);
+
+            Assert.Equal("The One Where It All Began", s1E1.Title, true);
+            Assert.Equal("s01e01", s1E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/b/a9/ba9bd5398ae5324c86a0130f4ccdf9a0.jpg",
+                s1E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1994, 9, 23, 0, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s1E12 = season1.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(973, s1E12.Id);
+
+            Assert.Equal("The One With the Dozen Lasagnas", s1E12.Title, true);
+            Assert.Equal("s01e12", s1E12.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/a/ec/aec6ba3728af059d22daaeb75ee6d884.jpg",
+                s1E12.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1995, 1, 13, 1, 0, 0, DateTimeKind.Utc)), s1E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s1E24 = season1.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(985, s1E24.Id);
+
+            Assert.Equal("The One Where Rachel Finds Out", s1E24.Title, true);
+            Assert.Equal("s01e24", s1E24.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/b/04/b04a1e0f1194c97464859cc9c768eb98.jpg",
+                s1E24.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1995, 5, 19, 0, 0, 0, DateTimeKind.Utc)), s1E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 2
+
+            var season2 = model.Seasons.First(s => s.Index == 2);
+
+            Assert.NotNull(season2.Episodes);
+            Assert.Equal(24, season2.Episodes.Count);
+
+            #region Episode 1
+
+            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(986, s2E1.Id);
+
+            Assert.Equal("The One With Ross's New Girlfriend", s2E1.Title, true);
+            Assert.Equal("s02e01", s2E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/d/c7/dc7c9160361216bd3f19fa9894cde632.jpg",
+                s2E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1995, 9, 22, 0, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s2E12 = season2.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(997, s2E12.Id);
+
+            Assert.Equal("The One After the Superbowl (1)", s2E12.Title, true);
+            Assert.Equal("s02e12", s2E12.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/0/db/0dbfb16558a6232cf0d75449a69c4b43.jpg",
+                s2E12.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1996, 1, 29, 1, 0, 0, DateTimeKind.Utc)), s2E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s2E24 = season2.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1009, s2E24.Id);
+
+            Assert.Equal("The One With Barry and Mindy's Wedding", s2E24.Title, true);
+            Assert.Equal("s02e24", s2E24.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/e/9d/e9d6818b784d4e9f35061e539239748b.jpg",
+                s2E24.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1996, 5, 17, 0, 0, 0, DateTimeKind.Utc)), s2E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 3
+
+            var season3 = model.Seasons.First(s => s.Index == 3);
+
+            Assert.NotNull(season3.Episodes);
+            Assert.Equal(25, season3.Episodes.Count);
+
+            #region Episode 1
+
+            var s3E1 = season3.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1010, s3E1.Id);
+
+            Assert.Equal("The One With the Princess Leia Fantasy", s3E1.Title, true);
+            Assert.Equal("s03e01", s3E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/0/ea/0ea28360eeaa51d7be680a9a50ad58b9.jpg",
+                s3E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1996, 9, 17, 0, 0, 0, DateTimeKind.Utc)), s3E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s3E12 = season3.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1021, s3E12.Id);
+
+            Assert.Equal("The One With All the Jealousy", s3E12.Title, true);
+            Assert.Equal("s03e12", s3E12.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/2/5f/25f88762e12ad5510c11a7badd9138df.jpg",
+                s3E12.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1997, 1, 17, 1, 0, 0, DateTimeKind.Utc)), s3E12.AirDate);
+
+            #endregion
+
+            #region Episode 25
+
+            var s3E25 = season3.Episodes.First(e => e.EpisodeNumber == 25);
+
+            Assert.Equal(1034, s3E25.Id);
+
+            Assert.Equal("The One at the Beach", s3E25.Title, true);
+            Assert.Equal("s03e25", s3E25.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/4/c3/4c3051486e49ebae6c88d5ce907b84b7.jpg",
+                s3E25.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1997, 5, 16, 0, 0, 0, DateTimeKind.Utc)), s3E25.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 4
+
+            var season4 = model.Seasons.First(s => s.Index == 4);
+
+            Assert.NotNull(season4.Episodes);
+            Assert.Equal(24, season4.Episodes.Count);
+
+            #region Episode 1
+
+            var s4E1 = season4.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1035, s4E1.Id);
+
+            Assert.Equal("The One With the Jellyfish", s4E1.Title, true);
+            Assert.Equal("s04e01", s4E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/e/af/eafa78de0610ec8475744262e07a429d.jpg",
+                s4E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1997, 9, 26, 0, 0, 0, DateTimeKind.Utc)), s4E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s4E12 = season4.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1046, s4E12.Id);
+
+            Assert.Equal("The One With the Embryos", s4E12.Title, true);
+            Assert.Equal("s04e12", s4E12.ShortName, true);
+
+            Assert.Empty(s4E12.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1998, 1, 16, 1, 0, 0, DateTimeKind.Utc)), s4E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s4E24 = season4.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1058, s4E24.Id);
+
+            Assert.Equal("The One With Ross's Wedding (2)", s4E24.Title, true);
+            Assert.Equal("s04e24", s4E24.ShortName, true);
+
+            Assert.Empty(s4E24.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1998, 5, 8, 0, 0, 0, DateTimeKind.Utc)), s4E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 5
+
+            var season5 = model.Seasons.First(s => s.Index == 5);
+
+            Assert.NotNull(season5.Episodes);
+            Assert.Equal(24, season5.Episodes.Count);
+
+            #region Episode 1
+
+            var s5E1 = season5.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1059, s5E1.Id);
+
+            Assert.Equal("The One After Ross Says Rachel", s5E1.Title, true);
+            Assert.Equal("s05e01", s5E1.ShortName, true);
+
+            Assert.Empty(s5E1.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1998, 9, 25, 0, 0, 0, DateTimeKind.Utc)), s5E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s5E12 = season5.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1070, s5E12.Id);
+
+            Assert.Equal("The One With Chandler's Work Laugh", s5E12.Title, true);
+            Assert.Equal("s05e12", s5E12.ShortName, true);
+
+            Assert.Empty(s5E12.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1999, 1, 22, 1, 0, 0, DateTimeKind.Utc)), s5E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s5E24 = season5.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1082, s5E24.Id);
+
+            Assert.Equal("The One in Vegas (2)", s5E24.Title, true);
+            Assert.Equal("s05e24", s5E24.ShortName, true);
+
+            Assert.Empty(s5E24.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1999, 5, 21, 0, 0, 0, DateTimeKind.Utc)), s5E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 6
+
+            var season6 = model.Seasons.First(s => s.Index == 6);
+
+            Assert.NotNull(season6.Episodes);
+            Assert.Equal(25, season6.Episodes.Count);
+
+            #region Episode 1
+
+            var s6E1 = season6.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1083, s6E1.Id);
+
+            Assert.Equal("The One After Vegas", s6E1.Title, true);
+            Assert.Equal("s06e01", s6E1.ShortName, true);
+
+            Assert.Empty(s6E1.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(1999, 9, 24, 0, 0, 0, DateTimeKind.Utc)), s6E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s6E12 = season6.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1094, s6E12.Id);
+
+            Assert.Equal("The One With the Joke", s6E12.Title, true);
+            Assert.Equal("s06e12", s6E12.ShortName, true);
+
+            Assert.Empty(s6E12.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2000, 1, 14, 1, 0, 0, DateTimeKind.Utc)), s6E12.AirDate);
+
+            #endregion
+
+            #region Episode 25
+
+            var s6E25 = season6.Episodes.First(e => e.EpisodeNumber == 25);
+
+            Assert.Equal(1107, s6E25.Id);
+
+            Assert.Equal("The One With the Proposal (2)", s6E25.Title, true);
+            Assert.Equal("s06e25", s6E25.ShortName, true);
+
+            Assert.Empty(s6E25.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2000, 5, 19, 0, 0, 0, DateTimeKind.Utc)), s6E25.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 7
+
+            var season7 = model.Seasons.First(s => s.Index == 7);
+
+            Assert.NotNull(season7.Episodes);
+            Assert.Equal(25, season7.Episodes.Count);
+
+            #region Episode 1
+
+            var s7E1 = season7.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1108, s7E1.Id);
+
+            Assert.Equal("The One With Monica's Thunder", s7E1.Title, true);
+            Assert.Equal("s07e01", s7E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/0/95/0959d895d4a6b97625ff10c655940302.jpg",
+                s7E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2000, 10, 13, 0, 0, 0, DateTimeKind.Utc)), s7E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s7E12 = season7.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1119, s7E12.Id);
+
+            Assert.Equal("The One Where They're Up All Night", s7E12.Title, true);
+            Assert.Equal("s07e12", s7E12.ShortName, true);
+
+            Assert.Empty(s7E12.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2001, 1, 12, 1, 0, 0, DateTimeKind.Utc)), s7E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s7E24 = season7.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1131, s7E24.Id);
+
+            Assert.Equal("The One with Monica and Chandler's Wedding (2)", s7E24.Title, true);
+            Assert.Equal("s07e24", s7E24.ShortName, true);
+
+            Assert.Empty(s7E24.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2001, 5, 18, 0, 0, 0, DateTimeKind.Utc)), s7E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 8
+
+            var season8 = model.Seasons.First(s => s.Index == 8);
+
+            Assert.NotNull(season8.Episodes);
+            Assert.Equal(24, season8.Episodes.Count);
+
+            #region Episode 1
+
+            var s8E1 = season8.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1132, s8E1.Id);
+
+            Assert.Equal("The One After \"I Do\"", s8E1.Title, true);
+            Assert.Equal("s08e01", s8E1.ShortName, true);
+
+            Assert.Empty(s8E1.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2001, 9, 28, 0, 0, 0, DateTimeKind.Utc)), s8E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s8E12 = season8.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1143, s8E12.Id);
+
+            Assert.Equal("The One Where Joey Dates Rachel", s8E12.Title, true);
+            Assert.Equal("s08e12", s8E12.ShortName, true);
+
+            Assert.Empty(s8E12.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2002, 1, 11, 1, 0, 0, DateTimeKind.Utc)), s8E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s8E24 = season8.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1155, s8E24.Id);
+
+            Assert.Equal("The One Where Rachel Has a Baby (2)", s8E24.Title, true);
+            Assert.Equal("s08e24", s8E24.ShortName, true);
+
+            Assert.Empty(s8E24.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2002, 5, 17, 0, 0, 0, DateTimeKind.Utc)), s8E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 9
+
+            var season9 = model.Seasons.First(s => s.Index == 9);
+
+            Assert.NotNull(season9.Episodes);
+            Assert.Equal(24, season9.Episodes.Count);
+
+            #region Episode 1
+
+            var s9E1 = season9.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1156, s9E1.Id);
+
+            Assert.Equal("The One Where No One Proposes", s9E1.Title, true);
+            Assert.Equal("s09e01", s9E1.ShortName, true);
+
+            Assert.Empty(s9E1.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2002, 9, 27, 0, 0, 0, DateTimeKind.Utc)), s9E1.AirDate);
+
+            #endregion
+
+            #region Episode 12
+
+            var s9E12 = season9.Episodes.First(e => e.EpisodeNumber == 12);
+
+            Assert.Equal(1167, s9E12.Id);
+
+            Assert.Equal("The One With Phoebe's Rats", s9E12.Title, true);
+            Assert.Equal("s09e12", s9E12.ShortName, true);
+
+            Assert.Empty(s9E12.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2003, 1, 17, 1, 0, 0, DateTimeKind.Utc)), s9E12.AirDate);
+
+            #endregion
+
+            #region Episode 24
+
+            var s9E24 = season9.Episodes.First(e => e.EpisodeNumber == 24);
+
+            Assert.Equal(1179, s9E24.Id);
+
+            Assert.Equal("The One in Barbados (2)", s9E24.Title, true);
+            Assert.Equal("s09e24", s9E24.ShortName, true);
+
+            Assert.Empty(s9E24.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2003, 5, 16, 0, 0, 0, DateTimeKind.Utc)), s9E24.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 10
+
+            var season10 = model.Seasons.First(s => s.Index == 10);
+
+            Assert.NotNull(season10.Episodes);
+            Assert.Equal(21, season10.Episodes.Count);
+
+            #region Episode 1
+
+            var s10E1 = season10.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1180, s10E1.Id);
+
+            Assert.Equal("The One After Joey And Rachel Kiss", s10E1.Title, true);
+            Assert.Equal("s10e01", s10E1.ShortName, true);
+
+            Assert.Empty(s10E1.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2003, 9, 26, 0, 0, 0, DateTimeKind.Utc)), s10E1.AirDate);
+
+            #endregion
+
+            #region Episode 9
+
+            var s10E9 = season10.Episodes.First(e => e.EpisodeNumber == 9);
+
+            Assert.Equal(1188, s10E9.Id);
+
+            Assert.Equal("The One With the Birth Mother", s10E9.Title, true);
+            Assert.Equal("s10e09", s10E9.ShortName, true);
+
+            Assert.Empty(s10E9.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2004, 1, 9, 1, 0, 0, DateTimeKind.Utc)), s10E9.AirDate);
+
+            #endregion
+
+            #region Episode 18
+
+            var s10E18 = season10.Episodes.First(e => e.EpisodeNumber == 18);
+
+            Assert.Equal(1197, s10E18.Id);
+
+            Assert.Equal("The Last One (2)", s10E18.Title, true);
+            Assert.Equal("s10e18", s10E18.ShortName, true);
+
+            Assert.Empty(s10E18.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2004, 5, 7, 0, 0, 0, DateTimeKind.Utc)), s10E18.AirDate);
+
+            #endregion
+
+            #region Episode 0 FRIENDS REUNION - Tribute To Director James Burrows
+
+            var s10E0 = season10.Episodes.First(e => e.EpisodeNumber == 0);
+
+            Assert.Equal(15668758, s10E0.Id);
+
+            Assert.Equal("FRIENDS REUNION - Tribute To Director James Burrows", s10E0.Title, true);
+            Assert.Equal("s10 special-3", s10E0.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/6/4b/64b85d4cc7efeb5fbd2ac6452b34b4cc.jpg",
+                s10E0.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc)), s10E0.AirDate);
+
+            #endregion
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Extract Anger Managment TvShow Tests
+
+        [Fact]
+        public async Task Should_Extract_Anger_Managment_Id_English()
+        {
+            var model = await _englishService.GetTvShowByIdAsync(23992);
+            ValidateAngerManagment(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Anger_Managment_Id_Russian()
+        {
+            var model = await _russianService.GetTvShowByIdAsync(23992);
+            ValidateAngerManagment(model, Language.Russian);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Anger_Managment_By_Uri()
+        {
+            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/23992/");
+            ValidateAngerManagment(model, Language.English);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Anger_Managment_By_English_Title()
+        {
+            string fullTitle = GetAngerManagmentTitle(Language.English);
+            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+
+            Assert.NotNull(model);
+            Assert.Equal(23992, model.Id);
+        }
+
+        [Fact]
+        public async Task Should_Extract_Anger_Managment_By_Russian_Title()
+        {
+            string fullTitle = GetAngerManagmentTitle(Language.Russian);
+            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+
+            Assert.NotNull(model);
+            Assert.Equal(23992, model.Id);
+        }
+
+        private static string GetAngerManagmentTitle(Language language)
+        {
+            switch (language)
+            {
+                case Language.English:
+                    return "Anger Management";
+                case Language.Russian:
+                    return "Управление гневом";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(language), language, null);
+            }
+        }
+
+        private void ValidateAngerManagment(MyShowsTvShowModel model, Language language)
+        {
+            #region Tv Show
+
+            string GetDescription()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return string.Empty;
+                    case Language.Russian:
+                        return
+                            "До своей карьеры терапевта, Чарли был в тупике из-за отсутствия перспектив в низшей " +
+                            "бейсбольной лиге. Проблема неумения контролировать свой гнев сбила его с пути в " +
+                            "высшую лигу. После прохождения курса терапии по борьбе с гневом, он вывел свою команду " +
+                            "в высшую лигу и провел один потрясающий сезон, прежде чем старые проблемы вновь не " +
+                            "напомнили о себе. В своем финальном матче он пытался ударить себя битой по ноге, в " +
+                            "результате чего получил травму, которая положила конец его карьере.Но в итоге эта же " +
+                            "травма привела его к нынешней профессии. В то время как Чарли борется со своим гневом, " +
+                            "в его жизни процветает хаос. Всё осложняется его отношениями с собственным терапевтом и " +
+                            "лучшим другом, бывшей женой, чьи позитивные взгляды на будущее, но при этом плохой выбор " +
+                            "мужчин, расстраивают Чарли и их 13-летнюю дочь, имеющую психические расстройства.";
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(23992, model.Id);
+
+            Assert.Equal(GetAngerManagmentTitle(language), model.Title, true);
+            Assert.Equal(GetAngerManagmentTitle(Language.English), model.TitleOriginal, true);
+
+            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
+
+            Assert.Equal("US", model.Country, true);
+
+            Assert.Equal("https://media.myshows.me/shows/normal/3/3b/3b8013ec507437324e069d8c998f8c9c.jpg", model.Image,
+                true);
+
+            Assert.True(model.Year.HasValue);
+            Assert.Equal(2012, model.Year.Value);
+
+            Assert.True(model.KinopoiskId.HasValue);
+            Assert.Equal(596247, model.KinopoiskId.Value);
+
+            Assert.True(model.TvrageId.HasValue);
+            Assert.Equal(29999, model.TvrageId.Value);
+
+            Assert.True(model.Runtime.HasValue);
+            Assert.Equal(22, model.Runtime.Value);
+
+            Assert.True(model.ImdbId.HasValue);
+            Assert.Equal(1986770, model.ImdbId.Value);
+
+            Assert.True(model.Rating.HasValue);
+            Assert.Equal(3.55m, model.Rating.Value, 2);
+
+            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
+
+            Assert.True(model.Started.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2012, 6, 28, 0, 0, 0, DateTimeKind.Utc)),
+                model.Started.Value);
+
+            Assert.True(model.Ended.HasValue);
+            Assert.Equal(new DateTimeOffset(new DateTime(2014, 12, 22, 0, 0, 0, DateTimeKind.Utc)), model.Ended.Value);
+
+            IEnumerable<string> GetGenres()
+            {
+                switch (language)
+                {
+                    case Language.English:
+                        return new List<string> {"Comedy"};
+                    case Language.Russian:
+                        return new List<string> {"Комедия"};
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(language), language, null);
+                }
+            }
+
+            Assert.Equal(GetGenres(), model.Genres);
+
+            Assert.NotNull(model.Seasons);
+            Assert.Equal(2, model.TotalSeasons);
+            Assert.Equal(2, model.Seasons.Count);
+
+            #endregion
+
+            #region Season 1
+
+            var season1 = model.Seasons.First(s => s.Index == 1);
+
+            Assert.NotNull(season1.Episodes);
+            Assert.Equal(10, season1.Episodes.Count);
+
+            #region Episode 1
+
+            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1411218, s1E1.Id);
+
+            Assert.Equal("Charlie Goes Back to Therapy", s1E1.Title, true);
+            Assert.Equal("s01e01", s1E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/a/9f/a9f9079688eb61352666e3e38157da14.jpg",
+                s1E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2012, 6, 29, 2, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+
+            #endregion
+
+            #region Episode 5
+
+            var s1E5 = season1.Episodes.First(e => e.EpisodeNumber == 5);
+
+            Assert.Equal(1515544, s1E5.Id);
+
+            Assert.Equal("Charlie Tries to Prove Therapy is Legit", s1E5.Title, true);
+            Assert.Equal("s01e05", s1E5.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/6/44/644fbc577091c796fb428a1b274c169b.jpg",
+                s1E5.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2012, 7, 20, 2, 0, 0, DateTimeKind.Utc)), s1E5.AirDate);
+
+            #endregion
+
+            #region Episode 10
+
+            var s1E10 = season1.Episodes.First(e => e.EpisodeNumber == 10);
+
+            Assert.Equal(1515549, s1E10.Id);
+
+            Assert.Equal("Charlie Gets Romantic", s1E10.Title, true);
+            Assert.Equal("s01e10", s1E10.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/8/aa/8aa9a6917e6bb7fa8389ccb720881bba.jpg",
+                s1E10.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2012, 8, 24, 2, 0, 0, DateTimeKind.Utc)), s1E10.AirDate);
+
+            #endregion
+
+            #endregion
+
+            #region Season 2
+
+            var season2 = model.Seasons.First(s => s.Index == 2);
+
+            Assert.NotNull(season2.Episodes);
+            Assert.Equal(90, season2.Episodes.Count);
+
+            #region Episode 1
+
+            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+
+            Assert.Equal(1579536, s2E1.Id);
+
+            Assert.Equal("Charlie Loses It at a Baby Shower", s2E1.Title, true);
+            Assert.Equal("s02e01", s2E1.ShortName, true);
+
+            Assert.Equal("https://media.myshows.me/episodes/normal/b/4e/b4ebede2195719823f18395ba56ed645.jpg",
+                s2E1.Image, true);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2013, 1, 18, 3, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+
+            #endregion
+
+            #region Episode 45
+
+            var s2E45 = season2.Episodes.First(e => e.EpisodeNumber == 45);
+
+            Assert.Equal(1979110, s2E45.Id);
+
+            Assert.Equal("Charlie and Lacey Shack Up", s2E45.Title, true);
+            Assert.Equal("s02e45", s2E45.ShortName, true);
+
+            Assert.Empty(s2E45.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2013, 12, 13, 2, 30, 0, DateTimeKind.Utc)), s2E45.AirDate);
+
+            #endregion
+
+            #region Episode 90
+
+            var s2E90 = season2.Episodes.First(e => e.EpisodeNumber == 90);
+
+            Assert.Equal(2459243, s2E90.Id);
+
+            Assert.Equal("Charlie and the 100th Episode", s2E90.Title, true);
+            Assert.Equal("s02e90", s2E90.ShortName, true);
+
+            Assert.Empty(s2E90.Image);
+
+            Assert.Equal(new DateTimeOffset(new DateTime(2014, 12, 23, 3, 0, 0, DateTimeKind.Utc)), s2E90.AirDate);
 
             #endregion
 

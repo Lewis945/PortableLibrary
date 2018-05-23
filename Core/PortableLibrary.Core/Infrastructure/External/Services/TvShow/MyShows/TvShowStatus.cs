@@ -3,6 +3,8 @@
     public enum TvShowStatus
     {
         CanceledOrEnded,
-        Ongoing
+        Ongoing,
+        NewSeries,
+        InDevelopment
     }
 }

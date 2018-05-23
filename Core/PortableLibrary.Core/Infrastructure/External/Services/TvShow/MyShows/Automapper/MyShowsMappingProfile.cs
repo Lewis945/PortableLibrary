@@ -38,8 +38,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
                                 return TvShowStatus.CanceledOrEnded;
                             case "Returning Series":
                                 return TvShowStatus.Ongoing;
+                            case "New Series":
+                                return TvShowStatus.NewSeries;
+                            case "In Development":
+                                return TvShowStatus.InDevelopment;
                             default:
-                                throw new ArgumentException("", nameof(src.Status));
+                                throw new ArgumentException($"Status {src.Status} is undefined!", nameof(src.Status));
                         }
                     }))
 //                .ForMember(dest => dest.Started,
