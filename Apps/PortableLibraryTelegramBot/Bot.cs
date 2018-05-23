@@ -133,7 +133,7 @@ namespace PortableLibraryTelegramBot
             var user = message.From;
             var chat = message.Chat;
 
-            if (message.Type != MessageType.TextMessage) return;
+            if (message.Type != MessageType.Text) return;
 
             var options = new DbContextOptionsBuilder<BotDataContext>()
                 .UseInMemoryDatabase(databaseName: "PortableLibrary")
