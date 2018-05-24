@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PortableLibrary.Core.Infrastructure\PortableLibrary.Core.Infrastructure.csproj" />
     <ProjectReference Include="..\PortableLibrary.Core\PortableLibrary.Core.csproj" />
   </ItemGroup>
 </Project>

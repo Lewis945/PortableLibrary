@@ -4,7 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Database\Migrations\" />
-    <Folder Include="External\Services" />
     <Folder Include="Validation" />
   </ItemGroup>
   <ItemGroup>

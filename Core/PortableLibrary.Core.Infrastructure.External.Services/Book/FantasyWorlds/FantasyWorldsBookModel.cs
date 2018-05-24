@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using PortableLibrary.Core.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book.FantasyWorlds
 {
-    public class FantasyWorldsBookModel : IExternalModel
+    public class FantasyWorldsBookModel
     {
         public string Title { get; set; }
         public string OriginalTitle { get; set; }
@@ -14,7 +13,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.FantasyWorl
 
         public string Author { get; set; }
         public string Description { get; set; }
-        
+
         public List<string> Series { get; set; }
 
         public int? Index { get; set; }

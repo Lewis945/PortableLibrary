@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using PortableLibrary.Core.Extensions;
+using PortableLibrary.Core.External.Services.TvShow.Models;
+using PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction;
 using PortableLibrary.Core.Http;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper;
@@ -41,41 +43,41 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         [Fact]
         public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Id_English()
         {
-            var model = await _englishService.GetTvShowByIdAsync(49623);
+            var model = await _englishService.ExtractTvShowAsync(49623);
             ValidateDirkGentlysHolisticDetectiveAgency(model, Language.English);
         }
 
         [Fact]
         public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Id_Russian()
         {
-            var model = await _russianService.GetTvShowByIdAsync(49623);
+            var model = await _russianService.ExtractTvShowAsync(49623);
             ValidateDirkGentlysHolisticDetectiveAgency(model, Language.Russian);
         }
 
         [Fact]
         public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Uri()
         {
-            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/49623/");
+            var model = await _englishService.ExtractTvShowAsync("https://myshows.me/view/49623/");
             ValidateDirkGentlysHolisticDetectiveAgency(model, Language.English);
         }
 
         [Fact]
-        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_English_Title()
+        public async Task Should_Find_Dirk_Gentlys_Holistic_Detective_Agency_By_English_Title()
         {
             string fullTitle = GetDirkGentlysHolisticDetectiveAgencyTitle(Language.English);
-            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _englishService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(49623, model.Id);
         }
 
         [Fact]
-        public async Task Should_Extract_Dirk_Gentlys_Holistic_Detective_Agency_By_Russian_Title()
+        public async Task Should_Find_Dirk_Gentlys_Holistic_Detective_Agency_By_Russian_Title()
         {
             string fullTitle = GetDirkGentlysHolisticDetectiveAgencyTitle(Language.Russian);
-            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _russianService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(49623, model.Id);
@@ -94,13 +96,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             }
         }
 
-        private void ValidateDirkGentlysHolisticDetectiveAgency(MyShowsTvShowModel model, Language language)
+        private void ValidateDirkGentlysHolisticDetectiveAgency(TvShowDataExtractionModel model, Language language)
         {
             #region Tv Show
 
             Assert.Equal(49623, model.Id);
 
-            Assert.Equal(GetDirkGentlysHolisticDetectiveAgencyTitle(language), model.Title, true);
+            Assert.NotNull(model.Titles);
+            Assert.Equal(new List<string> {GetDirkGentlysHolisticDetectiveAgencyTitle(language)}, model.Titles);
             Assert.Equal(GetDirkGentlysHolisticDetectiveAgencyTitle(Language.English), model.TitleOriginal, true);
 
             string GetDescription()
@@ -180,22 +183,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season1 = model.Seasons.First(s => s.Index == 1);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(8, season1.Episodes.Count);
+            ValidateSeason(season1, episodesCount: 8);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(15803466, s1E1.Id);
-
-            Assert.Equal("Horizons", s1E1.Title, true);
-            Assert.Equal("s01e01", s1E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/1/f2/1f24f4f38bc01a8f98d11dd7e7a01c53.jpg",
-                s1E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 10, 22, 16, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+            ValidateEpisode(s1E1, id: 15803466, title: "Horizons", shortName: "s01e01",
+                image: "https://media.myshows.me/episodes/normal/1/f2/1f24f4f38bc01a8f98d11dd7e7a01c53.jpg",
+                airDateUtc: new DateTime(2016, 10, 22, 16, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -203,15 +199,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E4 = season1.Episodes.First(e => e.EpisodeNumber == 4);
 
-            Assert.Equal(15807716, s1E4.Id);
-
-            Assert.Equal("Watkin", s1E4.Title, true);
-            Assert.Equal("s01e04", s1E4.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/2/42/242eb236a3b60e12adb592bbf6e04039.jpg",
-                s1E4.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 11, 12, 17, 0, 0, DateTimeKind.Utc)), s1E4.AirDate);
+            ValidateEpisode(s1E4, id: 15807716, title: "Watkin", shortName: "s01e04",
+                image: "https://media.myshows.me/episodes/normal/2/42/242eb236a3b60e12adb592bbf6e04039.jpg",
+                airDateUtc: new DateTime(2016, 11, 12, 17, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -219,15 +209,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E8 = season1.Episodes.First(e => e.EpisodeNumber == 8);
 
-            Assert.Equal(15807720, s1E8.Id);
-
-            Assert.Equal("Two Sane Guys Doing Normal Things", s1E8.Title, true);
-            Assert.Equal("s01e08", s1E8.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/d/34/d3464a7e1a065e107b3aa15cc358fff8.jpg",
-                s1E8.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 12, 10, 17, 0, 0, DateTimeKind.Utc)), s1E8.AirDate);
+            ValidateEpisode(s1E8, id: 15807720, title: "Two Sane Guys Doing Normal Things", shortName: "s01e08",
+                image: "https://media.myshows.me/episodes/normal/d/34/d3464a7e1a065e107b3aa15cc358fff8.jpg",
+                airDateUtc: new DateTime(2016, 12, 10, 17, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -237,22 +221,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season2 = model.Seasons.First(s => s.Index == 2);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(10, season2.Episodes.Count);
+            ValidateSeason(season2, episodesCount: 10);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(16232262, s2E1.Id);
-
-            Assert.Equal("Space Rabbit", s2E1.Title, true);
-            Assert.Equal("s02e01", s2E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/2/eb/2eb7af3e8251798935d8aac58b9db8c2.jpg",
-                s2E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2017, 10, 15, 1, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+            ValidateEpisode(s2E1, id: 16232262, title: "Space Rabbit", shortName: "s02e01",
+                image: "https://media.myshows.me/episodes/normal/2/eb/2eb7af3e8251798935d8aac58b9db8c2.jpg",
+                airDateUtc: new DateTime(2017, 10, 15, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -260,15 +237,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E5 = season2.Episodes.First(e => e.EpisodeNumber == 5);
 
-            Assert.Equal(16296021, s2E5.Id);
-
-            Assert.Equal("Shapes and Colors", s2E5.Title, true);
-            Assert.Equal("s02e05", s2E5.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/7/a6/7a6fcfa4e85eb0a9abd39e8765f25cc3.jpg",
-                s2E5.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2017, 11, 12, 2, 0, 0, DateTimeKind.Utc)), s2E5.AirDate);
+            ValidateEpisode(s2E5, id: 16296021, title: "Shapes and Colors", shortName: "s02e05",
+                image: "https://media.myshows.me/episodes/normal/7/a6/7a6fcfa4e85eb0a9abd39e8765f25cc3.jpg",
+                airDateUtc: new DateTime(2017, 11, 12, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -276,15 +247,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E10 = season2.Episodes.First(e => e.EpisodeNumber == 10);
 
-            Assert.Equal(16322322, s2E10.Id);
-
-            Assert.Equal("Nice Jacket", s2E10.Title, true);
-            Assert.Equal("s02e10", s2E10.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/9/40/9404c94125cd0625fe77ca49477c06b4.jpg",
-                s2E10.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2017, 12, 17, 2, 0, 0, DateTimeKind.Utc)), s2E10.AirDate);
+            ValidateEpisode(s2E10, id: 16322322, title: "Nice Jacket", shortName: "s02e10",
+                image: "https://media.myshows.me/episodes/normal/9/40/9404c94125cd0625fe77ca49477c06b4.jpg",
+                airDateUtc: new DateTime(2017, 12, 17, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -298,21 +263,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         [Fact]
         public async Task Should_Extract_Grimm_By_Id_English()
         {
-            var model = await _englishService.GetTvShowByIdAsync(17186);
+            var model = await _englishService.ExtractTvShowAsync(17186);
             ValidateGrimm(model, Language.English);
         }
 
         [Fact]
         public async Task Should_Extract_Grimm_By_Id_Russian()
         {
-            var model = await _russianService.GetTvShowByIdAsync(17186);
+            var model = await _russianService.ExtractTvShowAsync(17186);
             ValidateGrimm(model, Language.Russian);
         }
 
         [Fact]
         public async Task Should_Extract_Grimm_By_Uri()
         {
-            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/17186/");
+            var model = await _englishService.ExtractTvShowAsync("https://myshows.me/view/17186/");
             ValidateGrimm(model, Language.English);
         }
 
@@ -320,8 +285,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Grimm_By_English_Title()
         {
             string fullTitle = GetGrimmTitle(Language.English);
-            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _englishService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(17186, model.Id);
@@ -331,8 +296,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Grimm_By_Russian_Title()
         {
             string fullTitle = GetGrimmTitle(Language.Russian);
-            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _russianService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(17186, model.Id);
@@ -351,7 +316,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             }
         }
 
-        private void ValidateGrimm(MyShowsTvShowModel model, Language language)
+        private void ValidateGrimm(TvShowDataExtractionModel model, Language language)
         {
             #region Tv Show
 
@@ -397,7 +362,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(17186, model.Id);
 
-            Assert.Equal(GetGrimmTitle(language), model.Title, true);
+            Assert.NotNull(model.Titles);
+            Assert.Equal(new List<string> {GetGrimmTitle(language)}, model.Titles);
             Assert.Equal(GetGrimmTitle(Language.English), model.TitleOriginal, true);
 
             Assert.Equal(GetDescription(), model.Description, true);
@@ -459,22 +425,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season1 = model.Seasons.First(s => s.Index == 1);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(22, season1.Episodes.Count);
+            ValidateSeason(season1, 22);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1079861, s1E1.Id);
-
-            Assert.Equal("Pilot", s1E1.Title, true);
-            Assert.Equal("s01e01", s1E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/a/dd/add6e0e8eb00d31e8c27646e282da7e4.jpg",
-                s1E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2011, 10, 29, 1, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+            ValidateEpisode(s1E1, id: 1079861, title: "Pilot", shortName: "s01e01",
+                image: "https://media.myshows.me/episodes/normal/a/dd/add6e0e8eb00d31e8c27646e282da7e4.jpg",
+                airDateUtc: new DateTime(2011, 10, 29, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -482,15 +441,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E11 = season1.Episodes.First(e => e.EpisodeNumber == 11);
 
-            Assert.Equal(1356548, s1E11.Id);
-
-            Assert.Equal("Tarantella", s1E11.Title, true);
-            Assert.Equal("s01e11", s1E11.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/3/21/321b16834cca69227eda3c85c5411dab.jpg",
-                s1E11.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 2, 11, 2, 0, 0, DateTimeKind.Utc)), s1E11.AirDate);
+            ValidateEpisode(s1E11, id: 1356548, title: "Tarantella", shortName: "s01e11",
+                image: "https://media.myshows.me/episodes/normal/3/21/321b16834cca69227eda3c85c5411dab.jpg",
+                airDateUtc: new DateTime(2012, 2, 11, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -498,15 +451,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E22 = season1.Episodes.First(e => e.EpisodeNumber == 22);
 
-            Assert.Equal(1454628, s1E22.Id);
-
-            Assert.Equal("Woman in Black", s1E22.Title, true);
-            Assert.Equal("s01e22", s1E22.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/2/bc/2bc08974b48d72794c44898f9d9af6e3.jpg",
-                s1E22.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 5, 19, 1, 0, 0, DateTimeKind.Utc)), s1E22.AirDate);
+            ValidateEpisode(s1E22, id: 1454628, title: "Woman in Black", shortName: "s01e22",
+                image: "https://media.myshows.me/episodes/normal/2/bc/2bc08974b48d72794c44898f9d9af6e3.jpg",
+                airDateUtc: new DateTime(2012, 5, 19, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -516,22 +463,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season2 = model.Seasons.First(s => s.Index == 2);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.NotNull(season2.Specials);
-            Assert.Equal(22, season2.Episodes.Count);
-            Assert.Equal(1, season2.Specials.Count);
+            ValidateSeason(season2, 22, 1);
 
             #region Special 1
 
             var s2S1 = season2.Specials.First(e => e.ShortName == "s02 special-1");
 
-            Assert.Equal(2097143, s2S1.Id);
-
-            Assert.Equal("Bad Hair Day", s2S1.Title, true);
-
-            Assert.Empty(s2S1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 1, 17, 2, 0, 0, DateTimeKind.Utc)), s2S1.AirDate);
+            ValidateEpisode(s2S1, id: 2097143, title: "Bad Hair Day", shortName: "s02 special-1",
+                image: "-1", airDateUtc: new DateTime(2013, 1, 17, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -539,15 +478,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1488480, s2E1.Id);
-
-            Assert.Equal("Bad Teeth", s2E1.Title, true);
-            Assert.Equal("s02e01", s2E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/d/e2/de217bef1a0c8eddc9fce0c609bdf48b.jpg",
-                s2E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 8, 14, 1, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+            ValidateEpisode(s2E1, id: 1488480, title: "Bad Teeth", shortName: "s02e01",
+                image: "https://media.myshows.me/episodes/normal/d/e2/de217bef1a0c8eddc9fce0c609bdf48b.jpg",
+                airDateUtc: new DateTime(2012, 8, 14, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -555,15 +488,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E11 = season2.Episodes.First(e => e.EpisodeNumber == 11);
 
-            Assert.Equal(1636953, s2E11.Id);
-
-            Assert.Equal("To Protect and Serve Man", s2E11.Title, true);
-            Assert.Equal("s02e11", s2E11.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/c/2a/c2aadef981cfcc5f87a3c79f5eb93646.jpg",
-                s2E11.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 11, 10, 2, 0, 0, DateTimeKind.Utc)), s2E11.AirDate);
+            ValidateEpisode(s2E11, id: 1636953, title: "To Protect and Serve Man", shortName: "s02e11",
+                image: "https://media.myshows.me/episodes/normal/c/2a/c2aadef981cfcc5f87a3c79f5eb93646.jpg",
+                airDateUtc: new DateTime(2012, 11, 10, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -571,15 +498,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E22 = season2.Episodes.First(e => e.EpisodeNumber == 22);
 
-            Assert.Equal(1770962, s2E22.Id);
-
-            Assert.Equal("Goodnight, Sweet Grimm", s2E22.Title, true);
-            Assert.Equal("s02e22", s2E22.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/d/0c/d0ceac423a5ff915e7d1adb9c1a61e6b.jpg",
-                s2E22.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 5, 22, 1, 0, 0, DateTimeKind.Utc)), s2E22.AirDate);
+            ValidateEpisode(s2E22, id: 1770962, title: "Goodnight, Sweet Grimm", shortName: "s02e22",
+                image: "https://media.myshows.me/episodes/normal/d/0c/d0ceac423a5ff915e7d1adb9c1a61e6b.jpg",
+                airDateUtc: new DateTime(2013, 5, 22, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -589,22 +510,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season3 = model.Seasons.First(s => s.Index == 3);
 
-            Assert.NotNull(season3.Episodes);
-            Assert.NotNull(season3.Specials);
-            Assert.Equal(22, season3.Episodes.Count);
-            Assert.Equal(2, season3.Specials.Count);
+            ValidateSeason(season3, 22, 2);
 
             #region Special 1
 
             var s3S1 = season3.Specials.First(e => e.ShortName == "s03 special-1");
 
-            Assert.Equal(2097144, s3S1.Id);
-
-            Assert.Equal("Meltdown", s3S1.Title, true);
-
-            Assert.Empty(s3S1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 10, 5, 2, 0, 0, DateTimeKind.Utc)), s3S1.AirDate);
+            ValidateEpisode(s3S1, id: 2097144, title: "Meltdown", shortName: "s03 special-1",
+                image: "-1",
+                airDateUtc: new DateTime(2013, 10, 5, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -612,13 +526,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3S2 = season3.Specials.First(e => e.ShortName == "s03 special-2");
 
-            Assert.Equal(2097145, s3S2.Id);
-
-            Assert.Equal("Love is In the Air", s3S2.Title, true);
-
-            Assert.Empty(s3S2.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 1, 31, 14, 0, 0, DateTimeKind.Utc)), s3S2.AirDate);
+            ValidateEpisode(s3S2, id: 2097145, title: "Love is In the Air", shortName: "s03 special-2",
+                image: "-1",
+                airDateUtc: new DateTime(2014, 1, 31, 10, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -626,15 +536,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E1 = season3.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1845977, s3E1.Id);
-
-            Assert.Equal("The Ungrateful Dead", s3E1.Title, true);
-            Assert.Equal("s03e01", s3E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/1/6e/16ed0d8b568a998b428d773c65e76ba1.jpg",
-                s3E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 10, 26, 2, 0, 0, DateTimeKind.Utc)), s3E1.AirDate);
+            ValidateEpisode(s3E1, id: 1845977, title: "The Ungrateful Dead", shortName: "s03e01",
+                image: "https://media.myshows.me/episodes/normal/1/6e/16ed0d8b568a998b428d773c65e76ba1.jpg",
+                airDateUtc: new DateTime(2013, 10, 26, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -642,15 +546,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E11 = season3.Episodes.First(e => e.EpisodeNumber == 11);
 
-            Assert.Equal(1984662, s3E11.Id);
-
-            Assert.Equal("The Good Soldier", s3E11.Title, true);
-            Assert.Equal("s03e11", s3E11.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/c/3f/c3f8a1c0adc41661c37c8509be0ac66c.jpg",
-                s3E11.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 1, 18, 2, 0, 0, DateTimeKind.Utc)), s3E11.AirDate);
+            ValidateEpisode(s3E11, id: 1984662, title: "The Good Soldier", shortName: "s03e11",
+                image: "https://media.myshows.me/episodes/normal/c/3f/c3f8a1c0adc41661c37c8509be0ac66c.jpg",
+                airDateUtc: new DateTime(2014, 1, 18, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -658,15 +556,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E22 = season3.Episodes.First(e => e.EpisodeNumber == 22);
 
-            Assert.Equal(2131838, s3E22.Id);
-
-            Assert.Equal("Blond Ambition", s3E22.Title, true);
-            Assert.Equal("s03e22", s3E22.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/4/68/468e7f91b849d20ba7d6014f4d04c850.jpg",
-                s3E22.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 5, 17, 1, 0, 0, DateTimeKind.Utc)), s3E22.AirDate);
+            ValidateEpisode(s3E22, id: 2131838, title: "Blond Ambition", shortName: "s03e22",
+                image: "https://media.myshows.me/episodes/normal/4/68/468e7f91b849d20ba7d6014f4d04c850.jpg",
+                airDateUtc: new DateTime(2014, 5, 17, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -676,22 +568,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season4 = model.Seasons.First(s => s.Index == 4);
 
-            Assert.NotNull(season4.Episodes);
-            Assert.Equal(22, season4.Episodes.Count);
+            ValidateSeason(season4, 22);
 
             #region Episode 1
 
             var s4E1 = season4.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(2206361, s4E1.Id);
-
-            Assert.Equal("Thanks for the Memories", s4E1.Title, true);
-            Assert.Equal("s04e01", s4E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/d/5b/d5b944e31bdba1386b07eb8ddea61f51.jpg",
-                s4E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 10, 24, 21, 0, 0, DateTimeKind.Utc)), s4E1.AirDate);
+            ValidateEpisode(s4E1, id: 2206361, title: "Thanks for the Memories", shortName: "s04e01",
+                image: "https://media.myshows.me/episodes/normal/d/5b/d5b944e31bdba1386b07eb8ddea61f51.jpg",
+                airDateUtc: new DateTime(2014, 10, 24, 21, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -699,15 +584,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E11 = season4.Episodes.First(e => e.EpisodeNumber == 11);
 
-            Assert.Equal(2599027, s4E11.Id);
-
-            Assert.Equal("Death Do Us Part", s4E11.Title, true);
-            Assert.Equal("s04e11", s4E11.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/f/3c/f3c86d6017fa0ee09d32c34c3a823c3a.jpg",
-                s4E11.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2015, 1, 30, 23, 0, 0, DateTimeKind.Utc)), s4E11.AirDate);
+            ValidateEpisode(s4E11, id: 2599027, title: "Death Do Us Part", shortName: "s04e11",
+                image: "https://media.myshows.me/episodes/normal/f/3c/f3c86d6017fa0ee09d32c34c3a823c3a.jpg",
+                airDateUtc: new DateTime(2015, 1, 30, 23, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -715,15 +594,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E22 = season4.Episodes.First(e => e.EpisodeNumber == 22);
 
-            Assert.Equal(2650940, s4E22.Id);
-
-            Assert.Equal("Cry Havoc", s4E22.Title, true);
-            Assert.Equal("s04e22", s4E22.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/a/7b/a7b1e9c111c1df75537949a4914cb146.jpg",
-                s4E22.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2015, 5, 15, 21, 0, 0, DateTimeKind.Utc)), s4E22.AirDate);
+            ValidateEpisode(s4E22, id: 2650940, title: "Cry Havoc", shortName: "s04e22",
+                image: "https://media.myshows.me/episodes/normal/a/7b/a7b1e9c111c1df75537949a4914cb146.jpg",
+                airDateUtc: new DateTime(2015, 5, 15, 21, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -733,22 +606,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season5 = model.Seasons.First(s => s.Index == 5);
 
-            Assert.NotNull(season5.Episodes);
-            Assert.Equal(22, season5.Episodes.Count);
+            ValidateSeason(season5, 22);
 
             #region Episode 1
 
             var s5E1 = season5.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(2701637, s5E1.Id);
-
-            Assert.Equal("The Grimm Identity", s5E1.Title, true);
-            Assert.Equal("s05e01", s5E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/5/2a/52afddb5645a39443ef710e7e536521c.jpg",
-                s5E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2015, 10, 30, 21, 0, 0, DateTimeKind.Utc)), s5E1.AirDate);
+            ValidateEpisode(s5E1, id: 2701637, title: "The Grimm Identity", shortName: "s05e01",
+                image: "https://media.myshows.me/episodes/normal/5/2a/52afddb5645a39443ef710e7e536521c.jpg",
+                airDateUtc: new DateTime(2015, 10, 30, 21, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -756,15 +622,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E11 = season5.Episodes.First(e => e.EpisodeNumber == 11);
 
-            Assert.Equal(15478357, s5E11.Id);
-
-            Assert.Equal("Key Move", s5E11.Title, true);
-            Assert.Equal("s05e11", s5E11.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/4/31/43162a00298f053c48f3765f936ed09a.jpg",
-                s5E11.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 3, 5, 2, 0, 0, DateTimeKind.Utc)), s5E11.AirDate);
+            ValidateEpisode(s5E11, id: 15478357, title: "Key Move", shortName: "s05e11",
+                image: "https://media.myshows.me/episodes/normal/4/31/43162a00298f053c48f3765f936ed09a.jpg",
+                airDateUtc: new DateTime(2016, 3, 5, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -772,15 +632,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E22 = season5.Episodes.First(e => e.EpisodeNumber == 22);
 
-            Assert.Equal(15512584, s5E22.Id);
-
-            Assert.Equal("Beginning of the End - Part Two", s5E22.Title, true);
-            Assert.Equal("s05e22", s5E22.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/9/16/91675ceed70ab1f9e9a995d19c03b0d0.jpg",
-                s5E22.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 5, 21, 1, 0, 0, DateTimeKind.Utc)), s5E22.AirDate);
+            ValidateEpisode(s5E22, id: 15512584, title: "Beginning of the End - Part Two", shortName: "s05e22",
+                image: "https://media.myshows.me/episodes/normal/9/16/91675ceed70ab1f9e9a995d19c03b0d0.jpg",
+                airDateUtc: new DateTime(2016, 5, 21, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -790,22 +644,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season6 = model.Seasons.First(s => s.Index == 6);
 
-            Assert.NotNull(season6.Episodes);
-            Assert.Equal(13, season6.Episodes.Count);
+            ValidateSeason(season6, 13);
 
             #region Episode 1
 
             var s6E1 = season6.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(15824011, s6E1.Id);
-
-            Assert.Equal("Fugitive", s6E1.Title, true);
-            Assert.Equal("s06e01", s6E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/d/b8/db8ad9019d8ca576c5ece6cd594fb3ce.jpg",
-                s6E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2017, 1, 7, 1, 0, 0, DateTimeKind.Utc)), s6E1.AirDate);
+            ValidateEpisode(s6E1, id: 15824011, title: "Fugitive", shortName: "s06e01",
+                image: "https://media.myshows.me/episodes/normal/d/b8/db8ad9019d8ca576c5ece6cd594fb3ce.jpg",
+                airDateUtc: new DateTime(2017, 1, 7, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -813,15 +660,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E6 = season6.Episodes.First(e => e.EpisodeNumber == 6);
 
-            Assert.Equal(15914954, s6E6.Id);
-
-            Assert.Equal("Breakfast in Bed", s6E6.Title, true);
-            Assert.Equal("s06e06", s6E6.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/f/07/f072f764b9ed371fe47eb92ea9e93e0b.jpg",
-                s6E6.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2017, 2, 11, 1, 0, 0, DateTimeKind.Utc)), s6E6.AirDate);
+            ValidateEpisode(s6E6, id: 15914954, title: "Breakfast in Bed", shortName: "s06e06",
+                image: "https://media.myshows.me/episodes/normal/f/07/f072f764b9ed371fe47eb92ea9e93e0b.jpg",
+                airDateUtc: new DateTime(2017, 2, 11, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -829,15 +670,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E13 = season6.Episodes.First(e => e.EpisodeNumber == 13);
 
-            Assert.Equal(15982104, s6E13.Id);
-
-            Assert.Equal("The End", s6E13.Title, true);
-            Assert.Equal("s06e13", s6E13.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/a/f8/af8215e081bc806aee9592a6a946d6f9.jpg",
-                s6E13.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2017, 4, 1, 0, 0, 0, DateTimeKind.Utc)), s6E13.AirDate);
+            ValidateEpisode(s6E13, id: 15982104, title: "The End", shortName: "s06e13",
+                image: "https://media.myshows.me/episodes/normal/a/f8/af8215e081bc806aee9592a6a946d6f9.jpg",
+                airDateUtc: new DateTime(2017, 4, 1, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -851,21 +686,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         [Fact]
         public async Task Should_Extract_Friends_By_Id_English()
         {
-            var model = await _englishService.GetTvShowByIdAsync(20);
+            var model = await _englishService.ExtractTvShowAsync(20);
             ValidateFriends(model, Language.English);
         }
 
         [Fact]
         public async Task Should_Extract_Friends_By_Id_Russian()
         {
-            var model = await _russianService.GetTvShowByIdAsync(20);
+            var model = await _russianService.ExtractTvShowAsync(20);
             ValidateFriends(model, Language.Russian);
         }
 
         [Fact]
         public async Task Should_Extract_Friends_By_Uri()
         {
-            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/20/");
+            var model = await _englishService.ExtractTvShowAsync("https://myshows.me/view/20/");
             ValidateFriends(model, Language.English);
         }
 
@@ -873,8 +708,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Friends_By_English_Title()
         {
             string fullTitle = GetFriendsTitle(Language.English);
-            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle && m.Year == 1994);
+            var models = await _englishService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => (m.Titles?.Contains(fullTitle) ?? false) && m.Year == 1994);
 
             Assert.NotNull(model);
             Assert.Equal(20, model.Id);
@@ -884,8 +719,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Friends_By_Russian_Title()
         {
             string fullTitle = GetFriendsTitle(Language.Russian);
-            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle && m.Year == 1994);
+            var models = await _russianService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => (m.Titles?.Contains(fullTitle) ?? false) && m.Year == 1994);
 
             Assert.NotNull(model);
             Assert.Equal(20, model.Id);
@@ -904,13 +739,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             }
         }
 
-        private void ValidateFriends(MyShowsTvShowModel model, Language language)
+        private void ValidateFriends(TvShowDataExtractionModel model, Language language)
         {
             #region Tv Show
 
             Assert.Equal(20, model.Id);
 
-            Assert.Equal(GetFriendsTitle(language), model.Title, true);
+            Assert.NotNull(model.Titles);
+            Assert.Equal(new List<string> {GetFriendsTitle(language)}, model.Titles);
             Assert.Equal(GetFriendsTitle(Language.English), model.TitleOriginal, true);
 
             string GetDescription()
@@ -995,22 +831,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season1 = model.Seasons.First(s => s.Index == 1);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(24, season1.Episodes.Count);
+            ValidateSeason(season1, 24);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(962, s1E1.Id);
-
-            Assert.Equal("The One Where It All Began", s1E1.Title, true);
-            Assert.Equal("s01e01", s1E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/b/a9/ba9bd5398ae5324c86a0130f4ccdf9a0.jpg",
-                s1E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1994, 9, 23, 0, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+            ValidateEpisode(s1E1, id: 962, title: "The One Where It All Began", shortName: "s01e01",
+                image: "https://media.myshows.me/episodes/normal/b/a9/ba9bd5398ae5324c86a0130f4ccdf9a0.jpg",
+                airDateUtc: new DateTime(1994, 9, 23, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1018,15 +847,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E12 = season1.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(973, s1E12.Id);
-
-            Assert.Equal("The One With the Dozen Lasagnas", s1E12.Title, true);
-            Assert.Equal("s01e12", s1E12.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/a/ec/aec6ba3728af059d22daaeb75ee6d884.jpg",
-                s1E12.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1995, 1, 13, 1, 0, 0, DateTimeKind.Utc)), s1E12.AirDate);
+            ValidateEpisode(s1E12, id: 973, title: "The One With the Dozen Lasagnas", shortName: "s01e12",
+                image: "https://media.myshows.me/episodes/normal/a/ec/aec6ba3728af059d22daaeb75ee6d884.jpg",
+                airDateUtc: new DateTime(1995, 1, 13, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1034,15 +857,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E24 = season1.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(985, s1E24.Id);
-
-            Assert.Equal("The One Where Rachel Finds Out", s1E24.Title, true);
-            Assert.Equal("s01e24", s1E24.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/b/04/b04a1e0f1194c97464859cc9c768eb98.jpg",
-                s1E24.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1995, 5, 19, 0, 0, 0, DateTimeKind.Utc)), s1E24.AirDate);
+            ValidateEpisode(s1E24, id: 985, title: "The One Where Rachel Finds Out", shortName: "s01e24",
+                image: "https://media.myshows.me/episodes/normal/b/04/b04a1e0f1194c97464859cc9c768eb98.jpg",
+                airDateUtc: new DateTime(1995, 5, 19, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1052,22 +869,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season2 = model.Seasons.First(s => s.Index == 2);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(24, season2.Episodes.Count);
+            ValidateSeason(season2, 24);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(986, s2E1.Id);
-
-            Assert.Equal("The One With Ross's New Girlfriend", s2E1.Title, true);
-            Assert.Equal("s02e01", s2E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/d/c7/dc7c9160361216bd3f19fa9894cde632.jpg",
-                s2E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1995, 9, 22, 0, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+            ValidateEpisode(s2E1, id: 986, title: "The One With Ross's New Girlfriend", shortName: "s02e01",
+                image: "https://media.myshows.me/episodes/normal/d/c7/dc7c9160361216bd3f19fa9894cde632.jpg",
+                airDateUtc: new DateTime(1995, 9, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1075,15 +885,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E12 = season2.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(997, s2E12.Id);
-
-            Assert.Equal("The One After the Superbowl (1)", s2E12.Title, true);
-            Assert.Equal("s02e12", s2E12.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/0/db/0dbfb16558a6232cf0d75449a69c4b43.jpg",
-                s2E12.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1996, 1, 29, 1, 0, 0, DateTimeKind.Utc)), s2E12.AirDate);
+            ValidateEpisode(s2E12, id: 997, title: "The One After the Superbowl (1)", shortName: "s02e12",
+                image: "https://media.myshows.me/episodes/normal/0/db/0dbfb16558a6232cf0d75449a69c4b43.jpg",
+                airDateUtc: new DateTime(1996, 1, 29, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1091,15 +895,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E24 = season2.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1009, s2E24.Id);
-
-            Assert.Equal("The One With Barry and Mindy's Wedding", s2E24.Title, true);
-            Assert.Equal("s02e24", s2E24.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/e/9d/e9d6818b784d4e9f35061e539239748b.jpg",
-                s2E24.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1996, 5, 17, 0, 0, 0, DateTimeKind.Utc)), s2E24.AirDate);
+            ValidateEpisode(s2E24, id: 1009, title: "The One With Barry and Mindy's Wedding", shortName: "s02e24",
+                image: "https://media.myshows.me/episodes/normal/e/9d/e9d6818b784d4e9f35061e539239748b.jpg",
+                airDateUtc: new DateTime(1996, 5, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1109,22 +907,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season3 = model.Seasons.First(s => s.Index == 3);
 
-            Assert.NotNull(season3.Episodes);
-            Assert.Equal(25, season3.Episodes.Count);
+            ValidateSeason(season3, 25);
 
             #region Episode 1
 
             var s3E1 = season3.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1010, s3E1.Id);
-
-            Assert.Equal("The One With the Princess Leia Fantasy", s3E1.Title, true);
-            Assert.Equal("s03e01", s3E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/0/ea/0ea28360eeaa51d7be680a9a50ad58b9.jpg",
-                s3E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1996, 9, 17, 0, 0, 0, DateTimeKind.Utc)), s3E1.AirDate);
+            ValidateEpisode(s3E1, id: 1010, title: "The One With the Princess Leia Fantasy", shortName: "s03e01",
+                image: "https://media.myshows.me/episodes/normal/0/ea/0ea28360eeaa51d7be680a9a50ad58b9.jpg",
+                airDateUtc: new DateTime(1996, 9, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1132,15 +923,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E12 = season3.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1021, s3E12.Id);
-
-            Assert.Equal("The One With All the Jealousy", s3E12.Title, true);
-            Assert.Equal("s03e12", s3E12.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/2/5f/25f88762e12ad5510c11a7badd9138df.jpg",
-                s3E12.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1997, 1, 17, 1, 0, 0, DateTimeKind.Utc)), s3E12.AirDate);
+            ValidateEpisode(s3E12, id: 1021, title: "The One With All the Jealousy", shortName: "s03e12",
+                image: "https://media.myshows.me/episodes/normal/2/5f/25f88762e12ad5510c11a7badd9138df.jpg",
+                airDateUtc: new DateTime(1997, 1, 17, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1148,15 +933,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E25 = season3.Episodes.First(e => e.EpisodeNumber == 25);
 
-            Assert.Equal(1034, s3E25.Id);
-
-            Assert.Equal("The One at the Beach", s3E25.Title, true);
-            Assert.Equal("s03e25", s3E25.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/4/c3/4c3051486e49ebae6c88d5ce907b84b7.jpg",
-                s3E25.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1997, 5, 16, 0, 0, 0, DateTimeKind.Utc)), s3E25.AirDate);
+            ValidateEpisode(s3E25, id: 1034, title: "The One at the Beach", shortName: "s03e25",
+                image: "https://media.myshows.me/episodes/normal/4/c3/4c3051486e49ebae6c88d5ce907b84b7.jpg",
+                airDateUtc: new DateTime(1997, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1166,22 +945,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season4 = model.Seasons.First(s => s.Index == 4);
 
-            Assert.NotNull(season4.Episodes);
-            Assert.Equal(24, season4.Episodes.Count);
+            ValidateSeason(season4, 24);
 
             #region Episode 1
 
             var s4E1 = season4.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1035, s4E1.Id);
-
-            Assert.Equal("The One With the Jellyfish", s4E1.Title, true);
-            Assert.Equal("s04e01", s4E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/e/af/eafa78de0610ec8475744262e07a429d.jpg",
-                s4E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1997, 9, 26, 0, 0, 0, DateTimeKind.Utc)), s4E1.AirDate);
+            ValidateEpisode(s4E1, id: 1035, title: "The One With the Jellyfish", shortName: "s04e01",
+                image: "https://media.myshows.me/episodes/normal/e/af/eafa78de0610ec8475744262e07a429d.jpg",
+                airDateUtc: new DateTime(1997, 9, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1189,14 +961,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E12 = season4.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1046, s4E12.Id);
-
-            Assert.Equal("The One With the Embryos", s4E12.Title, true);
-            Assert.Equal("s04e12", s4E12.ShortName, true);
-
-            Assert.Empty(s4E12.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1998, 1, 16, 1, 0, 0, DateTimeKind.Utc)), s4E12.AirDate);
+            ValidateEpisode(s4E12, id: 1046, title: "The One With the Embryos", shortName: "s04e12",
+                image: "-1",
+                airDateUtc: new DateTime(1998, 1, 16, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1204,14 +971,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E24 = season4.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1058, s4E24.Id);
-
-            Assert.Equal("The One With Ross's Wedding (2)", s4E24.Title, true);
-            Assert.Equal("s04e24", s4E24.ShortName, true);
-
-            Assert.Empty(s4E24.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1998, 5, 8, 0, 0, 0, DateTimeKind.Utc)), s4E24.AirDate);
+            ValidateEpisode(s4E24, id: 1058, title: "The One With Ross's Wedding (2)", shortName: "s04e24",
+                image: "-1",
+                airDateUtc: new DateTime(1998, 5, 8, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1221,21 +983,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season5 = model.Seasons.First(s => s.Index == 5);
 
-            Assert.NotNull(season5.Episodes);
-            Assert.Equal(24, season5.Episodes.Count);
+            ValidateSeason(season5, 24);
 
             #region Episode 1
 
             var s5E1 = season5.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1059, s5E1.Id);
-
-            Assert.Equal("The One After Ross Says Rachel", s5E1.Title, true);
-            Assert.Equal("s05e01", s5E1.ShortName, true);
-
-            Assert.Empty(s5E1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1998, 9, 25, 0, 0, 0, DateTimeKind.Utc)), s5E1.AirDate);
+            ValidateEpisode(s5E1, id: 1059, title: "The One After Ross Says Rachel", shortName: "s05e01",
+                image: "-1",
+                airDateUtc: new DateTime(1998, 9, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1243,14 +999,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E12 = season5.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1070, s5E12.Id);
-
-            Assert.Equal("The One With Chandler's Work Laugh", s5E12.Title, true);
-            Assert.Equal("s05e12", s5E12.ShortName, true);
-
-            Assert.Empty(s5E12.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1999, 1, 22, 1, 0, 0, DateTimeKind.Utc)), s5E12.AirDate);
+            ValidateEpisode(s5E12, id: 1070, title: "The One With Chandler's Work Laugh", shortName: "s05e12",
+                image: "-1",
+                airDateUtc: new DateTime(1999, 1, 22, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1258,14 +1009,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E24 = season5.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1082, s5E24.Id);
-
-            Assert.Equal("The One in Vegas (2)", s5E24.Title, true);
-            Assert.Equal("s05e24", s5E24.ShortName, true);
-
-            Assert.Empty(s5E24.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1999, 5, 21, 0, 0, 0, DateTimeKind.Utc)), s5E24.AirDate);
+            ValidateEpisode(s5E24, id: 1082, title: "The One in Vegas (2)", shortName: "s05e24",
+                image: "-1",
+                airDateUtc: new DateTime(1999, 5, 21, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1275,21 +1021,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season6 = model.Seasons.First(s => s.Index == 6);
 
-            Assert.NotNull(season6.Episodes);
-            Assert.Equal(25, season6.Episodes.Count);
+            ValidateSeason(season6, 25);
 
             #region Episode 1
 
             var s6E1 = season6.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1083, s6E1.Id);
-
-            Assert.Equal("The One After Vegas", s6E1.Title, true);
-            Assert.Equal("s06e01", s6E1.ShortName, true);
-
-            Assert.Empty(s6E1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(1999, 9, 24, 0, 0, 0, DateTimeKind.Utc)), s6E1.AirDate);
+            ValidateEpisode(s6E1, id: 1083, title: "The One After Vegas", shortName: "s06e01",
+                image: "-1",
+                airDateUtc: new DateTime(1999, 9, 24, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1297,14 +1037,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E12 = season6.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1094, s6E12.Id);
-
-            Assert.Equal("The One With the Joke", s6E12.Title, true);
-            Assert.Equal("s06e12", s6E12.ShortName, true);
-
-            Assert.Empty(s6E12.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2000, 1, 14, 1, 0, 0, DateTimeKind.Utc)), s6E12.AirDate);
+            ValidateEpisode(s6E12, id: 1094, title: "The One With the Joke", shortName: "s06e12",
+                image: "-1",
+                airDateUtc: new DateTime(2000, 1, 14, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1312,14 +1047,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E25 = season6.Episodes.First(e => e.EpisodeNumber == 25);
 
-            Assert.Equal(1107, s6E25.Id);
-
-            Assert.Equal("The One With the Proposal (2)", s6E25.Title, true);
-            Assert.Equal("s06e25", s6E25.ShortName, true);
-
-            Assert.Empty(s6E25.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2000, 5, 19, 0, 0, 0, DateTimeKind.Utc)), s6E25.AirDate);
+            ValidateEpisode(s6E25, id: 1107, title: "The One With the Proposal (2)", shortName: "s06e25",
+                image: "-1",
+                airDateUtc: new DateTime(2000, 5, 19, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1329,24 +1059,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season7 = model.Seasons.First(s => s.Index == 7);
 
-            Assert.NotNull(season7.Episodes);
-            Assert.NotNull(season7.Specials);
-            Assert.Equal(24, season7.Episodes.Count);
-            Assert.Equal(1, season7.Specials.Count);
-            
+            ValidateSeason(season7, 24, 1);
+
             #region Episode 1
 
             var s7E1 = season7.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1108, s7E1.Id);
-
-            Assert.Equal("The One With Monica's Thunder", s7E1.Title, true);
-            Assert.Equal("s07e01", s7E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/0/95/0959d895d4a6b97625ff10c655940302.jpg",
-                s7E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2000, 10, 13, 0, 0, 0, DateTimeKind.Utc)), s7E1.AirDate);
+            ValidateEpisode(s7E1, id: 1108, title: "The One With Monica's Thunder", shortName: "s07e01",
+                image: "https://media.myshows.me/episodes/normal/0/95/0959d895d4a6b97625ff10c655940302.jpg",
+                airDateUtc: new DateTime(2000, 10, 13, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1354,14 +1075,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s7E12 = season7.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1119, s7E12.Id);
-
-            Assert.Equal("The One Where They're Up All Night", s7E12.Title, true);
-            Assert.Equal("s07e12", s7E12.ShortName, true);
-
-            Assert.Empty(s7E12.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2001, 1, 12, 1, 0, 0, DateTimeKind.Utc)), s7E12.AirDate);
+            ValidateEpisode(s7E12, id: 1119, title: "The One Where They're Up All Night", shortName: "s07e12",
+                image: "-1",
+                airDateUtc: new DateTime(2001, 1, 12, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1369,14 +1085,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s7E24 = season7.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1131, s7E24.Id);
-
-            Assert.Equal("The One with Monica and Chandler's Wedding (2)", s7E24.Title, true);
-            Assert.Equal("s07e24", s7E24.ShortName, true);
-
-            Assert.Empty(s7E24.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2001, 5, 18, 0, 0, 0, DateTimeKind.Utc)), s7E24.AirDate);
+            ValidateEpisode(s7E24, id: 1131, title: "The One with Monica and Chandler's Wedding (2)",
+                shortName: "s07e24",
+                image: "-1",
+                airDateUtc: new DateTime(2001, 5, 18, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1386,21 +1098,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season8 = model.Seasons.First(s => s.Index == 8);
 
-            Assert.NotNull(season8.Episodes);
-            Assert.Equal(24, season8.Episodes.Count);
+            ValidateSeason(season8, 24);
 
             #region Episode 1
 
             var s8E1 = season8.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1132, s8E1.Id);
-
-            Assert.Equal("The One After \"I Do\"", s8E1.Title, true);
-            Assert.Equal("s08e01", s8E1.ShortName, true);
-
-            Assert.Empty(s8E1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2001, 9, 28, 0, 0, 0, DateTimeKind.Utc)), s8E1.AirDate);
+            ValidateEpisode(s8E1, id: 1132, title: "The One After \"I Do\"", shortName: "s08e01",
+                image: "-1",
+                airDateUtc: new DateTime(2001, 9, 28, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1408,14 +1114,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s8E12 = season8.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1143, s8E12.Id);
-
-            Assert.Equal("The One Where Joey Dates Rachel", s8E12.Title, true);
-            Assert.Equal("s08e12", s8E12.ShortName, true);
-
-            Assert.Empty(s8E12.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2002, 1, 11, 1, 0, 0, DateTimeKind.Utc)), s8E12.AirDate);
+            ValidateEpisode(s8E12, id: 1143, title: "The One Where Joey Dates Rachel", shortName: "s08e12",
+                image: "-1",
+                airDateUtc: new DateTime(2002, 1, 11, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1423,14 +1124,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s8E24 = season8.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1155, s8E24.Id);
-
-            Assert.Equal("The One Where Rachel Has a Baby (2)", s8E24.Title, true);
-            Assert.Equal("s08e24", s8E24.ShortName, true);
-
-            Assert.Empty(s8E24.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2002, 5, 17, 0, 0, 0, DateTimeKind.Utc)), s8E24.AirDate);
+            ValidateEpisode(s8E24, id: 1155, title: "The One Where Rachel Has a Baby (2)", shortName: "s08e24",
+                image: "-1",
+                airDateUtc: new DateTime(2002, 5, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1440,21 +1136,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season9 = model.Seasons.First(s => s.Index == 9);
 
-            Assert.NotNull(season9.Episodes);
-            Assert.Equal(24, season9.Episodes.Count);
+            ValidateSeason(season9, 24);
 
             #region Episode 1
 
             var s9E1 = season9.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1156, s9E1.Id);
-
-            Assert.Equal("The One Where No One Proposes", s9E1.Title, true);
-            Assert.Equal("s09e01", s9E1.ShortName, true);
-
-            Assert.Empty(s9E1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2002, 9, 27, 0, 0, 0, DateTimeKind.Utc)), s9E1.AirDate);
+            ValidateEpisode(s9E1, id: 1156, title: "The One Where No One Proposes", shortName: "s09e01",
+                image: "-1",
+                airDateUtc: new DateTime(2002, 9, 27, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1462,14 +1152,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s9E12 = season9.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1167, s9E12.Id);
-
-            Assert.Equal("The One With Phoebe's Rats", s9E12.Title, true);
-            Assert.Equal("s09e12", s9E12.ShortName, true);
-
-            Assert.Empty(s9E12.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2003, 1, 17, 1, 0, 0, DateTimeKind.Utc)), s9E12.AirDate);
+            ValidateEpisode(s9E12, id: 1167, title: "The One With Phoebe's Rats", shortName: "s09e12",
+                image: "-1",
+                airDateUtc: new DateTime(2003, 1, 17, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1477,14 +1162,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s9E24 = season9.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1179, s9E24.Id);
-
-            Assert.Equal("The One in Barbados (2)", s9E24.Title, true);
-            Assert.Equal("s09e24", s9E24.ShortName, true);
-
-            Assert.Empty(s9E24.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2003, 5, 16, 0, 0, 0, DateTimeKind.Utc)), s9E24.AirDate);
+            ValidateEpisode(s9E24, id: 1179, title: "The One in Barbados (2)", shortName: "s09e24",
+                image: "-1",
+                airDateUtc: new DateTime(2003, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1494,23 +1174,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season10 = model.Seasons.First(s => s.Index == 10);
 
-            Assert.NotNull(season10.Episodes);
-            Assert.NotNull(season10.Specials);
-            Assert.Equal(18, season10.Episodes.Count);
-            Assert.Equal(3, season10.Specials.Count);
-            
+            ValidateSeason(season10, 18, 3);
+
             #region Episode 1
 
             var s10E1 = season10.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1180, s10E1.Id);
-
-            Assert.Equal("The One After Joey And Rachel Kiss", s10E1.Title, true);
-            Assert.Equal("s10e01", s10E1.ShortName, true);
-
-            Assert.Empty(s10E1.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2003, 9, 26, 0, 0, 0, DateTimeKind.Utc)), s10E1.AirDate);
+            ValidateEpisode(s10E1, id: 1180, title: "The One After Joey And Rachel Kiss", shortName: "s10e01",
+                image: "-1",
+                airDateUtc: new DateTime(2003, 9, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1518,14 +1190,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s10E9 = season10.Episodes.First(e => e.EpisodeNumber == 9);
 
-            Assert.Equal(1188, s10E9.Id);
-
-            Assert.Equal("The One With the Birth Mother", s10E9.Title, true);
-            Assert.Equal("s10e09", s10E9.ShortName, true);
-
-            Assert.Empty(s10E9.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2004, 1, 9, 1, 0, 0, DateTimeKind.Utc)), s10E9.AirDate);
+            ValidateEpisode(s10E9, id: 1188, title: "The One With the Birth Mother", shortName: "s10e09",
+                image: "-1",
+                airDateUtc: new DateTime(2004, 1, 9, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1533,14 +1200,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s10E18 = season10.Episodes.First(e => e.EpisodeNumber == 18);
 
-            Assert.Equal(1197, s10E18.Id);
-
-            Assert.Equal("The Last One (2)", s10E18.Title, true);
-            Assert.Equal("s10e18", s10E18.ShortName, true);
-
-            Assert.Empty(s10E18.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2004, 5, 7, 0, 0, 0, DateTimeKind.Utc)), s10E18.AirDate);
+            ValidateEpisode(s10E18, id: 1197, title: "The Last One (2)", shortName: "s10e18",
+                image: "-1",
+                airDateUtc: new DateTime(2004, 5, 7, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1548,14 +1210,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s10S3 = season10.Specials.First(e => e.ShortName == "s10 special-3");
 
-            Assert.Equal(15668758, s10S3.Id);
-
-            Assert.Equal("FRIENDS REUNION - Tribute To Director James Burrows", s10S3.Title, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/6/4b/64b85d4cc7efeb5fbd2ac6452b34b4cc.jpg",
-                s10S3.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc)), s10S3.AirDate);
+            ValidateEpisode(s10S3, id: 15668758, title: "FRIENDS REUNION - Tribute To Director James Burrows",
+                shortName: "s10 special-3",
+                image: "https://media.myshows.me/episodes/normal/6/4b/64b85d4cc7efeb5fbd2ac6452b34b4cc.jpg",
+                airDateUtc: new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1569,21 +1227,21 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         [Fact]
         public async Task Should_Extract_Anger_Managment_Id_English()
         {
-            var model = await _englishService.GetTvShowByIdAsync(23992);
+            var model = await _englishService.ExtractTvShowAsync(23992);
             ValidateAngerManagment(model, Language.English);
         }
 
         [Fact]
         public async Task Should_Extract_Anger_Managment_Id_Russian()
         {
-            var model = await _russianService.GetTvShowByIdAsync(23992);
+            var model = await _russianService.ExtractTvShowAsync(23992);
             ValidateAngerManagment(model, Language.Russian);
         }
 
         [Fact]
         public async Task Should_Extract_Anger_Managment_By_Uri()
         {
-            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/23992/");
+            var model = await _englishService.ExtractTvShowAsync("https://myshows.me/view/23992/");
             ValidateAngerManagment(model, Language.English);
         }
 
@@ -1591,8 +1249,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Anger_Managment_By_English_Title()
         {
             string fullTitle = GetAngerManagmentTitle(Language.English);
-            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _englishService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(23992, model.Id);
@@ -1602,8 +1260,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Anger_Managment_By_Russian_Title()
         {
             string fullTitle = GetAngerManagmentTitle(Language.Russian);
-            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _russianService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(23992, model.Id);
@@ -1622,7 +1280,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             }
         }
 
-        private void ValidateAngerManagment(MyShowsTvShowModel model, Language language)
+        private void ValidateAngerManagment(TvShowDataExtractionModel model, Language language)
         {
             #region Tv Show
 
@@ -1651,7 +1309,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(23992, model.Id);
 
-            Assert.Equal(GetAngerManagmentTitle(language), model.Title, true);
+            Assert.NotNull(model.Titles);
+            Assert.Equal(new List<string> {GetAngerManagmentTitle(language)}, model.Titles);
             Assert.Equal(GetAngerManagmentTitle(Language.English), model.TitleOriginal, true);
 
             Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
@@ -1713,22 +1372,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season1 = model.Seasons.First(s => s.Index == 1);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(10, season1.Episodes.Count);
+            ValidateSeason(season1, 10);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1411218, s1E1.Id);
-
-            Assert.Equal("Charlie Goes Back to Therapy", s1E1.Title, true);
-            Assert.Equal("s01e01", s1E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/a/9f/a9f9079688eb61352666e3e38157da14.jpg",
-                s1E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 6, 29, 2, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+            ValidateEpisode(s1E1, id: 1411218, title: "Charlie Goes Back to Therapy", shortName: "s01e01",
+                image: "https://media.myshows.me/episodes/normal/a/9f/a9f9079688eb61352666e3e38157da14.jpg",
+                airDateUtc: new DateTime(2012, 6, 29, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1736,15 +1388,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E5 = season1.Episodes.First(e => e.EpisodeNumber == 5);
 
-            Assert.Equal(1515544, s1E5.Id);
-
-            Assert.Equal("Charlie Tries to Prove Therapy is Legit", s1E5.Title, true);
-            Assert.Equal("s01e05", s1E5.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/6/44/644fbc577091c796fb428a1b274c169b.jpg",
-                s1E5.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 7, 20, 2, 0, 0, DateTimeKind.Utc)), s1E5.AirDate);
+            ValidateEpisode(s1E5, id: 1515544, title: "Charlie Tries to Prove Therapy is Legit", shortName: "s01e05",
+                image: "https://media.myshows.me/episodes/normal/6/44/644fbc577091c796fb428a1b274c169b.jpg",
+                airDateUtc: new DateTime(2012, 7, 20, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1752,15 +1398,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E10 = season1.Episodes.First(e => e.EpisodeNumber == 10);
 
-            Assert.Equal(1515549, s1E10.Id);
-
-            Assert.Equal("Charlie Gets Romantic", s1E10.Title, true);
-            Assert.Equal("s01e10", s1E10.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/8/aa/8aa9a6917e6bb7fa8389ccb720881bba.jpg",
-                s1E10.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2012, 8, 24, 2, 0, 0, DateTimeKind.Utc)), s1E10.AirDate);
+            ValidateEpisode(s1E10, id: 1515549, title: "Charlie Gets Romantic", shortName: "s01e10",
+                image: "https://media.myshows.me/episodes/normal/8/aa/8aa9a6917e6bb7fa8389ccb720881bba.jpg",
+                airDateUtc: new DateTime(2012, 8, 24, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1770,22 +1410,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season2 = model.Seasons.First(s => s.Index == 2);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(90, season2.Episodes.Count);
+            ValidateSeason(season2, 90);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1579536, s2E1.Id);
-
-            Assert.Equal("Charlie Loses It at a Baby Shower", s2E1.Title, true);
-            Assert.Equal("s02e01", s2E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/b/4e/b4ebede2195719823f18395ba56ed645.jpg",
-                s2E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 1, 18, 3, 0, 0, DateTimeKind.Utc)), s2E1.AirDate);
+            ValidateEpisode(s2E1, id: 1579536, title: "Charlie Loses It at a Baby Shower", shortName: "s02e01",
+                image: "https://media.myshows.me/episodes/normal/b/4e/b4ebede2195719823f18395ba56ed645.jpg",
+                airDateUtc: new DateTime(2013, 1, 18, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1793,14 +1426,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E45 = season2.Episodes.First(e => e.EpisodeNumber == 45);
 
-            Assert.Equal(1979110, s2E45.Id);
-
-            Assert.Equal("Charlie and Lacey Shack Up", s2E45.Title, true);
-            Assert.Equal("s02e45", s2E45.ShortName, true);
-
-            Assert.Empty(s2E45.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2013, 12, 13, 2, 30, 0, DateTimeKind.Utc)), s2E45.AirDate);
+            ValidateEpisode(s2E45, id: 1979110, title: "Charlie and Lacey Shack Up", shortName: "s02e45",
+                image: "-1",
+                airDateUtc: new DateTime(2013, 12, 13, 2, 30, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1808,14 +1436,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E90 = season2.Episodes.First(e => e.EpisodeNumber == 90);
 
-            Assert.Equal(2459243, s2E90.Id);
-
-            Assert.Equal("Charlie and the 100th Episode", s2E90.Title, true);
-            Assert.Equal("s02e90", s2E90.ShortName, true);
-
-            Assert.Empty(s2E90.Image);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 12, 23, 3, 0, 0, DateTimeKind.Utc)), s2E90.AirDate);
+            ValidateEpisode(s2E90, id: 2459243, title: "Charlie and the 100th Episode", shortName: "s02e90",
+                image: "-1",
+                airDateUtc: new DateTime(2014, 12, 23, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1823,27 +1446,27 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         }
 
         #endregion
-        
+
         #region Extract Steins;Gate Anime Show Tests
 
         [Fact]
         public async Task Should_Extract_Steins_Gate_Id_English()
         {
-            var model = await _englishService.GetTvShowByIdAsync(15897);
+            var model = await _englishService.ExtractTvShowAsync(15897);
             ValidateSteinsGate(model, Language.English);
         }
 
         [Fact]
         public async Task Should_Extract_Steins_Gate_Id_Russian()
         {
-            var model = await _russianService.GetTvShowByIdAsync(15897);
+            var model = await _russianService.ExtractTvShowAsync(15897);
             ValidateSteinsGate(model, Language.Russian);
         }
 
         [Fact]
         public async Task Should_Extract_Steins_Gate_By_Uri()
         {
-            var model = await _englishService.GetTvShowByUriAsync("https://myshows.me/view/15897/");
+            var model = await _englishService.ExtractTvShowAsync("https://myshows.me/view/15897/");
             ValidateSteinsGate(model, Language.English);
         }
 
@@ -1851,8 +1474,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Steins_Gate_By_English_Title()
         {
             string fullTitle = GetSteinsGateTitle(Language.English);
-            var models = await _englishService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _englishService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(15897, model.Id);
@@ -1862,8 +1485,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         public async Task Should_Extract_Steins_Gate_By_Russian_Title()
         {
             string fullTitle = GetSteinsGateTitle(Language.Russian);
-            var models = await _russianService.GetTvShowsByTitleAsync(fullTitle);
-            var model = models.FirstOrDefault(m => m.Title == fullTitle);
+            var models = await _russianService.FindTvShowAsync(fullTitle);
+            var model = models.FirstOrDefault(m => m.Titles?.Contains(fullTitle) ?? false);
 
             Assert.NotNull(model);
             Assert.Equal(15897, model.Id);
@@ -1882,7 +1505,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             }
         }
 
-        private void ValidateSteinsGate(MyShowsTvShowModel model, Language language)
+        private void ValidateSteinsGate(TvShowDataExtractionModel model, Language language)
         {
             #region Tv Show
 
@@ -1916,7 +1539,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(15897, model.Id);
 
-            Assert.Equal(GetSteinsGateTitle(language), model.Title, true);
+            Assert.NotNull(model.Titles);
+            Assert.Equal(new List<string> {GetSteinsGateTitle(language)}, model.Titles);
             Assert.Equal(GetSteinsGateTitle(Language.English), model.TitleOriginal, true);
 
             Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
@@ -1958,7 +1582,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 switch (language)
                 {
                     case Language.English:
-                        return new List<string> {"Drama","Sci-Fi", "Fantasy", "Anime"};
+                        return new List<string> {"Drama", "Sci-Fi", "Fantasy", "Anime"};
                     case Language.Russian:
                         return new List<string> {"Драма", "Фантастика", "Фэнтези", "Аниме"};
                     default:
@@ -1978,24 +1602,15 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var season1 = model.Seasons.First(s => s.Index == 1);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.NotNull(season1.Specials);
-            Assert.Equal(24, season1.Episodes.Count);
-            Assert.Equal(7, season1.Specials.Count);
+            ValidateSeason(season1, 24, 7);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
 
-            Assert.Equal(1021681, s1E1.Id);
-
-            Assert.Equal("Prologue of the Beginning and the End", s1E1.Title, true);
-            Assert.Equal("s01e01", s1E1.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/9/79/979790b845c14f22cbf65676b35def02.jpg",
-                s1E1.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2011, 4, 6, 3, 0, 0, DateTimeKind.Utc)), s1E1.AirDate);
+            ValidateEpisode(s1E1, id: 1021681, title: "Prologue of the Beginning and the End", shortName: "s01e01",
+                image: "https://media.myshows.me/episodes/normal/9/79/979790b845c14f22cbf65676b35def02.jpg",
+                airDateUtc: new DateTime(2011, 4, 6, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -2003,15 +1618,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E12 = season1.Episodes.First(e => e.EpisodeNumber == 12);
 
-            Assert.Equal(1100177, s1E12.Id);
-
-            Assert.Equal("Dogma of Static Limit", s1E12.Title, true);
-            Assert.Equal("s01e12", s1E12.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/4/7c/47cc636b76ca10d8507418f4557034d7.jpg",
-                s1E12.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2011, 6, 22, 3, 0, 0, DateTimeKind.Utc)), s1E12.AirDate);
+            ValidateEpisode(s1E12, id: 1100177, title: "Dogma of Static Limit", shortName: "s01e12",
+                image: "https://media.myshows.me/episodes/normal/4/7c/47cc636b76ca10d8507418f4557034d7.jpg",
+                airDateUtc: new DateTime(2011, 6, 22, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -2019,34 +1628,68 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E24 = season1.Episodes.First(e => e.EpisodeNumber == 24);
 
-            Assert.Equal(1197405, s1E24.Id);
-
-            Assert.Equal("The Prologue Begins With the End", s1E24.Title, true);
-            Assert.Equal("s01e24", s1E24.ShortName, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/7/e3/7e33df48114661a3cd9f22388e23c104.jpg",
-                s1E24.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2011, 9, 14, 3, 0, 0, DateTimeKind.Utc)), s1E24.AirDate);
+            ValidateEpisode(s1E24, id: 1197405, title: "The Prologue Begins With the End", shortName: "s01e24",
+                image: "https://media.myshows.me/episodes/normal/7/e3/7e33df48114661a3cd9f22388e23c104.jpg",
+                airDateUtc: new DateTime(2011, 9, 14, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Special 4
-          
+
             var s1S4 = season1.Specials.First(e => e.ShortName == "s01 special-4");
 
-            Assert.Equal(2608194, s1S4.Id);
-
-            Assert.Equal("Soumei Eichi no Cognitive Computing Episode 4: Meeting Chapter", s1S4.Title, true);
-
-            Assert.Equal("https://media.myshows.me/episodes/normal/3/6b/36bec630c22324fe32c735d9a6f9c2ea.jpg",
-                s1S4.Image, true);
-
-            Assert.Equal(new DateTimeOffset(new DateTime(2014, 10, 22, 4, 0, 0, DateTimeKind.Utc)), s1S4.AirDate);
+            ValidateEpisode(s1S4, id: 2608194, title: "Soumei Eichi no Cognitive Computing Episode 4: Meeting Chapter",
+                shortName: "s01 special-4",
+                image: "https://media.myshows.me/episodes/normal/3/6b/36bec630c22324fe32c735d9a6f9c2ea.jpg",
+                airDateUtc: new DateTime(2014, 10, 22, 4, 0, 0, DateTimeKind.Utc));
 
             #endregion
-            
+
             #endregion
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static void ValidateSeason(TvShowSeasonDataExtractionModel season,
+            int? episodesCount = null, int? specialsCount = null)
+        {
+            if (episodesCount.HasValue)
+            {
+                Assert.NotNull(season.Episodes);
+                Assert.Equal(episodesCount.Value, season.Episodes.Count);
+            }
+            else
+            {
+                Assert.Empty(season.Episodes);
+            }
+
+            if (specialsCount.HasValue)
+            {
+                Assert.NotNull(season.Specials);
+                Assert.Equal(specialsCount.Value, season.Specials.Count);
+            }
+            else
+            {
+                Assert.Empty(season.Specials);
+            }
+        }
+
+        private static void ValidateEpisode(TvShowEpisodeDataExtractionModel episode, int id, string title,
+            string shortName, string image, DateTime airDateUtc)
+        {
+            Assert.Equal(id, episode.Id);
+
+            Assert.Equal(new List<string> {title}, episode.Titles);
+            Assert.Equal(shortName, episode.ShortName, true);
+
+            if (image != "-1")
+                Assert.Equal(image, episode.Image, true);
+            else
+                Assert.Empty(episode.Image);
+
+            Assert.Equal(new DateTimeOffset(airDateUtc), episode.AirDate);
         }
 
         #endregion

@@ -2,6 +2,9 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+
+[assembly:InternalsVisibleTo("PortableLibrary.Core.Infrastructure.External.Services.Tests")]
 
 namespace PortableLibrary.Core.Infrastructure.External.Services
 {

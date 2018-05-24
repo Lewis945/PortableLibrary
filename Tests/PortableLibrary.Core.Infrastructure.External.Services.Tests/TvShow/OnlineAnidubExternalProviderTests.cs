@@ -20,7 +20,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         #endregion
 
         //https://online.anidub.com/anime/full/7710-vrata-shtaynera-steinsgate-01-25-iz-25bdrip720p2011.html
-
+        //https://tr.anidub.com/anime_tv/full/7710-vrata-shtaynera-steinsgate-01-25-iz-25bdrip720p2011.html
         #region Extract Anime Shows
         
 

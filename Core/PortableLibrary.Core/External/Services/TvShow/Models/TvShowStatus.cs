@@ -1,4 +1,4 @@
-﻿namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
+﻿namespace PortableLibrary.Core.External.Services.TvShow.Models
 {
     public enum TvShowStatus
     {

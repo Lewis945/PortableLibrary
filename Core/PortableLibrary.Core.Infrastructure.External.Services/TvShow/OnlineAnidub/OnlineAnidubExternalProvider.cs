@@ -1,5 +1,6 @@
-﻿using System;
+﻿using System.Text;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.OnlineAnidub
@@ -30,12 +31,28 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.OnlineAni
         }
 
         #endregion
-        
+
         #region Public Methods
 
-        public Task<OnlineAnidubTvShowModel> Extract(string uri)
+        public async Task<OnlineAnidubTvShowModel> Extract(string uri)
         {
-            throw new NotImplementedException();
+            var model = new OnlineAnidubTvShowModel();
+
+            var container = await GetSeasonContainerNodeAsync(uri);
+
+            return model;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private async Task<HtmlNode> GetSeasonContainerNodeAsync(string uri)
+        {
+            var web = new HtmlWeb();
+            var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri, Encoding.UTF8));
+            var divAllEntries = document.DocumentNode.SelectSingleNode("//div[@id='allEntries']");
+            return divAllEntries;
         }
 
         #endregion

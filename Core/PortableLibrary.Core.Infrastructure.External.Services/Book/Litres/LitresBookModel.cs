@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using PortableLibrary.Core.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
 {
-    public class LitresBookModel : IExternalModel
+    public class LitresBookModel
     {
         public string Title { get; set; }
         public string Author { get; set; }

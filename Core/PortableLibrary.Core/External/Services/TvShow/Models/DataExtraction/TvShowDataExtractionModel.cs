@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using PortableLibrary.Core.External.Models;
+using PortableLibrary.Core.External.Services.Base.Model;
 
-namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
+namespace PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction
 {
-    public class MyShowsTvShowModel : IExternalModel
+    public class TvShowDataExtractionModel : IItemDataExtractionModel
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
+        public int? Id { get; set; }
+        public List<string> Titles { get; set; }
         public string TitleOriginal { get; set; }
         public string Description { get; set; }
         public int? TotalSeasons { get; set; }
-        public TvShowStatus Status { get; set; }
+        public TvShowStatus? Status { get; set; }
         public string Country { get; set; }
         public DateTimeOffset? Started { get; set; }
         public DateTimeOffset? Ended { get; set; }
@@ -25,6 +25,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
         public List<string> Genres { get; set; }
 
-        public List<MyShowsTvShowSeasonModel> Seasons { get; set; }
+        public List<TvShowSeasonDataExtractionModel> Seasons { get; set; }
     }
 }

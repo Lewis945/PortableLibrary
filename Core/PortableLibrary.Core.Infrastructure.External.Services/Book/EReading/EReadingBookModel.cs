@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using PortableLibrary.Core.External.Models;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Book.EReading
 {
-    public class EReadingBookModel : IExternalModel
+    public class EReadingBookModel
     {
         public string Title { get; set; }
         public string Author { get; set; }

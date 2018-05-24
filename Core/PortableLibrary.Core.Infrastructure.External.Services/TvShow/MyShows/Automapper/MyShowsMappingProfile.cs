@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AutoMapper;
 using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Extensions;
+using PortableLibrary.Core.External.Services.TvShow.Models;
+using PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction;
+using PortableLibrary.Core.External.Services.TvShow.Models.Search;
+using PortableLibrary.Core.External.Services.TvShow.Models.Tracking;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Response;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper
@@ -14,13 +19,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
         {
             CreateMap<string, DateTimeOffset?>().ConvertUsing(new DateTimeOffsetTypeConverter());
 
-            CreateMap<EpisodeResponse, MyShowsTvShowSeasonModel>()
+            #region Data Extraction
+
+            CreateMap<EpisodeResponse, TvShowSeasonDataExtractionModel>()
                 .ForMember(dest => dest.Index, opt => opt.MapFrom(src => src.SeasonNumber));
 
-            CreateMap<EpisodeResponse, MyShowsTvShowEpisodeModel>()
-                .ForMember(dest => dest.AirDate, opt => opt.MapFrom(src => src.AirDateUTC));
+            CreateMap<EpisodeResponse, TvShowEpisodeDataExtractionModel>()
+                .ForMember(dest => dest.AirDate, opt => opt.MapFrom(src => src.AirDateUTC))
+                .ForMember(dest => dest.Titles, opt => opt.MapFrom(src => new List<string> {src.Title}));
 
-            CreateMap<TvShowResponse, MyShowsTvShowModel>()
+            CreateMap<TvShowResponse, TvShowDataExtractionModel>()
                 .ForMember(dest => dest.Description,
                     opt => opt.ResolveUsing((src, dest, destMember, res) =>
                     {
@@ -50,10 +58,55 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
 //                    opt => opt.MapFrom(src => src.Started))
                 .ForMember(dest => dest.Seasons,
                     opt => opt.MapFrom(src =>
+                        src.Episodes.DistinctBy(e => e.SeasonNumber).OrderBy(e => e.SeasonNumber)))
+                .ForMember(dest => dest.Titles, opt => opt.MapFrom(src => new List<string> {src.Title}));
+
+            CreateMap<TvShowResponseWrapper, TvShowDataExtractionModel>()
+                .ConvertUsing<TvShowEpisodeDataExtractionModelConverter>();
+
+            #endregion
+
+            #region Tracking
+
+            CreateMap<EpisodeResponse, TvShowSeasonTrackingModel>()
+                .ForMember(dest => dest.Index, opt => opt.MapFrom(src => src.SeasonNumber));
+
+            CreateMap<EpisodeResponse, TvShowEpisodeTrackingModel>()
+                .ForMember(dest => dest.AirDate, opt => opt.MapFrom(src => src.AirDateUTC));
+
+            CreateMap<TvShowResponse, TvShowTrackingModel>()
+                .ForMember(dest => dest.Status,
+                    opt => opt.ResolveUsing((src, dest, destMember, res) =>
+                    {
+                        switch (src.Status)
+                        {
+                            case "Canceled/Ended":
+                                return TvShowStatus.CanceledOrEnded;
+                            case "Returning Series":
+                                return TvShowStatus.Ongoing;
+                            case "New Series":
+                                return TvShowStatus.NewSeries;
+                            case "In Development":
+                                return TvShowStatus.InDevelopment;
+                            default:
+                                throw new ArgumentException($"Status {src.Status} is undefined!", nameof(src.Status));
+                        }
+                    }))
+                .ForMember(dest => dest.Seasons,
+                    opt => opt.MapFrom(src =>
                         src.Episodes.DistinctBy(e => e.SeasonNumber).OrderBy(e => e.SeasonNumber)));
 
-            CreateMap<TvShowResponseWrapper, MyShowsTvShowModel>()
-                .ConvertUsing<MyShowsTvShowModelConverter>();
+            CreateMap<TvShowResponseWrapper, TvShowTrackingModel>()
+                .ConvertUsing<TvShowEpisodeTrackingModelConverter>();
+
+            #endregion
+
+            #region Search
+
+            CreateMap<TvShowResponse, TvShowSearchModel>()
+                .ForMember(dest => dest.Titles, opt => opt.MapFrom(src => new List<string> {src.Title}));
+
+            #endregion
         }
     }
 }
