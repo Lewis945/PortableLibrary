@@ -14,7 +14,7 @@ using Xunit;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 {
-    public class MyShowsExternalProviderTests
+    public class MyShowsExternalProviderTests : TvShowExternalProviderTestsBase
     {
         #region Fields
 
@@ -102,9 +102,11 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(49623, model.Id);
 
-            Assert.NotNull(model.Titles);
-            Assert.Equal(new List<string> {GetDirkGentlysHolisticDetectiveAgencyTitle(language)}, model.Titles);
-            Assert.Equal(GetDirkGentlysHolisticDetectiveAgencyTitle(Language.English), model.TitleOriginal, true);
+            ValidateTvShow(model, title: GetDirkGentlysHolisticDetectiveAgencyTitle(language),
+                originalTitle: GetDirkGentlysHolisticDetectiveAgencyTitle(Language.English),
+                imageUri: "https://media.myshows.me/shows/normal/9/9b/9b214e17391f62bd8e4d85df4e6b0b5a.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: GetGenres().ToList(), description: GetDescription(),
+                seasonsCount: 2);
 
             string GetDescription()
             {
@@ -124,12 +126,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 }
             }
 
-            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
-
             Assert.Equal("US", model.Country, true);
-
-            Assert.Equal("https://media.myshows.me/shows/normal/9/9b/9b214e17391f62bd8e4d85df4e6b0b5a.jpg", model.Image,
-                true);
 
             Assert.True(model.Year.HasValue);
             Assert.Equal(2016, model.Year.Value);
@@ -148,8 +145,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.True(model.Rating.HasValue);
             Assert.Equal(4.52m, model.Rating.Value, 2);
-
-            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
 
             Assert.True(model.Started.HasValue);
             Assert.Equal(new DateTimeOffset(new DateTime(2016, 10, 22, 0, 0, 0, DateTimeKind.Utc)),
@@ -171,12 +166,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 }
             }
 
-            Assert.Equal(GetGenres(), model.Genres);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(2, model.TotalSeasons);
-            Assert.Equal(2, model.Seasons.Count);
-
             #endregion
 
             #region Season 1
@@ -187,31 +176,32 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+            var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s1E1, id: 15803466, title: "Horizons", shortName: "s01e01",
+            ValidateEpisode(s1E1, id: 15803466, title: "Horizons", originalTitle: "Horizons", shortName: "s01e01",
                 image: "https://media.myshows.me/episodes/normal/1/f2/1f24f4f38bc01a8f98d11dd7e7a01c53.jpg",
-                airDateUtc: new DateTime(2016, 10, 22, 16, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2016, 10, 22, 16, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 4
 
-            var s1E4 = season1.Episodes.First(e => e.EpisodeNumber == 4);
+            var s1E4 = season1.Episodes.First(e => e.Index == 4);
 
-            ValidateEpisode(s1E4, id: 15807716, title: "Watkin", shortName: "s01e04",
+            ValidateEpisode(s1E4, id: 15807716, title: "Watkin", originalTitle: "Watkin", shortName: "s01e04",
                 image: "https://media.myshows.me/episodes/normal/2/42/242eb236a3b60e12adb592bbf6e04039.jpg",
-                airDateUtc: new DateTime(2016, 11, 12, 17, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2016, 11, 12, 17, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 8
 
-            var s1E8 = season1.Episodes.First(e => e.EpisodeNumber == 8);
+            var s1E8 = season1.Episodes.First(e => e.Index == 8);
 
-            ValidateEpisode(s1E8, id: 15807720, title: "Two Sane Guys Doing Normal Things", shortName: "s01e08",
+            ValidateEpisode(s1E8, id: 15807720, title: "Two Sane Guys Doing Normal Things",
+                originalTitle: "Two Sane Guys Doing Normal Things", shortName: "s01e08",
                 image: "https://media.myshows.me/episodes/normal/d/34/d3464a7e1a065e107b3aa15cc358fff8.jpg",
-                airDateUtc: new DateTime(2016, 12, 10, 17, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2016, 12, 10, 17, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -225,31 +215,34 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+            var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s2E1, id: 16232262, title: "Space Rabbit", shortName: "s02e01",
+            ValidateEpisode(s2E1, id: 16232262, title: "Space Rabbit", originalTitle: "Space Rabbit",
+                shortName: "s02e01",
                 image: "https://media.myshows.me/episodes/normal/2/eb/2eb7af3e8251798935d8aac58b9db8c2.jpg",
-                airDateUtc: new DateTime(2017, 10, 15, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2017, 10, 15, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 5
 
-            var s2E5 = season2.Episodes.First(e => e.EpisodeNumber == 5);
+            var s2E5 = season2.Episodes.First(e => e.Index == 5);
 
-            ValidateEpisode(s2E5, id: 16296021, title: "Shapes and Colors", shortName: "s02e05",
+            ValidateEpisode(s2E5, id: 16296021, title: "Shapes and Colors", originalTitle: "Shapes and Colors",
+                shortName: "s02e05",
                 image: "https://media.myshows.me/episodes/normal/7/a6/7a6fcfa4e85eb0a9abd39e8765f25cc3.jpg",
-                airDateUtc: new DateTime(2017, 11, 12, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2017, 11, 12, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 10
 
-            var s2E10 = season2.Episodes.First(e => e.EpisodeNumber == 10);
+            var s2E10 = season2.Episodes.First(e => e.Index == 10);
 
-            ValidateEpisode(s2E10, id: 16322322, title: "Nice Jacket", shortName: "s02e10",
+            ValidateEpisode(s2E10, id: 16322322, title: "Nice Jacket", originalTitle: "Nice Jacket",
+                shortName: "s02e10",
                 image: "https://media.myshows.me/episodes/normal/9/40/9404c94125cd0625fe77ca49477c06b4.jpg",
-                airDateUtc: new DateTime(2017, 12, 17, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2017, 12, 17, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -362,16 +355,13 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(17186, model.Id);
 
-            Assert.NotNull(model.Titles);
-            Assert.Equal(new List<string> {GetGrimmTitle(language)}, model.Titles);
-            Assert.Equal(GetGrimmTitle(Language.English), model.TitleOriginal, true);
-
-            Assert.Equal(GetDescription(), model.Description, true);
+            ValidateTvShow(model, title: GetGrimmTitle(language),
+                originalTitle: GetGrimmTitle(Language.English),
+                imageUri: "https://media.myshows.me/shows/normal/c/c2/c27a40b5d158fffc0e8096d29cc1df01.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: GetGenres().ToList(), description: GetDescription(),
+                seasonsCount: 6);
 
             Assert.Equal("US", model.Country, true);
-
-            Assert.Equal("https://media.myshows.me/shows/normal/c/c2/c27a40b5d158fffc0e8096d29cc1df01.jpg", model.Image,
-                true);
 
             Assert.True(model.Year.HasValue);
             Assert.Equal(2011, model.Year.Value);
@@ -390,8 +380,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.True(model.Rating.HasValue);
             Assert.Equal(4.05m, model.Rating.Value, 2);
-
-            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
 
             Assert.True(model.Started.HasValue);
             Assert.Equal(new DateTimeOffset(new DateTime(2011, 10, 28, 0, 0, 0, DateTimeKind.Utc)),
@@ -413,12 +401,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 }
             }
 
-            Assert.Equal(GetGenres(), model.Genres);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(6, model.TotalSeasons);
-            Assert.Equal(6, model.Seasons.Count);
-
             #endregion
 
             #region Season 1
@@ -429,31 +411,32 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+            var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s1E1, id: 1079861, title: "Pilot", shortName: "s01e01",
+            ValidateEpisode(s1E1, id: 1079861, title: "Pilot", originalTitle: "Pilot", shortName: "s01e01",
                 image: "https://media.myshows.me/episodes/normal/a/dd/add6e0e8eb00d31e8c27646e282da7e4.jpg",
-                airDateUtc: new DateTime(2011, 10, 29, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2011, 10, 29, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 11
 
-            var s1E11 = season1.Episodes.First(e => e.EpisodeNumber == 11);
+            var s1E11 = season1.Episodes.First(e => e.Index == 11);
 
-            ValidateEpisode(s1E11, id: 1356548, title: "Tarantella", shortName: "s01e11",
+            ValidateEpisode(s1E11, id: 1356548, title: "Tarantella", originalTitle: "Tarantella", shortName: "s01e11",
                 image: "https://media.myshows.me/episodes/normal/3/21/321b16834cca69227eda3c85c5411dab.jpg",
-                airDateUtc: new DateTime(2012, 2, 11, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 2, 11, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 22
 
-            var s1E22 = season1.Episodes.First(e => e.EpisodeNumber == 22);
+            var s1E22 = season1.Episodes.First(e => e.Index == 22);
 
-            ValidateEpisode(s1E22, id: 1454628, title: "Woman in Black", shortName: "s01e22",
+            ValidateEpisode(s1E22, id: 1454628, title: "Woman in Black", originalTitle: "Woman in Black",
+                shortName: "s01e22",
                 image: "https://media.myshows.me/episodes/normal/2/bc/2bc08974b48d72794c44898f9d9af6e3.jpg",
-                airDateUtc: new DateTime(2012, 5, 19, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 5, 19, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -469,38 +452,41 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2S1 = season2.Specials.First(e => e.ShortName == "s02 special-1");
 
-            ValidateEpisode(s2S1, id: 2097143, title: "Bad Hair Day", shortName: "s02 special-1",
-                image: "-1", airDateUtc: new DateTime(2013, 1, 17, 2, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s2S1, id: 2097143, title: "Bad Hair Day", originalTitle: "Bad Hair Day",
+                shortName: "s02 special-1",
+                dateReleasedOrigianl: new DateTime(2013, 1, 17, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 1
 
-            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+            var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s2E1, id: 1488480, title: "Bad Teeth", shortName: "s02e01",
+            ValidateEpisode(s2E1, id: 1488480, title: "Bad Teeth", originalTitle: "Bad Teeth", shortName: "s02e01",
                 image: "https://media.myshows.me/episodes/normal/d/e2/de217bef1a0c8eddc9fce0c609bdf48b.jpg",
-                airDateUtc: new DateTime(2012, 8, 14, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 8, 14, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 11
 
-            var s2E11 = season2.Episodes.First(e => e.EpisodeNumber == 11);
+            var s2E11 = season2.Episodes.First(e => e.Index == 11);
 
-            ValidateEpisode(s2E11, id: 1636953, title: "To Protect and Serve Man", shortName: "s02e11",
+            ValidateEpisode(s2E11, id: 1636953, title: "To Protect and Serve Man",
+                originalTitle: "To Protect and Serve Man", shortName: "s02e11",
                 image: "https://media.myshows.me/episodes/normal/c/2a/c2aadef981cfcc5f87a3c79f5eb93646.jpg",
-                airDateUtc: new DateTime(2012, 11, 10, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 11, 10, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 22
 
-            var s2E22 = season2.Episodes.First(e => e.EpisodeNumber == 22);
+            var s2E22 = season2.Episodes.First(e => e.Index == 22);
 
-            ValidateEpisode(s2E22, id: 1770962, title: "Goodnight, Sweet Grimm", shortName: "s02e22",
+            ValidateEpisode(s2E22, id: 1770962, title: "Goodnight, Sweet Grimm",
+                originalTitle: "Goodnight, Sweet Grimm", shortName: "s02e22",
                 image: "https://media.myshows.me/episodes/normal/d/0c/d0ceac423a5ff915e7d1adb9c1a61e6b.jpg",
-                airDateUtc: new DateTime(2013, 5, 22, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2013, 5, 22, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -516,9 +502,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3S1 = season3.Specials.First(e => e.ShortName == "s03 special-1");
 
-            ValidateEpisode(s3S1, id: 2097144, title: "Meltdown", shortName: "s03 special-1",
-                image: "-1",
-                airDateUtc: new DateTime(2013, 10, 5, 2, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s3S1, id: 2097144, title: "Meltdown", originalTitle: "Meltdown", shortName: "s03 special-1",
+                dateReleasedOrigianl: new DateTime(2013, 10, 5, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -526,39 +511,42 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3S2 = season3.Specials.First(e => e.ShortName == "s03 special-2");
 
-            ValidateEpisode(s3S2, id: 2097145, title: "Love is In the Air", shortName: "s03 special-2",
-                image: "-1",
-                airDateUtc: new DateTime(2014, 1, 31, 10, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s3S2, id: 2097145, title: "Love is In the Air", originalTitle: "Love is In the Air",
+                shortName: "s03 special-2",
+                dateReleasedOrigianl: new DateTime(2014, 1, 31, 10, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 1
 
-            var s3E1 = season3.Episodes.First(e => e.EpisodeNumber == 1);
+            var s3E1 = season3.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s3E1, id: 1845977, title: "The Ungrateful Dead", shortName: "s03e01",
+            ValidateEpisode(s3E1, id: 1845977, title: "The Ungrateful Dead", originalTitle: "The Ungrateful Dead",
+                shortName: "s03e01",
                 image: "https://media.myshows.me/episodes/normal/1/6e/16ed0d8b568a998b428d773c65e76ba1.jpg",
-                airDateUtc: new DateTime(2013, 10, 26, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2013, 10, 26, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 11
 
-            var s3E11 = season3.Episodes.First(e => e.EpisodeNumber == 11);
+            var s3E11 = season3.Episodes.First(e => e.Index == 11);
 
-            ValidateEpisode(s3E11, id: 1984662, title: "The Good Soldier", shortName: "s03e11",
+            ValidateEpisode(s3E11, id: 1984662, title: "The Good Soldier", originalTitle: "The Good Soldier",
+                shortName: "s03e11",
                 image: "https://media.myshows.me/episodes/normal/c/3f/c3f8a1c0adc41661c37c8509be0ac66c.jpg",
-                airDateUtc: new DateTime(2014, 1, 18, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2014, 1, 18, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 22
 
-            var s3E22 = season3.Episodes.First(e => e.EpisodeNumber == 22);
+            var s3E22 = season3.Episodes.First(e => e.Index == 22);
 
-            ValidateEpisode(s3E22, id: 2131838, title: "Blond Ambition", shortName: "s03e22",
+            ValidateEpisode(s3E22, id: 2131838, title: "Blond Ambition", originalTitle: "Blond Ambition",
+                shortName: "s03e22",
                 image: "https://media.myshows.me/episodes/normal/4/68/468e7f91b849d20ba7d6014f4d04c850.jpg",
-                airDateUtc: new DateTime(2014, 5, 17, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2014, 5, 17, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -572,31 +560,33 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s4E1 = season4.Episodes.First(e => e.EpisodeNumber == 1);
+            var s4E1 = season4.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s4E1, id: 2206361, title: "Thanks for the Memories", shortName: "s04e01",
+            ValidateEpisode(s4E1, id: 2206361, title: "Thanks for the Memories",
+                originalTitle: "Thanks for the Memories", shortName: "s04e01",
                 image: "https://media.myshows.me/episodes/normal/d/5b/d5b944e31bdba1386b07eb8ddea61f51.jpg",
-                airDateUtc: new DateTime(2014, 10, 24, 21, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2014, 10, 24, 21, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 11
 
-            var s4E11 = season4.Episodes.First(e => e.EpisodeNumber == 11);
+            var s4E11 = season4.Episodes.First(e => e.Index == 11);
 
-            ValidateEpisode(s4E11, id: 2599027, title: "Death Do Us Part", shortName: "s04e11",
+            ValidateEpisode(s4E11, id: 2599027, title: "Death Do Us Part", originalTitle: "Death Do Us Part",
+                shortName: "s04e11",
                 image: "https://media.myshows.me/episodes/normal/f/3c/f3c86d6017fa0ee09d32c34c3a823c3a.jpg",
-                airDateUtc: new DateTime(2015, 1, 30, 23, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2015, 1, 30, 23, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 22
 
-            var s4E22 = season4.Episodes.First(e => e.EpisodeNumber == 22);
+            var s4E22 = season4.Episodes.First(e => e.Index == 22);
 
-            ValidateEpisode(s4E22, id: 2650940, title: "Cry Havoc", shortName: "s04e22",
+            ValidateEpisode(s4E22, id: 2650940, title: "Cry Havoc", originalTitle: "Cry Havoc", shortName: "s04e22",
                 image: "https://media.myshows.me/episodes/normal/a/7b/a7b1e9c111c1df75537949a4914cb146.jpg",
-                airDateUtc: new DateTime(2015, 5, 15, 21, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2015, 5, 15, 21, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -610,31 +600,33 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s5E1 = season5.Episodes.First(e => e.EpisodeNumber == 1);
+            var s5E1 = season5.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s5E1, id: 2701637, title: "The Grimm Identity", shortName: "s05e01",
+            ValidateEpisode(s5E1, id: 2701637, title: "The Grimm Identity", originalTitle: "The Grimm Identity",
+                shortName: "s05e01",
                 image: "https://media.myshows.me/episodes/normal/5/2a/52afddb5645a39443ef710e7e536521c.jpg",
-                airDateUtc: new DateTime(2015, 10, 30, 21, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2015, 10, 30, 21, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 11
 
-            var s5E11 = season5.Episodes.First(e => e.EpisodeNumber == 11);
+            var s5E11 = season5.Episodes.First(e => e.Index == 11);
 
-            ValidateEpisode(s5E11, id: 15478357, title: "Key Move", shortName: "s05e11",
+            ValidateEpisode(s5E11, id: 15478357, title: "Key Move", originalTitle: "Key Move", shortName: "s05e11",
                 image: "https://media.myshows.me/episodes/normal/4/31/43162a00298f053c48f3765f936ed09a.jpg",
-                airDateUtc: new DateTime(2016, 3, 5, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2016, 3, 5, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 22
 
-            var s5E22 = season5.Episodes.First(e => e.EpisodeNumber == 22);
+            var s5E22 = season5.Episodes.First(e => e.Index == 22);
 
-            ValidateEpisode(s5E22, id: 15512584, title: "Beginning of the End - Part Two", shortName: "s05e22",
+            ValidateEpisode(s5E22, id: 15512584, title: "Beginning of the End - Part Two",
+                originalTitle: "Beginning of the End - Part Two", shortName: "s05e22",
                 image: "https://media.myshows.me/episodes/normal/9/16/91675ceed70ab1f9e9a995d19c03b0d0.jpg",
-                airDateUtc: new DateTime(2016, 5, 21, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2016, 5, 21, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -648,31 +640,32 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s6E1 = season6.Episodes.First(e => e.EpisodeNumber == 1);
+            var s6E1 = season6.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s6E1, id: 15824011, title: "Fugitive", shortName: "s06e01",
+            ValidateEpisode(s6E1, id: 15824011, title: "Fugitive", originalTitle: "Fugitive", shortName: "s06e01",
                 image: "https://media.myshows.me/episodes/normal/d/b8/db8ad9019d8ca576c5ece6cd594fb3ce.jpg",
-                airDateUtc: new DateTime(2017, 1, 7, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2017, 1, 7, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 6
 
-            var s6E6 = season6.Episodes.First(e => e.EpisodeNumber == 6);
+            var s6E6 = season6.Episodes.First(e => e.Index == 6);
 
-            ValidateEpisode(s6E6, id: 15914954, title: "Breakfast in Bed", shortName: "s06e06",
+            ValidateEpisode(s6E6, id: 15914954, title: "Breakfast in Bed", originalTitle: "Breakfast in Bed",
+                shortName: "s06e06",
                 image: "https://media.myshows.me/episodes/normal/f/07/f072f764b9ed371fe47eb92ea9e93e0b.jpg",
-                airDateUtc: new DateTime(2017, 2, 11, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2017, 2, 11, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 13
 
-            var s6E13 = season6.Episodes.First(e => e.EpisodeNumber == 13);
+            var s6E13 = season6.Episodes.First(e => e.Index == 13);
 
-            ValidateEpisode(s6E13, id: 15982104, title: "The End", shortName: "s06e13",
+            ValidateEpisode(s6E13, id: 15982104, title: "The End", originalTitle: "The End", shortName: "s06e13",
                 image: "https://media.myshows.me/episodes/normal/a/f8/af8215e081bc806aee9592a6a946d6f9.jpg",
-                airDateUtc: new DateTime(2017, 4, 1, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2017, 4, 1, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -745,9 +738,11 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(20, model.Id);
 
-            Assert.NotNull(model.Titles);
-            Assert.Equal(new List<string> {GetFriendsTitle(language)}, model.Titles);
-            Assert.Equal(GetFriendsTitle(Language.English), model.TitleOriginal, true);
+            ValidateTvShow(model, title: GetFriendsTitle(language),
+                originalTitle: GetFriendsTitle(Language.English),
+                imageUri: "https://media.myshows.me/shows/normal/3/39/3902fe3a363a08eb23b02d0743a2461d.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: GetGenres().ToList(), description: GetDescription(),
+                seasonsCount: 10);
 
             string GetDescription()
             {
@@ -772,12 +767,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 }
             }
 
-            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
-
             Assert.Equal("US", model.Country, true);
-
-            Assert.Equal("https://media.myshows.me/shows/normal/3/39/3902fe3a363a08eb23b02d0743a2461d.jpg", model.Image,
-                true);
 
             Assert.True(model.Year.HasValue);
             Assert.Equal(1994, model.Year.Value);
@@ -796,8 +786,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.True(model.Rating.HasValue);
             Assert.Equal(4.75m, model.Rating.Value, 2);
-
-            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
 
             Assert.True(model.Started.HasValue);
             Assert.Equal(new DateTimeOffset(new DateTime(1994, 9, 22, 0, 0, 0, DateTimeKind.Utc)),
@@ -819,12 +807,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 }
             }
 
-            Assert.Equal(GetGenres(), model.Genres);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(10, model.TotalSeasons);
-            Assert.Equal(10, model.Seasons.Count);
-
             #endregion
 
             #region Season 1
@@ -835,31 +817,34 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+            var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s1E1, id: 962, title: "The One Where It All Began", shortName: "s01e01",
+            ValidateEpisode(s1E1, id: 962, title: "The One Where It All Began",
+                originalTitle: "The One Where It All Began", shortName: "s01e01",
                 image: "https://media.myshows.me/episodes/normal/b/a9/ba9bd5398ae5324c86a0130f4ccdf9a0.jpg",
-                airDateUtc: new DateTime(1994, 9, 23, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1994, 9, 23, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s1E12 = season1.Episodes.First(e => e.EpisodeNumber == 12);
+            var s1E12 = season1.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s1E12, id: 973, title: "The One With the Dozen Lasagnas", shortName: "s01e12",
+            ValidateEpisode(s1E12, id: 973, title: "The One With the Dozen Lasagnas",
+                originalTitle: "The One With the Dozen Lasagnas", shortName: "s01e12",
                 image: "https://media.myshows.me/episodes/normal/a/ec/aec6ba3728af059d22daaeb75ee6d884.jpg",
-                airDateUtc: new DateTime(1995, 1, 13, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1995, 1, 13, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s1E24 = season1.Episodes.First(e => e.EpisodeNumber == 24);
+            var s1E24 = season1.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s1E24, id: 985, title: "The One Where Rachel Finds Out", shortName: "s01e24",
+            ValidateEpisode(s1E24, id: 985, title: "The One Where Rachel Finds Out",
+                originalTitle: "The One Where Rachel Finds Out", shortName: "s01e24",
                 image: "https://media.myshows.me/episodes/normal/b/04/b04a1e0f1194c97464859cc9c768eb98.jpg",
-                airDateUtc: new DateTime(1995, 5, 19, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1995, 5, 19, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -873,31 +858,34 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+            var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s2E1, id: 986, title: "The One With Ross's New Girlfriend", shortName: "s02e01",
+            ValidateEpisode(s2E1, id: 986, title: "The One With Ross's New Girlfriend",
+                originalTitle: "The One With Ross's New Girlfriend", shortName: "s02e01",
                 image: "https://media.myshows.me/episodes/normal/d/c7/dc7c9160361216bd3f19fa9894cde632.jpg",
-                airDateUtc: new DateTime(1995, 9, 22, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1995, 9, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s2E12 = season2.Episodes.First(e => e.EpisodeNumber == 12);
+            var s2E12 = season2.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s2E12, id: 997, title: "The One After the Superbowl (1)", shortName: "s02e12",
+            ValidateEpisode(s2E12, id: 997, title: "The One After the Superbowl (1)",
+                originalTitle: "The One After the Superbowl (1)", shortName: "s02e12",
                 image: "https://media.myshows.me/episodes/normal/0/db/0dbfb16558a6232cf0d75449a69c4b43.jpg",
-                airDateUtc: new DateTime(1996, 1, 29, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1996, 1, 29, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s2E24 = season2.Episodes.First(e => e.EpisodeNumber == 24);
+            var s2E24 = season2.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s2E24, id: 1009, title: "The One With Barry and Mindy's Wedding", shortName: "s02e24",
+            ValidateEpisode(s2E24, id: 1009, title: "The One With Barry and Mindy's Wedding",
+                originalTitle: "The One With Barry and Mindy's Wedding", shortName: "s02e24",
                 image: "https://media.myshows.me/episodes/normal/e/9d/e9d6818b784d4e9f35061e539239748b.jpg",
-                airDateUtc: new DateTime(1996, 5, 17, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1996, 5, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -911,31 +899,34 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s3E1 = season3.Episodes.First(e => e.EpisodeNumber == 1);
+            var s3E1 = season3.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s3E1, id: 1010, title: "The One With the Princess Leia Fantasy", shortName: "s03e01",
+            ValidateEpisode(s3E1, id: 1010, title: "The One With the Princess Leia Fantasy",
+                originalTitle: "The One With the Princess Leia Fantasy", shortName: "s03e01",
                 image: "https://media.myshows.me/episodes/normal/0/ea/0ea28360eeaa51d7be680a9a50ad58b9.jpg",
-                airDateUtc: new DateTime(1996, 9, 17, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1996, 9, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s3E12 = season3.Episodes.First(e => e.EpisodeNumber == 12);
+            var s3E12 = season3.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s3E12, id: 1021, title: "The One With All the Jealousy", shortName: "s03e12",
+            ValidateEpisode(s3E12, id: 1021, title: "The One With All the Jealousy",
+                originalTitle: "The One With All the Jealousy", shortName: "s03e12",
                 image: "https://media.myshows.me/episodes/normal/2/5f/25f88762e12ad5510c11a7badd9138df.jpg",
-                airDateUtc: new DateTime(1997, 1, 17, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1997, 1, 17, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 25
 
-            var s3E25 = season3.Episodes.First(e => e.EpisodeNumber == 25);
+            var s3E25 = season3.Episodes.First(e => e.Index == 25);
 
-            ValidateEpisode(s3E25, id: 1034, title: "The One at the Beach", shortName: "s03e25",
+            ValidateEpisode(s3E25, id: 1034, title: "The One at the Beach",
+                originalTitle: "The One at the Beach", shortName: "s03e25",
                 image: "https://media.myshows.me/episodes/normal/4/c3/4c3051486e49ebae6c88d5ce907b84b7.jpg",
-                airDateUtc: new DateTime(1997, 5, 16, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1997, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -949,31 +940,32 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s4E1 = season4.Episodes.First(e => e.EpisodeNumber == 1);
+            var s4E1 = season4.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s4E1, id: 1035, title: "The One With the Jellyfish", shortName: "s04e01",
+            ValidateEpisode(s4E1, id: 1035, title: "The One With the Jellyfish",
+                originalTitle: "The One With the Jellyfish", shortName: "s04e01",
                 image: "https://media.myshows.me/episodes/normal/e/af/eafa78de0610ec8475744262e07a429d.jpg",
-                airDateUtc: new DateTime(1997, 9, 26, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(1997, 9, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s4E12 = season4.Episodes.First(e => e.EpisodeNumber == 12);
+            var s4E12 = season4.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s4E12, id: 1046, title: "The One With the Embryos", shortName: "s04e12",
-                image: "-1",
-                airDateUtc: new DateTime(1998, 1, 16, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s4E12, id: 1046, title: "The One With the Embryos",
+                originalTitle: "The One With the Embryos", shortName: "s04e12",
+                dateReleasedOrigianl: new DateTime(1998, 1, 16, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s4E24 = season4.Episodes.First(e => e.EpisodeNumber == 24);
+            var s4E24 = season4.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s4E24, id: 1058, title: "The One With Ross's Wedding (2)", shortName: "s04e24",
-                image: "-1",
-                airDateUtc: new DateTime(1998, 5, 8, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s4E24, id: 1058, title: "The One With Ross's Wedding (2)",
+                originalTitle: "The One With Ross's Wedding (2)", shortName: "s04e24",
+                dateReleasedOrigianl: new DateTime(1998, 5, 8, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -987,31 +979,31 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s5E1 = season5.Episodes.First(e => e.EpisodeNumber == 1);
+            var s5E1 = season5.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s5E1, id: 1059, title: "The One After Ross Says Rachel", shortName: "s05e01",
-                image: "-1",
-                airDateUtc: new DateTime(1998, 9, 25, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s5E1, id: 1059, title: "The One After Ross Says Rachel",
+                originalTitle: "The One After Ross Says Rachel", shortName: "s05e01",
+                dateReleasedOrigianl: new DateTime(1998, 9, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s5E12 = season5.Episodes.First(e => e.EpisodeNumber == 12);
+            var s5E12 = season5.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s5E12, id: 1070, title: "The One With Chandler's Work Laugh", shortName: "s05e12",
-                image: "-1",
-                airDateUtc: new DateTime(1999, 1, 22, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s5E12, id: 1070, title: "The One With Chandler's Work Laugh",
+                originalTitle: "The One With Chandler's Work Laugh", shortName: "s05e12",
+                dateReleasedOrigianl: new DateTime(1999, 1, 22, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s5E24 = season5.Episodes.First(e => e.EpisodeNumber == 24);
+            var s5E24 = season5.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s5E24, id: 1082, title: "The One in Vegas (2)", shortName: "s05e24",
-                image: "-1",
-                airDateUtc: new DateTime(1999, 5, 21, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s5E24, id: 1082, title: "The One in Vegas (2)",
+                originalTitle: "The One in Vegas (2)", shortName: "s05e24",
+                dateReleasedOrigianl: new DateTime(1999, 5, 21, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1025,31 +1017,31 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s6E1 = season6.Episodes.First(e => e.EpisodeNumber == 1);
+            var s6E1 = season6.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s6E1, id: 1083, title: "The One After Vegas", shortName: "s06e01",
-                image: "-1",
-                airDateUtc: new DateTime(1999, 9, 24, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s6E1, id: 1083, title: "The One After Vegas",
+                originalTitle: "The One After Vegas", shortName: "s06e01",
+                dateReleasedOrigianl: new DateTime(1999, 9, 24, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s6E12 = season6.Episodes.First(e => e.EpisodeNumber == 12);
+            var s6E12 = season6.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s6E12, id: 1094, title: "The One With the Joke", shortName: "s06e12",
-                image: "-1",
-                airDateUtc: new DateTime(2000, 1, 14, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s6E12, id: 1094, title: "The One With the Joke",
+                originalTitle: "The One With the Joke", shortName: "s06e12",
+                dateReleasedOrigianl: new DateTime(2000, 1, 14, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 25
 
-            var s6E25 = season6.Episodes.First(e => e.EpisodeNumber == 25);
+            var s6E25 = season6.Episodes.First(e => e.Index == 25);
 
-            ValidateEpisode(s6E25, id: 1107, title: "The One With the Proposal (2)", shortName: "s06e25",
-                image: "-1",
-                airDateUtc: new DateTime(2000, 5, 19, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s6E25, id: 1107, title: "The One With the Proposal (2)",
+                originalTitle: "The One With the Proposal (2)", shortName: "s06e25",
+                dateReleasedOrigianl: new DateTime(2000, 5, 19, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1063,32 +1055,33 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s7E1 = season7.Episodes.First(e => e.EpisodeNumber == 1);
+            var s7E1 = season7.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s7E1, id: 1108, title: "The One With Monica's Thunder", shortName: "s07e01",
+            ValidateEpisode(s7E1, id: 1108, title: "The One With Monica's Thunder",
+                originalTitle: "The One With Monica's Thunder", shortName: "s07e01",
                 image: "https://media.myshows.me/episodes/normal/0/95/0959d895d4a6b97625ff10c655940302.jpg",
-                airDateUtc: new DateTime(2000, 10, 13, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2000, 10, 13, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s7E12 = season7.Episodes.First(e => e.EpisodeNumber == 12);
+            var s7E12 = season7.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s7E12, id: 1119, title: "The One Where They're Up All Night", shortName: "s07e12",
-                image: "-1",
-                airDateUtc: new DateTime(2001, 1, 12, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s7E12, id: 1119, title: "The One Where They're Up All Night",
+                originalTitle: "The One Where They're Up All Night", shortName: "s07e12",
+                dateReleasedOrigianl: new DateTime(2001, 1, 12, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s7E24 = season7.Episodes.First(e => e.EpisodeNumber == 24);
+            var s7E24 = season7.Episodes.First(e => e.Index == 24);
 
             ValidateEpisode(s7E24, id: 1131, title: "The One with Monica and Chandler's Wedding (2)",
+                originalTitle: "The One with Monica and Chandler's Wedding (2)",
                 shortName: "s07e24",
-                image: "-1",
-                airDateUtc: new DateTime(2001, 5, 18, 0, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2001, 5, 18, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1102,31 +1095,31 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s8E1 = season8.Episodes.First(e => e.EpisodeNumber == 1);
+            var s8E1 = season8.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s8E1, id: 1132, title: "The One After \"I Do\"", shortName: "s08e01",
-                image: "-1",
-                airDateUtc: new DateTime(2001, 9, 28, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s8E1, id: 1132, title: "The One After \"I Do\"",
+                originalTitle: "The One After \"I Do\"", shortName: "s08e01",
+                dateReleasedOrigianl: new DateTime(2001, 9, 28, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s8E12 = season8.Episodes.First(e => e.EpisodeNumber == 12);
+            var s8E12 = season8.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s8E12, id: 1143, title: "The One Where Joey Dates Rachel", shortName: "s08e12",
-                image: "-1",
-                airDateUtc: new DateTime(2002, 1, 11, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s8E12, id: 1143, title: "The One Where Joey Dates Rachel",
+                originalTitle: "The One Where Joey Dates Rachel", shortName: "s08e12",
+                dateReleasedOrigianl: new DateTime(2002, 1, 11, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s8E24 = season8.Episodes.First(e => e.EpisodeNumber == 24);
+            var s8E24 = season8.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s8E24, id: 1155, title: "The One Where Rachel Has a Baby (2)", shortName: "s08e24",
-                image: "-1",
-                airDateUtc: new DateTime(2002, 5, 17, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s8E24, id: 1155, title: "The One Where Rachel Has a Baby (2)",
+                originalTitle: "The One Where Rachel Has a Baby (2)", shortName: "s08e24",
+                dateReleasedOrigianl: new DateTime(2002, 5, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1140,31 +1133,31 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s9E1 = season9.Episodes.First(e => e.EpisodeNumber == 1);
+            var s9E1 = season9.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s9E1, id: 1156, title: "The One Where No One Proposes", shortName: "s09e01",
-                image: "-1",
-                airDateUtc: new DateTime(2002, 9, 27, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s9E1, id: 1156, title: "The One Where No One Proposes",
+                originalTitle: "The One Where No One Proposes", shortName: "s09e01",
+                dateReleasedOrigianl: new DateTime(2002, 9, 27, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s9E12 = season9.Episodes.First(e => e.EpisodeNumber == 12);
+            var s9E12 = season9.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s9E12, id: 1167, title: "The One With Phoebe's Rats", shortName: "s09e12",
-                image: "-1",
-                airDateUtc: new DateTime(2003, 1, 17, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s9E12, id: 1167, title: "The One With Phoebe's Rats",
+                originalTitle: "The One With Phoebe's Rats", shortName: "s09e12",
+                dateReleasedOrigianl: new DateTime(2003, 1, 17, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s9E24 = season9.Episodes.First(e => e.EpisodeNumber == 24);
+            var s9E24 = season9.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s9E24, id: 1179, title: "The One in Barbados (2)", shortName: "s09e24",
-                image: "-1",
-                airDateUtc: new DateTime(2003, 5, 16, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s9E24, id: 1179, title: "The One in Barbados (2)",
+                originalTitle: "The One in Barbados (2)", shortName: "s09e24",
+                dateReleasedOrigianl: new DateTime(2003, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1178,31 +1171,31 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s10E1 = season10.Episodes.First(e => e.EpisodeNumber == 1);
+            var s10E1 = season10.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s10E1, id: 1180, title: "The One After Joey And Rachel Kiss", shortName: "s10e01",
-                image: "-1",
-                airDateUtc: new DateTime(2003, 9, 26, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s10E1, id: 1180, title: "The One After Joey And Rachel Kiss",
+                originalTitle: "The One After Joey And Rachel Kiss", shortName: "s10e01",
+                dateReleasedOrigianl: new DateTime(2003, 9, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 9
 
-            var s10E9 = season10.Episodes.First(e => e.EpisodeNumber == 9);
+            var s10E9 = season10.Episodes.First(e => e.Index == 9);
 
-            ValidateEpisode(s10E9, id: 1188, title: "The One With the Birth Mother", shortName: "s10e09",
-                image: "-1",
-                airDateUtc: new DateTime(2004, 1, 9, 1, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s10E9, id: 1188, title: "The One With the Birth Mother",
+                originalTitle: "The One With the Birth Mother", shortName: "s10e09",
+                dateReleasedOrigianl: new DateTime(2004, 1, 9, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 18
 
-            var s10E18 = season10.Episodes.First(e => e.EpisodeNumber == 18);
+            var s10E18 = season10.Episodes.First(e => e.Index == 18);
 
-            ValidateEpisode(s10E18, id: 1197, title: "The Last One (2)", shortName: "s10e18",
-                image: "-1",
-                airDateUtc: new DateTime(2004, 5, 7, 0, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s10E18, id: 1197, title: "The Last One (2)",
+                originalTitle: "The Last One (2)", shortName: "s10e18",
+                dateReleasedOrigianl: new DateTime(2004, 5, 7, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1211,9 +1204,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var s10S3 = season10.Specials.First(e => e.ShortName == "s10 special-3");
 
             ValidateEpisode(s10S3, id: 15668758, title: "FRIENDS REUNION - Tribute To Director James Burrows",
+                originalTitle: "FRIENDS REUNION - Tribute To Director James Burrows",
                 shortName: "s10 special-3",
                 image: "https://media.myshows.me/episodes/normal/6/4b/64b85d4cc7efeb5fbd2ac6452b34b4cc.jpg",
-                airDateUtc: new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2016, 2, 22, 1, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1309,16 +1303,13 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal(23992, model.Id);
 
-            Assert.NotNull(model.Titles);
-            Assert.Equal(new List<string> {GetAngerManagmentTitle(language)}, model.Titles);
-            Assert.Equal(GetAngerManagmentTitle(Language.English), model.TitleOriginal, true);
-
-            Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
+            ValidateTvShow(model, title: GetAngerManagmentTitle(language),
+                originalTitle: GetAngerManagmentTitle(Language.English),
+                imageUri: "https://media.myshows.me/shows/normal/3/3b/3b8013ec507437324e069d8c998f8c9c.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: GetGenres().ToList(), description: GetDescription(),
+                seasonsCount: 2);
 
             Assert.Equal("US", model.Country, true);
-
-            Assert.Equal("https://media.myshows.me/shows/normal/3/3b/3b8013ec507437324e069d8c998f8c9c.jpg", model.Image,
-                true);
 
             Assert.True(model.Year.HasValue);
             Assert.Equal(2012, model.Year.Value);
@@ -1337,8 +1328,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.True(model.Rating.HasValue);
             Assert.Equal(3.55m, model.Rating.Value, 2);
-
-            Assert.Equal(TvShowStatus.CanceledOrEnded, model.Status);
 
             Assert.True(model.Started.HasValue);
             Assert.Equal(new DateTimeOffset(new DateTime(2012, 6, 28, 0, 0, 0, DateTimeKind.Utc)),
@@ -1360,12 +1349,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 }
             }
 
-            Assert.Equal(GetGenres(), model.Genres);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(2, model.TotalSeasons);
-            Assert.Equal(2, model.Seasons.Count);
-
             #endregion
 
             #region Season 1
@@ -1376,31 +1359,34 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+            var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s1E1, id: 1411218, title: "Charlie Goes Back to Therapy", shortName: "s01e01",
+            ValidateEpisode(s1E1, id: 1411218, title: "Charlie Goes Back to Therapy",
+                originalTitle: "Charlie Goes Back to Therapy", shortName: "s01e01",
                 image: "https://media.myshows.me/episodes/normal/a/9f/a9f9079688eb61352666e3e38157da14.jpg",
-                airDateUtc: new DateTime(2012, 6, 29, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 6, 29, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 5
 
-            var s1E5 = season1.Episodes.First(e => e.EpisodeNumber == 5);
+            var s1E5 = season1.Episodes.First(e => e.Index == 5);
 
-            ValidateEpisode(s1E5, id: 1515544, title: "Charlie Tries to Prove Therapy is Legit", shortName: "s01e05",
+            ValidateEpisode(s1E5, id: 1515544, title: "Charlie Tries to Prove Therapy is Legit",
+                originalTitle: "Charlie Tries to Prove Therapy is Legit", shortName: "s01e05",
                 image: "https://media.myshows.me/episodes/normal/6/44/644fbc577091c796fb428a1b274c169b.jpg",
-                airDateUtc: new DateTime(2012, 7, 20, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 7, 20, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 10
 
-            var s1E10 = season1.Episodes.First(e => e.EpisodeNumber == 10);
+            var s1E10 = season1.Episodes.First(e => e.Index == 10);
 
-            ValidateEpisode(s1E10, id: 1515549, title: "Charlie Gets Romantic", shortName: "s01e10",
+            ValidateEpisode(s1E10, id: 1515549, title: "Charlie Gets Romantic", originalTitle: "Charlie Gets Romantic",
+                shortName: "s01e10",
                 image: "https://media.myshows.me/episodes/normal/8/aa/8aa9a6917e6bb7fa8389ccb720881bba.jpg",
-                airDateUtc: new DateTime(2012, 8, 24, 2, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2012, 8, 24, 2, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1414,31 +1400,32 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s2E1 = season2.Episodes.First(e => e.EpisodeNumber == 1);
+            var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s2E1, id: 1579536, title: "Charlie Loses It at a Baby Shower", shortName: "s02e01",
+            ValidateEpisode(s2E1, id: 1579536, title: "Charlie Loses It at a Baby Shower",
+                originalTitle: "Charlie Loses It at a Baby Shower", shortName: "s02e01",
                 image: "https://media.myshows.me/episodes/normal/b/4e/b4ebede2195719823f18395ba56ed645.jpg",
-                airDateUtc: new DateTime(2013, 1, 18, 3, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2013, 1, 18, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 45
 
-            var s2E45 = season2.Episodes.First(e => e.EpisodeNumber == 45);
+            var s2E45 = season2.Episodes.First(e => e.Index == 45);
 
-            ValidateEpisode(s2E45, id: 1979110, title: "Charlie and Lacey Shack Up", shortName: "s02e45",
-                image: "-1",
-                airDateUtc: new DateTime(2013, 12, 13, 2, 30, 0, DateTimeKind.Utc));
+            ValidateEpisode(s2E45, id: 1979110, title: "Charlie and Lacey Shack Up",
+                originalTitle: "Charlie and Lacey Shack Up", shortName: "s02e45",
+                dateReleasedOrigianl: new DateTime(2013, 12, 13, 2, 30, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 90
 
-            var s2E90 = season2.Episodes.First(e => e.EpisodeNumber == 90);
+            var s2E90 = season2.Episodes.First(e => e.Index == 90);
 
-            ValidateEpisode(s2E90, id: 2459243, title: "Charlie and the 100th Episode", shortName: "s02e90",
-                image: "-1",
-                airDateUtc: new DateTime(2014, 12, 23, 3, 0, 0, DateTimeKind.Utc));
+            ValidateEpisode(s2E90, id: 2459243, title: "Charlie and the 100th Episode",
+                originalTitle: "Charlie and the 100th Episode", shortName: "s02e90",
+                dateReleasedOrigianl: new DateTime(2014, 12, 23, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1547,7 +1534,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             Assert.Equal("JP", model.Country, true);
 
-            Assert.Equal("https://media.myshows.me/shows/normal/1/1b/1ba31529a26258159a5f2b6de7351a65.jpg", model.Image,
+            Assert.Equal("https://media.myshows.me/shows/normal/1/1b/1ba31529a26258159a5f2b6de7351a65.jpg",
+                model.ImageUri,
                 true);
 
             Assert.True(model.Year.HasValue);
@@ -1606,31 +1594,34 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Episode 1
 
-            var s1E1 = season1.Episodes.First(e => e.EpisodeNumber == 1);
+            var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            ValidateEpisode(s1E1, id: 1021681, title: "Prologue of the Beginning and the End", shortName: "s01e01",
+            ValidateEpisode(s1E1, id: 1021681, title: "Prologue of the Beginning and the End",
+                originalTitle: "Prologue of the Beginning and the End", shortName: "s01e01",
                 image: "https://media.myshows.me/episodes/normal/9/79/979790b845c14f22cbf65676b35def02.jpg",
-                airDateUtc: new DateTime(2011, 4, 6, 3, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2011, 4, 6, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 12
 
-            var s1E12 = season1.Episodes.First(e => e.EpisodeNumber == 12);
+            var s1E12 = season1.Episodes.First(e => e.Index == 12);
 
-            ValidateEpisode(s1E12, id: 1100177, title: "Dogma of Static Limit", shortName: "s01e12",
+            ValidateEpisode(s1E12, id: 1100177, title: "Dogma of Static Limit", originalTitle: "Dogma of Static Limit",
+                shortName: "s01e12",
                 image: "https://media.myshows.me/episodes/normal/4/7c/47cc636b76ca10d8507418f4557034d7.jpg",
-                airDateUtc: new DateTime(2011, 6, 22, 3, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2011, 6, 22, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #region Episode 24
 
-            var s1E24 = season1.Episodes.First(e => e.EpisodeNumber == 24);
+            var s1E24 = season1.Episodes.First(e => e.Index == 24);
 
-            ValidateEpisode(s1E24, id: 1197405, title: "The Prologue Begins With the End", shortName: "s01e24",
+            ValidateEpisode(s1E24, id: 1197405, title: "The Prologue Begins With the End",
+                originalTitle: "The Prologue Begins With the End", shortName: "s01e24",
                 image: "https://media.myshows.me/episodes/normal/7/e3/7e33df48114661a3cd9f22388e23c104.jpg",
-                airDateUtc: new DateTime(2011, 9, 14, 3, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2011, 9, 14, 3, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1639,57 +1630,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var s1S4 = season1.Specials.First(e => e.ShortName == "s01 special-4");
 
             ValidateEpisode(s1S4, id: 2608194, title: "Soumei Eichi no Cognitive Computing Episode 4: Meeting Chapter",
+                originalTitle: "Soumei Eichi no Cognitive Computing Episode 4: Meeting Chapter",
                 shortName: "s01 special-4",
                 image: "https://media.myshows.me/episodes/normal/3/6b/36bec630c22324fe32c735d9a6f9c2ea.jpg",
-                airDateUtc: new DateTime(2014, 10, 22, 4, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2014, 10, 22, 4, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
             #endregion
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static void ValidateSeason(TvShowSeasonDataExtractionModel season,
-            int? episodesCount = null, int? specialsCount = null)
-        {
-            if (episodesCount.HasValue)
-            {
-                Assert.NotNull(season.Episodes);
-                Assert.Equal(episodesCount.Value, season.Episodes.Count);
-            }
-            else
-            {
-                Assert.Empty(season.Episodes);
-            }
-
-            if (specialsCount.HasValue)
-            {
-                Assert.NotNull(season.Specials);
-                Assert.Equal(specialsCount.Value, season.Specials.Count);
-            }
-            else
-            {
-                Assert.Empty(season.Specials);
-            }
-        }
-
-        private static void ValidateEpisode(TvShowEpisodeDataExtractionModel episode, int id, string title,
-            string shortName, string image, DateTime airDateUtc)
-        {
-            Assert.Equal(id, episode.Id);
-
-            Assert.Equal(new List<string> {title}, episode.Titles);
-            Assert.Equal(shortName, episode.ShortName, true);
-
-            if (image != "-1")
-                Assert.Equal(image, episode.Image, true);
-            else
-                Assert.Empty(episode.Image);
-
-            Assert.Equal(new DateTimeOffset(airDateUtc), episode.AirDate);
         }
 
         #endregion

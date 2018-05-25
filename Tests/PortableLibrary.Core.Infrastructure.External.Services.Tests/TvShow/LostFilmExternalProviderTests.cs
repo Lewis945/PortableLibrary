@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PortableLibrary.Core.External.Services.TvShow.Models;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 {
-    public class LostFilmExternalProviderTests
+    public class LostFilmExternalProviderTests : TvShowExternalProviderTestsBase
     {
         #region Fields
 
@@ -37,22 +39,13 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Tv Show
 
-            Assert.Equal("static.lostfilm.tv/Images/293/Posters/poster.jpg",
-                model.ImageUri, true);
-
-            Assert.Equal("Холистическое детективное агентство Дирка Джентли", model.Title, true);
-            Assert.Equal("Dirk Gently's Holistic Detective Agency", model.OriginalTitle, true);
-
-            Assert.True(model.IsComplete);
-
-            Assert.Collection(model.Genres,
-                item => Assert.Equal("Комедия", item, true),
-                item => Assert.Equal("Мистика", item, true),
-                item => Assert.Equal("Фантастика", item, true),
-                item => Assert.Equal("Детектив", item, true)
-            );
-
-            string modelDescription = Regex.Replace(model.Description, @"\t|\n|\r|\s", string.Empty);
+            var genres = new List<string>
+            {
+                "Комедия",
+                "Мистика",
+                "Фантастика",
+                "Детектив"
+            };
 
             string testDescription =
                 "Жестоко растерзанные трупы, устрашающего вида бугаи-наемники, спятившая девица с мачете, " +
@@ -89,30 +82,26 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             testDescription = Regex.Replace(testDescription, @"\t|\n|\r|\s", string.Empty);
 
-            Assert.Equal(testDescription, modelDescription, true);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(2, model.Seasons.Count);
+            ValidateTvShow(model, title: "Холистическое детективное агентство Дирка Джентли",
+                originalTitle: "Dirk Gently's Holistic Detective Agency",
+                imageUri: "static.lostfilm.tv/Images/293/Posters/poster.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: genres, description: testDescription, seasonsCount: 2);
 
             #endregion
 
             #region Season 1
 
             var season1 = model.Seasons.First(s => s.Index == 1);
-            Assert.Equal(8, season1.TotalEpisodesCount);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(8, season1.Episodes.Count);
+            ValidateSeason(season1, 8);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Горизонты", s1E1.Title, true);
-            Assert.Equal("Horizons", s1E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 11, 03), s1E1.DateReleased);
-            Assert.Equal(new DateTime(2016, 10, 22), s1E1.DateOriginalReleased);
+            ValidateEpisode(s1E1, title: "Горизонты", originalTitle: "Horizons",
+                dateReleased: new DateTime(2016, 11, 3, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 10, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -120,11 +109,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E2 = season1.Episodes.First(e => e.Index == 2);
 
-            Assert.Equal("Бюро находок", s1E2.Title, true);
-            Assert.Equal("Lost and Found", s1E2.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 11, 6), s1E2.DateReleased);
-            Assert.Equal(new DateTime(2016, 10, 29), s1E2.DateOriginalReleased);
+            ValidateEpisode(s1E2, title: "Бюро находок", originalTitle: "Lost and Found",
+                dateReleased: new DateTime(2016, 11, 6, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 10, 29, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -132,11 +119,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E3 = season1.Episodes.First(e => e.Index == 3);
 
-            Assert.Equal("Сумасшедшие фанаты стен", s1E3.Title, true);
-            Assert.Equal("Rogue Wall Enthusiasts", s1E3.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 11, 8), s1E3.DateReleased);
-            Assert.Equal(new DateTime(2016, 11, 5), s1E3.DateOriginalReleased);
+            ValidateEpisode(s1E3, title: "Сумасшедшие фанаты стен", originalTitle: "Rogue Wall Enthusiasts",
+                dateReleased: new DateTime(2016, 11, 8, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 11, 5, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -144,11 +129,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E4 = season1.Episodes.First(e => e.Index == 4);
 
-            Assert.Equal("Уоткин", s1E4.Title, true);
-            Assert.Equal("Watkin", s1E4.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 11, 15), s1E4.DateReleased);
-            Assert.Equal(new DateTime(2016, 11, 12), s1E4.DateOriginalReleased);
+            ValidateEpisode(s1E4, title: "Уоткин", originalTitle: "Watkin",
+                dateReleased: new DateTime(2016, 11, 15, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 11, 12, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -156,11 +139,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E5 = season1.Episodes.First(e => e.Index == 5);
 
-            Assert.Equal("Очень эректус", s1E5.Title, true);
-            Assert.Equal("Very Erectus", s1E5.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 11, 22), s1E5.DateReleased);
-            Assert.Equal(new DateTime(2016, 11, 19), s1E5.DateOriginalReleased);
+            ValidateEpisode(s1E5, title: "Очень эректус", originalTitle: "Very Erectus",
+                dateReleased: new DateTime(2016, 11, 22, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 11, 19, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -168,11 +149,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E6 = season1.Episodes.First(e => e.Index == 6);
 
-            Assert.Equal("Мы всё исправим", s1E6.Title, true);
-            Assert.Equal("Fix Everything", s1E6.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 11, 29), s1E6.DateReleased);
-            Assert.Equal(new DateTime(2016, 11, 26), s1E6.DateOriginalReleased);
+            ValidateEpisode(s1E6, title: "Мы всё исправим", originalTitle: "Fix Everything",
+                dateReleased: new DateTime(2016, 11, 29, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 11, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -180,11 +159,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E7 = season1.Episodes.First(e => e.Index == 7);
 
-            Assert.Equal("Взрывоопасный дух", s1E7.Title, true);
-            Assert.Equal("Weaponized Soul", s1E7.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 12, 7), s1E7.DateReleased);
-            Assert.Equal(new DateTime(2016, 12, 3), s1E7.DateOriginalReleased);
+            ValidateEpisode(s1E7, title: "Взрывоопасный дух", originalTitle: "Weaponized Soul",
+                dateReleased: new DateTime(2016, 12, 7, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 12, 3, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -192,11 +169,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E8 = season1.Episodes.First(e => e.Index == 8);
 
-            Assert.Equal("Два вменяемых парня, занимающиеся нормальными вещами", s1E8.Title, true);
-            Assert.Equal("Two Sane Guys Doing Normal Things", s1E8.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2016, 12, 13), s1E8.DateReleased);
-            Assert.Equal(new DateTime(2016, 12, 10), s1E8.DateOriginalReleased);
+            ValidateEpisode(s1E8, title: "Два вменяемых парня, занимающиеся нормальными вещами",
+                originalTitle: "Two Sane Guys Doing Normal Things",
+                dateReleased: new DateTime(2016, 12, 13, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2016, 12, 10, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -205,20 +181,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 2
 
             var season2 = model.Seasons.First(s => s.Index == 2);
-            Assert.Equal(10, season2.TotalEpisodesCount);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(10, season2.Episodes.Count);
+            ValidateSeason(season2, 10);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Кролик из космоса", s2E1.Title, true);
-            Assert.Equal("Space Rabbit", s2E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 10, 16), s2E1.DateReleased);
-            Assert.Equal(new DateTime(2017, 10, 14), s2E1.DateOriginalReleased);
+            ValidateEpisode(s2E1, title: "Кролик из космоса", originalTitle: "Space Rabbit",
+                dateReleased: new DateTime(2017, 10, 16, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 10, 14, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -226,11 +198,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E2 = season2.Episodes.First(e => e.Index == 2);
 
-            Assert.Equal("Фанаты мокрых кругов", s2E2.Title, true);
-            Assert.Equal("Fans of Wet Circles", s2E2.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 10, 23), s2E2.DateReleased);
-            Assert.Equal(new DateTime(2017, 10, 21), s2E2.DateOriginalReleased);
+            ValidateEpisode(s2E2, title: "Фанаты мокрых кругов", originalTitle: "Fans of Wet Circles",
+                dateReleased: new DateTime(2017, 10, 23, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 10, 21, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -238,11 +208,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E3 = season2.Episodes.First(e => e.Index == 3);
 
-            Assert.Equal("Два сломанных пальца", s2E3.Title, true);
-            Assert.Equal("Two Broken Fingers", s2E3.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 10, 30), s2E3.DateReleased);
-            Assert.Equal(new DateTime(2017, 10, 28), s2E3.DateOriginalReleased);
+            ValidateEpisode(s2E3, title: "Два сломанных пальца", originalTitle: "Two Broken Fingers",
+                dateReleased: new DateTime(2017, 10, 30, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 10, 28, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -250,11 +218,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E4 = season2.Episodes.First(e => e.Index == 4);
 
-            Assert.Equal("Дом внутри дома", s2E4.Title, true);
-            Assert.Equal("The House Within the House", s2E4.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 11, 6), s2E4.DateReleased);
-            Assert.Equal(new DateTime(2017, 11, 4), s2E4.DateOriginalReleased);
+            ValidateEpisode(s2E4, title: "Дом внутри дома", originalTitle: "The House Within the House",
+                dateReleased: new DateTime(2017, 11, 6, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 11, 4, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -262,11 +228,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E5 = season2.Episodes.First(e => e.Index == 5);
 
-            Assert.Equal("Цветные узоры", s2E5.Title, true);
-            Assert.Equal("Shapes and Colors", s2E5.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 11, 13), s2E5.DateReleased);
-            Assert.Equal(new DateTime(2017, 11, 11), s2E5.DateOriginalReleased);
+            ValidateEpisode(s2E5, title: "Цветные узоры", originalTitle: "Shapes and Colors",
+                dateReleased: new DateTime(2017, 11, 13, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 11, 11, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -274,11 +238,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E6 = season2.Episodes.First(e => e.Index == 6);
 
-            Assert.Equal("Высокая самооценка", s2E6.Title, true);
-            Assert.Equal("Girl Power", s2E6.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 11, 20), s2E6.DateReleased);
-            Assert.Equal(new DateTime(2017, 11, 18), s2E6.DateOriginalReleased);
+            ValidateEpisode(s2E6, title: "Высокая самооценка", originalTitle: "Girl Power",
+                dateReleased: new DateTime(2017, 11, 20, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 11, 18, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -286,11 +248,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E7 = season2.Episodes.First(e => e.Index == 7);
 
-            Assert.Equal("Это не Майами", s2E7.Title, true);
-            Assert.Equal("That Is Not Miami", s2E7.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 11, 27), s2E7.DateReleased);
-            Assert.Equal(new DateTime(2017, 11, 25), s2E7.DateOriginalReleased);
+            ValidateEpisode(s2E7, title: "Это не Майами", originalTitle: "That Is Not Miami",
+                dateReleased: new DateTime(2017, 11, 27, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 11, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -298,11 +258,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E8 = season2.Episodes.First(e => e.Index == 8);
 
-            Assert.Equal("Мелкий чел, черные волосы", s2E8.Title, true);
-            Assert.Equal("Little Guy, Black Hair", s2E8.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 12, 4), s2E8.DateReleased);
-            Assert.Equal(new DateTime(2017, 12, 2), s2E8.DateOriginalReleased);
+            ValidateEpisode(s2E8, title: "Мелкий чел, черные волосы", originalTitle: "Little Guy, Black Hair",
+                dateReleased: new DateTime(2017, 12, 4, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 12, 2, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -310,11 +268,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E9 = season2.Episodes.First(e => e.Index == 9);
 
-            Assert.Equal("Проблемы — это плохо", s2E9.Title, true);
-            Assert.Equal("Trouble is Bad", s2E9.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 12, 11), s2E9.DateReleased);
-            Assert.Equal(new DateTime(2017, 12, 9), s2E9.DateOriginalReleased);
+            ValidateEpisode(s2E9, title: "Проблемы — это плохо", originalTitle: "Trouble is Bad",
+                dateReleased: new DateTime(2017, 12, 11, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 12, 9, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -322,11 +278,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E10 = season2.Episodes.First(e => e.Index == 10);
 
-            Assert.Equal("Классная куртка", s2E10.Title, true);
-            Assert.Equal("Nice Jacket", s2E10.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2017, 12, 19), s2E10.DateReleased);
-            Assert.Equal(new DateTime(2017, 12, 16), s2E10.DateOriginalReleased);
+            ValidateEpisode(s2E10, title: "Классная куртка", originalTitle: "Nice Jacket",
+                dateReleased: new DateTime(2017, 12, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2017, 12, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -342,19 +296,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Tv Show
 
-            Assert.Equal("static.lostfilm.tv/Images/172/Posters/poster.jpg",
-                model.ImageUri, true);
-
-            Assert.Equal("Управление гневом", model.Title, true);
-            Assert.Equal("Anger Management", model.OriginalTitle, true);
-
-            Assert.True(model.IsComplete);
-
-            Assert.Collection(model.Genres,
-                item => Assert.Equal("Комедия", item, true)
-            );
-
-            string modelDescription = Regex.Replace(model.Description, @"\t|\n|\r|\s", string.Empty);
+            var genres = new List<string>
+            {
+                "Комедия",
+            };
 
             string testDescription = "Чарли, перед возвращением в стан своей бейсбольной команды прошел курс " +
                                      "управления гневом, прежде чем доказать себе и окружающим, что он настоящий лидер команды. " +
@@ -366,30 +311,26 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             testDescription = Regex.Replace(testDescription, @"\t|\n|\r|\s", string.Empty);
 
-            Assert.Equal(testDescription, modelDescription, true);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(2, model.Seasons.Count);
+            ValidateTvShow(model, title: "Управление гневом",
+                originalTitle: "Anger Management",
+                imageUri: "static.lostfilm.tv/Images/172/Posters/poster.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: genres, description: testDescription, seasonsCount: 2);
 
             #endregion
 
             #region Season 1
 
             var season1 = model.Seasons.First(s => s.Index == 1);
-            Assert.Equal(10, season1.TotalEpisodesCount);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(10, season1.Episodes.Count);
+            ValidateSeason(season1, 10);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Чарли снова проходит терапию", s1E1.Title, true);
-            Assert.Equal("Charlie Goes Back to Therapy", s1E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2012, 7, 2), s1E1.DateReleased);
-            Assert.Equal(new DateTime(2012, 6, 28), s1E1.DateOriginalReleased);
+            ValidateEpisode(s1E1, title: "Чарли снова проходит терапию", originalTitle: "Charlie Goes Back to Therapy",
+                dateReleased: new DateTime(2012, 7, 2, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2012, 6, 28, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -397,11 +338,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E5 = season1.Episodes.First(e => e.Index == 5);
 
-            Assert.Equal("Чарли доказывает, что терапия — штука честная", s1E5.Title, true);
-            Assert.Equal("Charlie Tries to Prove Therapy Is Legit", s1E5.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2012, 7, 22), s1E5.DateReleased);
-            Assert.Equal(new DateTime(2012, 7, 19), s1E5.DateOriginalReleased);
+            ValidateEpisode(s1E5, title: "Чарли доказывает, что терапия — штука честная",
+                originalTitle: "Charlie Tries to Prove Therapy Is Legit",
+                dateReleased: new DateTime(2012, 7, 22, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2012, 7, 19, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -409,11 +349,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E10 = season1.Episodes.First(e => e.Index == 10);
 
-            Assert.Equal("Чарли потянуло на романтику", s1E10.Title, true);
-            Assert.Equal("Charlie Gets Romantic", s1E10.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2012, 8, 25), s1E10.DateReleased);
-            Assert.Equal(new DateTime(2012, 8, 23), s1E10.DateOriginalReleased);
+            ValidateEpisode(s1E10, title: "Чарли потянуло на романтику", originalTitle: "Charlie Gets Romantic",
+                dateReleased: new DateTime(2012, 8, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2012, 8, 23, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -422,20 +360,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 2
 
             var season2 = model.Seasons.First(s => s.Index == 2);
-            Assert.Equal(90, season2.TotalEpisodesCount);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(90, season2.Episodes.Count);
+            ValidateSeason(season2, 90);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Как Чарли психанул на предрожденчике", s2E1.Title, true);
-            Assert.Equal("Charlie Loses it at a Baby Shower", s2E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2013, 1, 21), s2E1.DateReleased);
-            Assert.Equal(new DateTime(2013, 1, 17), s2E1.DateOriginalReleased);
+            ValidateEpisode(s2E1, title: "Как Чарли психанул на предрожденчике",
+                originalTitle: "Charlie Loses it at a Baby Shower",
+                dateReleased: new DateTime(2013, 1, 21, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2013, 1, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -443,11 +378,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E50 = season2.Episodes.First(e => e.Index == 50);
 
-            Assert.Equal("Чарли и Шон соревнуются из-за девушки", s2E50.Title, true);
-            Assert.Equal("Charlie and Sean Fight Over a Girl", s2E50.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2014, 3, 4), s2E50.DateReleased);
-            Assert.Equal(new DateTime(2014, 2, 27), s2E50.DateOriginalReleased);
+            ValidateEpisode(s2E50, title: "Чарли и Шон соревнуются из-за девушки",
+                originalTitle: "Charlie and Sean Fight Over a Girl",
+                dateReleased: new DateTime(2014, 3, 4, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2014, 2, 27, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -455,11 +389,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E90 = season2.Episodes.First(e => e.Index == 90);
 
-            Assert.Equal("Чарли и сотая серия", s2E90.Title, true);
-            Assert.Equal("Charlie & the 100th Episode", s2E90.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2015, 1, 19), s2E90.DateReleased);
-            Assert.Equal(new DateTime(2014, 12, 22), s2E90.DateOriginalReleased);
+            ValidateEpisode(s2E90, title: "Чарли и сотая серия", originalTitle: "Charlie & the 100th Episode",
+                dateReleased: new DateTime(2015, 1, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2014, 12, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -475,20 +407,11 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Tv Show
 
-            Assert.Equal("static.lostfilm.tv/Images/72/Posters/poster.jpg",
-                model.ImageUri, true);
-
-            Assert.Equal("Друзья", model.Title, true);
-            Assert.Equal("Friends", model.OriginalTitle, true);
-
-            Assert.True(model.IsComplete);
-
-            Assert.Collection(model.Genres,
-                item => Assert.Equal("Комедия", item, true),
-                item => Assert.Equal("Семейный", item, true)
-            );
-
-            string modelDescription = Regex.Replace(model.Description, @"\t|\n|\r|\s", string.Empty);
+            var genres = new List<string>
+            {
+                "Комедия",
+                "Семейный"
+            };
 
             string testDescription = "«Друзья» — это ситком, который с середины 90-х и на долгие годы задал " +
                                      "тон всем комедийным телешоу о том, как в одной компании могут уживаться, дружить, любить, " +
@@ -527,30 +450,27 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             testDescription = Regex.Replace(testDescription, @"\t|\n|\r|\s", string.Empty);
 
-            Assert.Equal(testDescription, modelDescription, true);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(10, model.Seasons.Count);
+            ValidateTvShow(model, title: "Друзья",
+                originalTitle: "Friends",
+                imageUri: "static.lostfilm.tv/Images/72/Posters/poster.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: genres, description: testDescription, seasonsCount: 10);
 
             #endregion
 
             #region Season 1
 
             var season1 = model.Seasons.First(s => s.Index == 1);
-            Assert.Equal(24, season1.TotalEpisodesCount);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(24, season1.Episodes.Count);
+            ValidateSeason(season1, 24);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия, где Моника берет новую соседку", s1E1.Title, true);
-            Assert.Equal("The One Where Monica Gets A Roommate", s1E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 14), s1E1.DateReleased);
-            Assert.Equal(new DateTime(1994, 9, 22), s1E1.DateOriginalReleased);
+            ValidateEpisode(s1E1, title: "Серия, где Моника берет новую соседку",
+                originalTitle: "The One Where Monica Gets A Roommate",
+                dateReleased: new DateTime(2006, 12, 14, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1994, 9, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -558,11 +478,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E12 = season1.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия с дюжиной лазаний", s1E12.Title, true);
-            Assert.Equal("The One With The Dozen Lasagnas", s1E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 14), s1E12.DateReleased);
-            Assert.Equal(new DateTime(1995, 1, 12), s1E12.DateOriginalReleased);
+            ValidateEpisode(s1E12, title: "Серия с дюжиной лазаний", originalTitle: "The One With The Dozen Lasagnas",
+                dateReleased: new DateTime(2006, 12, 14, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1995, 1, 12, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -570,11 +488,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E24 = season1.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия, где Рейчел понимает", s1E24.Title, true);
-            Assert.Equal("The One Where Rachel Finds Out", s1E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 14), s1E24.DateReleased);
-            Assert.Equal(new DateTime(1995, 5, 18), s1E24.DateOriginalReleased);
+            ValidateEpisode(s1E24, title: "Серия, где Рейчел понимает", originalTitle: "The One Where Rachel Finds Out",
+                dateReleased: new DateTime(2006, 12, 14, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1995, 5, 18, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -583,20 +499,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 2
 
             var season2 = model.Seasons.First(s => s.Index == 2);
-            Assert.Equal(24, season2.TotalEpisodesCount);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(24, season2.Episodes.Count);
+            ValidateSeason(season2, 24);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия с новой подругой Росса", s2E1.Title, true);
-            Assert.Equal("The One With Ross's New Girlfriend", s2E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 15), s2E1.DateReleased);
-            Assert.Equal(new DateTime(1995, 9, 21), s2E1.DateOriginalReleased);
+            ValidateEpisode(s2E1, title: "Серия с новой подругой Росса",
+                originalTitle: "The One With Ross's New Girlfriend",
+                dateReleased: new DateTime(2006, 12, 15, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1995, 9, 21, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -604,11 +517,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E12 = season2.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия после Суперкубка. Часть 1", s2E12.Title, true);
-            Assert.Equal("The One After The Super Bowl (1)", s2E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 15), s2E12.DateReleased);
-            Assert.Equal(new DateTime(1996, 1, 28), s2E12.DateOriginalReleased);
+            ValidateEpisode(s2E12, title: "Серия после Суперкубка. Часть 1",
+                originalTitle: "The One After The Super Bowl (1)",
+                dateReleased: new DateTime(2006, 12, 15, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1996, 1, 28, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -616,11 +528,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E24 = season2.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия со свадьбой Барри и Минди", s2E24.Title, true);
-            Assert.Equal("The One With Barry And Mindy's Wedding", s2E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 15), s2E24.DateReleased);
-            Assert.Equal(new DateTime(1996, 5, 16), s2E24.DateOriginalReleased);
+            ValidateEpisode(s2E24, title: "Серия со свадьбой Барри и Минди",
+                originalTitle: "The One With Barry And Mindy's Wedding",
+                dateReleased: new DateTime(2006, 12, 15, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1996, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -629,20 +540,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 3
 
             var season3 = model.Seasons.First(s => s.Index == 3);
-            Assert.Equal(25, season3.TotalEpisodesCount);
 
-            Assert.NotNull(season3.Episodes);
-            Assert.Equal(25, season3.Episodes.Count);
+            ValidateSeason(season3, 25);
 
             #region Episode 1
 
             var s3E1 = season3.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия с фантазией о принцессе Лейе", s3E1.Title, true);
-            Assert.Equal("The One With The Princess Leia Fantasy", s3E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 18), s3E1.DateReleased);
-            Assert.Equal(new DateTime(1996, 9, 16), s3E1.DateOriginalReleased);
+            ValidateEpisode(s3E1, title: "Серия с фантазией о принцессе Лейе",
+                originalTitle: "The One With The Princess Leia Fantasy",
+                dateReleased: new DateTime(2006, 12, 18, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1996, 9, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -650,11 +558,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E12 = season3.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия с ревностью всех", s3E12.Title, true);
-            Assert.Equal("The One With All The Jealousy", s3E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 18), s3E12.DateReleased);
-            Assert.Equal(new DateTime(1997, 1, 16), s3E12.DateOriginalReleased);
+            ValidateEpisode(s3E12, title: "Серия с ревностью всех", originalTitle: "The One With All The Jealousy",
+                dateReleased: new DateTime(2006, 12, 18, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1997, 1, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -662,11 +568,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E25 = season3.Episodes.First(e => e.Index == 25);
 
-            Assert.Equal("Серия на пляже", s3E25.Title, true);
-            Assert.Equal("The One At The Beach", s3E25.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 18), s3E25.DateReleased);
-            Assert.Equal(new DateTime(1997, 5, 15), s3E25.DateOriginalReleased);
+            ValidateEpisode(s3E25, title: "Серия на пляже", originalTitle: "The One At The Beach",
+                dateReleased: new DateTime(2006, 12, 18, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1997, 5, 15, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -675,20 +579,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 4
 
             var season4 = model.Seasons.First(s => s.Index == 4);
-            Assert.Equal(24, season4.TotalEpisodesCount);
 
-            Assert.NotNull(season4.Episodes);
-            Assert.Equal(24, season4.Episodes.Count);
+            ValidateSeason(season4, 24);
 
             #region Episode 1
 
             var s4E1 = season4.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия с медузой", s4E1.Title, true);
-            Assert.Equal("The One With The Jellyfish", s4E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 19), s4E1.DateReleased);
-            Assert.Equal(new DateTime(1997, 9, 25), s4E1.DateOriginalReleased);
+            ValidateEpisode(s4E1, title: "Серия с медузой", originalTitle: "The One With The Jellyfish",
+                dateReleased: new DateTime(2006, 12, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1997, 9, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -696,11 +596,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E12 = season4.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия с эмбрионами", s4E12.Title, true);
-            Assert.Equal("The One With The Embryos", s4E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 19), s4E12.DateReleased);
-            Assert.Equal(new DateTime(1998, 1, 15), s4E12.DateOriginalReleased);
+            ValidateEpisode(s4E12, title: "Серия с эмбрионами", originalTitle: "The One With The Embryos",
+                dateReleased: new DateTime(2006, 12, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1998, 1, 15, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -708,11 +606,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E24 = season4.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия со свадьбой Росса. Часть 2", s4E24.Title, true);
-            Assert.Equal("The One With Ross's Wedding (2)", s4E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 19), s4E24.DateReleased);
-            Assert.Equal(new DateTime(1998, 5, 7), s4E24.DateOriginalReleased);
+            ValidateEpisode(s4E24, title: "Серия со свадьбой Росса. Часть 2",
+                originalTitle: "The One With Ross's Wedding (2)",
+                dateReleased: new DateTime(2006, 12, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1998, 5, 7, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -721,20 +618,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 5
 
             var season5 = model.Seasons.First(s => s.Index == 5);
-            Assert.Equal(24, season5.TotalEpisodesCount);
 
-            Assert.NotNull(season5.Episodes);
-            Assert.Equal(24, season5.Episodes.Count);
+            ValidateSeason(season5, 24);
 
             #region Episode 1
 
             var s5E1 = season5.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия после того, как Росс назвал имя Рэйчел", s5E1.Title, true);
-            Assert.Equal("The One After Ross Says Rachel", s5E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 22), s5E1.DateReleased);
-            Assert.Equal(new DateTime(1998, 9, 24), s5E1.DateOriginalReleased);
+            ValidateEpisode(s5E1, title: "Серия после того, как Росс назвал имя Рэйчел",
+                originalTitle: "The One After Ross Says Rachel",
+                dateReleased: new DateTime(2006, 12, 22, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1998, 9, 24, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -742,11 +636,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E12 = season5.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия с рабочим смехом Чендлера", s5E12.Title, true);
-            Assert.Equal("The One With Chandler's Work Laugh", s5E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 22), s5E12.DateReleased);
-            Assert.Equal(new DateTime(1999, 1, 21), s5E12.DateOriginalReleased);
+            ValidateEpisode(s5E12, title: "Серия с рабочим смехом Чендлера",
+                originalTitle: "The One With Chandler's Work Laugh",
+                dateReleased: new DateTime(2006, 12, 22, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1999, 1, 21, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -754,11 +647,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E24 = season5.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия в Вегасе. Часть 2", s5E24.Title, true);
-            Assert.Equal("The One In Vegas (2)", s5E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 22), s5E24.DateReleased);
-            Assert.Equal(new DateTime(1999, 5, 20), s5E24.DateOriginalReleased);
+            ValidateEpisode(s5E24, title: "Серия в Вегасе. Часть 2", originalTitle: "The One In Vegas (2)",
+                dateReleased: new DateTime(2006, 12, 22, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1999, 5, 20, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -767,20 +658,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 6
 
             var season6 = model.Seasons.First(s => s.Index == 6);
-            Assert.Equal(25, season6.TotalEpisodesCount);
 
-            Assert.NotNull(season6.Episodes);
-            Assert.Equal(25, season6.Episodes.Count);
+            ValidateSeason(season6, 25);
 
             #region Episode 1
 
             var s6E1 = season6.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия после Вегаса", s6E1.Title, true);
-            Assert.Equal("The One After Vegas", s6E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 25), s6E1.DateReleased);
-            Assert.Equal(new DateTime(1999, 9, 23), s6E1.DateOriginalReleased);
+            ValidateEpisode(s6E1, title: "Серия после Вегаса", originalTitle: "The One After Vegas",
+                dateReleased: new DateTime(2006, 12, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(1999, 9, 23, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -788,11 +675,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E12 = season6.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия c шуткой", s6E12.Title, true);
-            Assert.Equal("The One With The Joke", s6E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 25), s6E12.DateReleased);
-            Assert.Equal(new DateTime(2000, 1, 13), s6E12.DateOriginalReleased);
+            ValidateEpisode(s6E12, title: "Серия c шуткой", originalTitle: "The One With The Joke",
+                dateReleased: new DateTime(2006, 12, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2000, 1, 13, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -800,11 +685,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E25 = season6.Episodes.First(e => e.Index == 25);
 
-            Assert.Equal("Серия с предложением. Часть 2", s6E25.Title, true);
-            Assert.Equal("The One With The Proposal (2)", s6E25.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 25), s6E25.DateReleased);
-            Assert.Equal(new DateTime(2000, 5, 18), s6E25.DateOriginalReleased);
+            ValidateEpisode(s6E25, title: "Серия с предложением. Часть 2",
+                originalTitle: "The One With The Proposal (2)",
+                dateReleased: new DateTime(2006, 12, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2000, 5, 18, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -813,20 +697,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 7
 
             var season7 = model.Seasons.First(s => s.Index == 7);
-            Assert.Equal(24, season7.TotalEpisodesCount);
 
-            Assert.NotNull(season7.Episodes);
-            Assert.Equal(24, season7.Episodes.Count);
+            ValidateSeason(season7, 24);
 
             #region Episode 1
 
             var s7E1 = season7.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия с вечеринкой Моники", s7E1.Title, true);
-            Assert.Equal("The One With Monica's Thunder", s7E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 27), s7E1.DateReleased);
-            Assert.Equal(new DateTime(2000, 10, 12), s7E1.DateOriginalReleased);
+            ValidateEpisode(s7E1, title: "Серия с вечеринкой Моники", originalTitle: "The One With Monica's Thunder",
+                dateReleased: new DateTime(2006, 12, 27, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2000, 10, 12, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -834,11 +714,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s7E12 = season7.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия, в которой никто не спит", s7E12.Title, true);
-            Assert.Equal("The One Where They're Up All Night", s7E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 27), s7E12.DateReleased);
-            Assert.Equal(new DateTime(2001, 1, 11), s7E12.DateOriginalReleased);
+            ValidateEpisode(s7E12, title: "Серия, в которой никто не спит",
+                originalTitle: "The One Where They're Up All Night",
+                dateReleased: new DateTime(2006, 12, 27, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2001, 1, 11, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -846,11 +725,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s7E24 = season7.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия со свадьбой Моники и Чендлера. Часть 2", s7E24.Title, true);
-            Assert.Equal("The One With Chandler And Monica's Wedding (2)", s7E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2006, 12, 27), s7E24.DateReleased);
-            Assert.Equal(new DateTime(2001, 5, 17), s7E24.DateOriginalReleased);
+            ValidateEpisode(s7E24, title: "Серия со свадьбой Моники и Чендлера. Часть 2",
+                originalTitle: "The One With Chandler And Monica's Wedding (2)",
+                dateReleased: new DateTime(2006, 12, 27, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2001, 5, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -859,20 +737,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 8
 
             var season8 = model.Seasons.First(s => s.Index == 8);
-            Assert.Equal(24, season8.TotalEpisodesCount);
 
-            Assert.NotNull(season8.Episodes);
-            Assert.Equal(24, season8.Episodes.Count);
+            ValidateSeason(season8, 24);
 
             #region Episode 1
 
             var s8E1 = season8.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия после слов «Я согласен»", s8E1.Title, true);
-            Assert.Equal("The One After I Do", s8E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 3), s8E1.DateReleased);
-            Assert.Equal(new DateTime(2001, 9, 27), s8E1.DateOriginalReleased);
+            ValidateEpisode(s8E1, title: "Серия после слов «Я согласен»", originalTitle: "The One After I Do",
+                dateReleased: new DateTime(2007, 1, 3, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2001, 9, 27, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -880,11 +754,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s8E12 = season8.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия, в которой Джо идет на свидание с Рэйчел", s8E12.Title, true);
-            Assert.Equal("The One Where Joey Dates Rachel", s8E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 3), s8E12.DateReleased);
-            Assert.Equal(new DateTime(2002, 1, 10), s8E12.DateOriginalReleased);
+            ValidateEpisode(s8E12, title: "Серия, в которой Джо идет на свидание с Рэйчел",
+                originalTitle: "The One Where Joey Dates Rachel",
+                dateReleased: new DateTime(2007, 1, 3, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2002, 1, 10, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -892,11 +765,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s8E24 = season8.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия, в которой рождается ребёнок. Часть 2", s8E24.Title, true);
-            Assert.Equal("The One Where Rachel Has A Baby (2)", s8E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 3), s8E24.DateReleased);
-            Assert.Equal(new DateTime(2002, 5, 16), s8E24.DateOriginalReleased);
+            ValidateEpisode(s8E24, title: "Серия, в которой рождается ребёнок. Часть 2",
+                originalTitle: "The One Where Rachel Has A Baby (2)",
+                dateReleased: new DateTime(2007, 1, 3, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2002, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -905,20 +777,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 9
 
             var season9 = model.Seasons.First(s => s.Index == 9);
-            Assert.Equal(24, season9.TotalEpisodesCount);
 
-            Assert.NotNull(season9.Episodes);
-            Assert.Equal(24, season9.Episodes.Count);
+            ValidateSeason(season9, 24);
 
             #region Episode 1
 
             var s9E1 = season9.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия, в которой никто не делает предложения", s9E1.Title, true);
-            Assert.Equal("The One Where No One Proposes", s9E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 8), s9E1.DateReleased);
-            Assert.Equal(new DateTime(2002, 9, 26), s9E1.DateOriginalReleased);
+            ValidateEpisode(s9E1, title: "Серия, в которой никто не делает предложения",
+                originalTitle: "The One Where No One Proposes",
+                dateReleased: new DateTime(2007, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2002, 9, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -926,11 +795,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s9E12 = season9.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Серия с крысами Фиби", s9E12.Title, true);
-            Assert.Equal("The One With Phoebe's Rats", s9E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 8), s9E12.DateReleased);
-            Assert.Equal(new DateTime(2003, 1, 16), s9E12.DateOriginalReleased);
+            ValidateEpisode(s9E12, title: "Серия с крысами Фиби", originalTitle: "The One With Phoebe's Rats",
+                dateReleased: new DateTime(2007, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2003, 1, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -938,11 +805,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s9E24 = season9.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Серия на Барбадосе. Часть 2", s9E24.Title, true);
-            Assert.Equal("The One In Barbados (2)", s9E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 8), s9E24.DateReleased);
-            Assert.Equal(new DateTime(2003, 5, 15), s9E24.DateOriginalReleased);
+            ValidateEpisode(s9E24, title: "Серия на Барбадосе. Часть 2", originalTitle: "The One In Barbados (2)",
+                dateReleased: new DateTime(2007, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2003, 5, 15, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -951,20 +816,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 10
 
             var season10 = model.Seasons.First(s => s.Index == 10);
-            Assert.Equal(18, season10.TotalEpisodesCount);
 
-            Assert.NotNull(season10.Episodes);
-            Assert.Equal(18, season10.Episodes.Count);
+            ValidateSeason(season10, 18);
 
             #region Episode 1
 
             var s10E1 = season10.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Серия после поцелуя Джо и Рейчел", s10E1.Title, true);
-            Assert.Equal("The One After Joey And Rachel Kiss", s10E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 10), s10E1.DateReleased);
-            Assert.Equal(new DateTime(2003, 9, 25), s10E1.DateOriginalReleased);
+            ValidateEpisode(s10E1, title: "Серия после поцелуя Джо и Рейчел",
+                originalTitle: "The One After Joey And Rachel Kiss",
+                dateReleased: new DateTime(2007, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2003, 9, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -972,11 +834,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s9E9 = season10.Episodes.First(e => e.Index == 9);
 
-            Assert.Equal("Серия с суррогатной матерью", s9E9.Title, true);
-            Assert.Equal("The One With The Birth Mother", s9E9.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 10), s9E9.DateReleased);
-            Assert.Equal(new DateTime(2004, 1, 8), s9E9.DateOriginalReleased);
+            ValidateEpisode(s9E9, title: "Серия с суррогатной матерью", originalTitle: "The One With The Birth Mother",
+                dateReleased: new DateTime(2007, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2004, 1, 8, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -984,11 +844,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s9E18 = season10.Episodes.First(e => e.Index == 18);
 
-            Assert.Equal("Последняя серия. Часть 2", s9E18.Title, true);
-            Assert.Equal("The Last One: Part 2", s9E18.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 1, 10), s9E18.DateReleased);
-            Assert.Equal(new DateTime(2004, 5, 5), s9E18.DateOriginalReleased);
+            ValidateEpisode(s9E18, title: "Последняя серия. Часть 2", originalTitle: "The Last One: Part 2",
+                dateReleased: new DateTime(2007, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2004, 5, 5, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1004,20 +862,11 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             #region Tv Show
 
-            Assert.Equal("static.lostfilm.tv/Images/64/Posters/poster.jpg",
-                model.ImageUri, true);
-
-            Assert.Equal("Отчаянные домохозяйки", model.Title, true);
-            Assert.Equal("Desperate Housewives", model.OriginalTitle, true);
-
-            Assert.True(model.IsComplete);
-
-            Assert.Collection(model.Genres,
-                item => Assert.Equal("Драма", item, true),
-                item => Assert.Equal("Комедия", item, true)
-            );
-
-            string modelDescription = Regex.Replace(model.Description, @"\t|\n|\r|\s", string.Empty);
+            var genres = new List<string>
+            {
+                "Драма",
+                "Комедия"
+            };
 
             string testDescription = "В центре событий — четыре современные домохозяйки, которые живут в тихом " +
                                      "пригороде и отчаянно ищут личного счастья. Сьюзан осталась одна после того, " +
@@ -1036,30 +885,26 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             testDescription = Regex.Replace(testDescription, @"\t|\n|\r|\s", string.Empty);
 
-            Assert.Equal(testDescription, modelDescription, true);
-
-            Assert.NotNull(model.Seasons);
-            Assert.Equal(8, model.Seasons.Count);
+            ValidateTvShow(model, title: "Отчаянные домохозяйки",
+                originalTitle: "Desperate Housewives",
+                imageUri: "static.lostfilm.tv/Images/64/Posters/poster.jpg",
+                status: TvShowStatus.CanceledOrEnded, genres: genres, description: testDescription, seasonsCount: 8);
 
             #endregion
 
             #region Season 1
 
             var season1 = model.Seasons.First(s => s.Index == 1);
-            Assert.Equal(23, season1.TotalEpisodesCount);
 
-            Assert.NotNull(season1.Episodes);
-            Assert.Equal(23, season1.Episodes.Count);
+            ValidateSeason(season1, 23);
 
             #region Episode 1
 
             var s1E1 = season1.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Пилотная", s1E1.Title, true);
-            Assert.Equal("Pilot", s1E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 2, 13), s1E1.DateReleased);
-            Assert.Equal(new DateTime(2004, 10, 3), s1E1.DateOriginalReleased);
+            ValidateEpisode(s1E1, title: "Пилотная", originalTitle: "Pilot",
+                dateReleased: new DateTime(2007, 2, 13, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2004, 10, 3, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1067,11 +912,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E12 = season1.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Каждый день немного смерти", s1E12.Title, true);
-            Assert.Equal("Every Day a Little Death", s1E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 3, 2), s1E12.DateReleased);
-            Assert.Equal(new DateTime(2005, 1, 16), s1E12.DateOriginalReleased);
+            ValidateEpisode(s1E12, title: "Каждый день немного смерти", originalTitle: "Every Day a Little Death",
+                dateReleased: new DateTime(2007, 3, 2, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2005, 1, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1079,11 +922,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s1E23 = season1.Episodes.First(e => e.Index == 23);
 
-            Assert.Equal("В один прекрасный день", s1E23.Title, true);
-            Assert.Equal("One Wonderful Day", s1E23.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 4, 1), s1E23.DateReleased);
-            Assert.Equal(new DateTime(2005, 5, 22), s1E23.DateOriginalReleased);
+            ValidateEpisode(s1E23, title: "В один прекрасный день", originalTitle: "One Wonderful Day",
+                dateReleased: new DateTime(2007, 4, 1, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2005, 5, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1092,20 +933,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 2
 
             var season2 = model.Seasons.First(s => s.Index == 2);
-            Assert.Equal(24, season2.TotalEpisodesCount);
 
-            Assert.NotNull(season2.Episodes);
-            Assert.Equal(24, season2.Episodes.Count);
+            ValidateSeason(season2, 24);
 
             #region Episode 1
 
             var s2E1 = season2.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Следующий", s2E1.Title, true);
-            Assert.Equal("Next", s2E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 7, 24), s2E1.DateReleased);
-            Assert.Equal(new DateTime(2005, 9, 25), s2E1.DateOriginalReleased);
+            ValidateEpisode(s2E1, title: "Следующий", originalTitle: "Next",
+                dateReleased: new DateTime(2007, 7, 24, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2005, 9, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1113,11 +950,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E12 = season2.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("У нас все будет хорошо", s2E12.Title, true);
-            Assert.Equal("We're Gonna Be All Right", s2E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 7, 29), s2E12.DateReleased);
-            Assert.Equal(new DateTime(2006, 1, 15), s2E12.DateOriginalReleased);
+            ValidateEpisode(s2E12, title: "У нас все будет хорошо", originalTitle: "We're Gonna Be All Right",
+                dateReleased: new DateTime(2007, 7, 29, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2006, 1, 15, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1125,11 +960,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s2E24 = season2.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("Помни: часть 2", s2E24.Title, true);
-            Assert.Equal("Remember: Part 2", s2E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 7, 31), s2E24.DateReleased);
-            Assert.Equal(new DateTime(2006, 5, 21), s2E24.DateOriginalReleased);
+            ValidateEpisode(s2E24, title: "Помни: часть 2", originalTitle: "Remember: Part 2",
+                dateReleased: new DateTime(2007, 7, 31, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2006, 5, 21, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1138,20 +971,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 3
 
             var season3 = model.Seasons.First(s => s.Index == 3);
-            Assert.Equal(23, season3.TotalEpisodesCount);
 
-            Assert.NotNull(season3.Episodes);
-            Assert.Equal(23, season3.Episodes.Count);
+            ValidateSeason(season3, 23);
 
             #region Episode 1
 
             var s3E1 = season3.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Слышишь, дождь стучит по крыше?", s3E1.Title, true);
-            Assert.Equal("Listen to the Rain on the Roof", s3E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 6, 7), s3E1.DateReleased);
-            Assert.Equal(new DateTime(2006, 9, 24), s3E1.DateOriginalReleased);
+            ValidateEpisode(s3E1, title: "Слышишь, дождь стучит по крыше?",
+                originalTitle: "Listen to the Rain on the Roof",
+                dateReleased: new DateTime(2007, 6, 7, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2006, 9, 24, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1159,11 +989,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E12 = season3.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Неприятное соседство", s3E12.Title, true);
-            Assert.Equal("Not While I'm Around", s3E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2007, 8, 7), s3E12.DateReleased);
-            Assert.Equal(new DateTime(2007, 1, 14), s3E12.DateOriginalReleased);
+            ValidateEpisode(s3E12, title: "Неприятное соседство", originalTitle: "Not While I'm Around",
+                dateReleased: new DateTime(2007, 8, 7, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2007, 1, 14, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1171,11 +999,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s3E23 = season3.Episodes.First(e => e.Index == 23);
 
-            Assert.Equal("Свадебная суета", s3E23.Title, true);
-            Assert.Equal("Getting Married Today", s3E23.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2008, 7, 19), s3E23.DateReleased);
-            Assert.Equal(new DateTime(2007, 5, 20), s3E23.DateOriginalReleased);
+            ValidateEpisode(s3E23, title: "Свадебная суета", originalTitle: "Getting Married Today",
+                dateReleased: new DateTime(2008, 7, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2007, 5, 20, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1184,20 +1010,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 4
 
             var season4 = model.Seasons.First(s => s.Index == 4);
-            Assert.Equal(17, season4.TotalEpisodesCount);
 
-            Assert.NotNull(season4.Episodes);
-            Assert.Equal(17, season4.Episodes.Count);
+            ValidateSeason(season4, 17);
 
             #region Episode 1
 
             var s4E1 = season4.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Теперь ты знаешь", s4E1.Title, true);
-            Assert.Equal("Now You Know", s4E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 25), s4E1.DateReleased);
-            Assert.Equal(new DateTime(2007, 9, 30), s4E1.DateOriginalReleased);
+            ValidateEpisode(s4E1, title: "Теперь ты знаешь", originalTitle: "Now You Know",
+                dateReleased: new DateTime(2009, 11, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2007, 9, 30, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1205,11 +1027,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E8 = season4.Episodes.First(e => e.Index == 8);
 
-            Assert.Equal("Далекое прошлое", s4E8.Title, true);
-            Assert.Equal("Distant Past", s4E8.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 25), s4E8.DateReleased);
-            Assert.Equal(new DateTime(2007, 11, 25), s4E8.DateOriginalReleased);
+            ValidateEpisode(s4E8, title: "Далекое прошлое", originalTitle: "Distant Past",
+                dateReleased: new DateTime(2009, 11, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2007, 11, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1217,11 +1037,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s4E17 = season4.Episodes.First(e => e.Index == 17);
 
-            Assert.Equal("Свобода", s4E17.Title, true);
-            Assert.Equal("Free", s4E17.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 25), s4E17.DateReleased);
-            Assert.Equal(new DateTime(2008, 5, 18), s4E17.DateOriginalReleased);
+            ValidateEpisode(s4E17, title: "Свобода", originalTitle: "Free",
+                dateReleased: new DateTime(2009, 11, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2008, 5, 18, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1230,20 +1048,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 5
 
             var season5 = model.Seasons.First(s => s.Index == 5);
-            Assert.Equal(24, season5.TotalEpisodesCount);
 
-            Assert.NotNull(season5.Episodes);
-            Assert.Equal(24, season5.Episodes.Count);
+            ValidateSeason(season5, 24);
 
             #region Episode 1
 
             var s5E1 = season5.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Завтра будет хорошо", s5E1.Title, true);
-            Assert.Equal("You're Gonna Love Tomorrow", s5E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 25), s5E1.DateReleased);
-            Assert.Equal(new DateTime(2008, 9, 28), s5E1.DateOriginalReleased);
+            ValidateEpisode(s5E1, title: "Завтра будет хорошо", originalTitle: "You're Gonna Love Tomorrow",
+                dateReleased: new DateTime(2009, 11, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2008, 9, 28, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1251,11 +1065,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E12 = season5.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Прием! Прием!", s5E12.Title, true);
-            Assert.Equal("Connect! Connect!", s5E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 25), s5E12.DateReleased);
-            Assert.Equal(new DateTime(2009, 1, 11), s5E12.DateOriginalReleased);
+            ValidateEpisode(s5E12, title: "Прием! Прием!", originalTitle: "Connect! Connect!",
+                dateReleased: new DateTime(2009, 11, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2009, 1, 11, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1263,11 +1075,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s5E24 = season5.Episodes.First(e => e.Index == 24);
 
-            Assert.Equal("В плену иллюзий", s5E24.Title, true);
-            Assert.Equal("If It's Only in Your Head", s5E24.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 25), s5E24.DateReleased);
-            Assert.Equal(new DateTime(2009, 5, 17), s5E24.DateOriginalReleased);
+            ValidateEpisode(s5E24, title: "В плену иллюзий", originalTitle: "If It's Only in Your Head",
+                dateReleased: new DateTime(2009, 11, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2009, 5, 17, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1276,20 +1086,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 6
 
             var season6 = model.Seasons.First(s => s.Index == 6);
-            Assert.Equal(23, season6.TotalEpisodesCount);
 
-            Assert.NotNull(season6.Episodes);
-            Assert.Equal(23, season6.Episodes.Count);
+            ValidateSeason(season6, 23);
 
             #region Episode 1
 
             var s6E1 = season6.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Лучшее — враг хорошего!", s6E1.Title, true);
-            Assert.Equal("Nice Is Different Than Good", s6E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2009, 11, 27), s6E1.DateReleased);
-            Assert.Equal(new DateTime(2009, 9, 27), s6E1.DateOriginalReleased);
+            ValidateEpisode(s6E1, title: "Лучшее — враг хорошего!", originalTitle: "Nice Is Different Than Good",
+                dateReleased: new DateTime(2009, 11, 27, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2009, 9, 27, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1297,11 +1103,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E12 = season6.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Придется пойти на хитрость", s6E12.Title, true);
-            Assert.Equal("You Gotta Get a Gimmick", s6E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2010, 1, 16), s6E12.DateReleased);
-            Assert.Equal(new DateTime(2010, 1, 10), s6E12.DateOriginalReleased);
+            ValidateEpisode(s6E12, title: "Придется пойти на хитрость", originalTitle: "You Gotta Get a Gimmick",
+                dateReleased: new DateTime(2010, 1, 16, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2010, 1, 10, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1309,11 +1113,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s6E23 = season6.Episodes.First(e => e.Index == 23);
 
-            Assert.Equal("Видимо, это прощание", s6E23.Title, true);
-            Assert.Equal("I Guess This Is Goodbye", s6E23.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2010, 6, 3), s6E23.DateReleased);
-            Assert.Equal(new DateTime(2010, 5, 16), s6E23.DateOriginalReleased);
+            ValidateEpisode(s6E23, title: "Видимо, это прощание", originalTitle: "I Guess This Is Goodbye",
+                dateReleased: new DateTime(2010, 6, 3, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2010, 5, 16, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1322,20 +1124,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 7
 
             var season7 = model.Seasons.First(s => s.Index == 7);
-            Assert.Equal(23, season7.TotalEpisodesCount);
 
-            Assert.NotNull(season7.Episodes);
-            Assert.Equal(23, season7.Episodes.Count);
+            ValidateSeason(season7, 23);
 
             #region Episode 1
 
             var s7E1 = season7.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Помнишь Пола?", s7E1.Title, true);
-            Assert.Equal("Remember Paul?", s7E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2010, 10, 2), s7E1.DateReleased);
-            Assert.Equal(new DateTime(2010, 9, 26), s7E1.DateOriginalReleased);
+            ValidateEpisode(s7E1, title: "Помнишь Пола?", originalTitle: "Remember Paul?",
+                dateReleased: new DateTime(2010, 10, 2, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2010, 9, 26, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1343,11 +1141,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s7E12 = season7.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Где мое место?", s7E12.Title, true);
-            Assert.Equal("Where Do I Belong?", s7E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2011, 1, 17), s7E12.DateReleased);
-            Assert.Equal(new DateTime(2011, 1, 9), s7E12.DateOriginalReleased);
+            ValidateEpisode(s7E12, title: "Где мое место?", originalTitle: "Where Do I Belong?",
+                dateReleased: new DateTime(2011, 1, 17, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2011, 1, 9, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1355,11 +1151,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s7E23 = season7.Episodes.First(e => e.Index == 23);
 
-            Assert.Equal("Приходите на ужин", s7E23.Title, true);
-            Assert.Equal("Come on Over for Dinner", s7E23.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2011, 6, 14), s7E23.DateReleased);
-            Assert.Equal(new DateTime(2011, 5, 15), s7E23.DateOriginalReleased);
+            ValidateEpisode(s7E23, title: "Приходите на ужин", originalTitle: "Come on Over for Dinner",
+                dateReleased: new DateTime(2011, 6, 14, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2011, 5, 15, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1368,20 +1162,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             #region Season 8
 
             var season8 = model.Seasons.First(s => s.Index == 8);
-            Assert.Equal(23, season8.TotalEpisodesCount);
 
-            Assert.NotNull(season8.Episodes);
-            Assert.Equal(23, season8.Episodes.Count);
+            ValidateSeason(season8, 23);
 
             #region Episode 1
 
             var s8E1 = season8.Episodes.First(e => e.Index == 1);
 
-            Assert.Equal("Тайны, которые я не хочу знать", s8E1.Title, true);
-            Assert.Equal("Secrets That I Never Want to Know", s8E1.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2011, 10, 19), s8E1.DateReleased);
-            Assert.Equal(new DateTime(2011, 9, 25), s8E1.DateOriginalReleased);
+            ValidateEpisode(s8E1, title: "Тайны, которые я не хочу знать",
+                originalTitle: "Secrets That I Never Want to Know",
+                dateReleased: new DateTime(2011, 10, 19, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2011, 9, 25, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1389,11 +1180,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s8E12 = season8.Episodes.First(e => e.Index == 12);
 
-            Assert.Equal("Что хорошего в том, чтобы быть хорошей", s8E12.Title, true);
-            Assert.Equal("What's the Good of Being Good", s8E12.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2012, 1, 25), s8E12.DateReleased);
-            Assert.Equal(new DateTime(2012, 1, 22), s8E12.DateOriginalReleased);
+            ValidateEpisode(s8E12, title: "Что хорошего в том, чтобы быть хорошей",
+                originalTitle: "What's the Good of Being Good",
+                dateReleased: new DateTime(2012, 1, 25, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2012, 1, 22, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -1401,11 +1191,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             var s8E23 = season8.Episodes.First(e => e.Index == 23);
 
-            Assert.Equal("Последний штрих", s8E23.Title, true);
-            Assert.Equal("Finishing the Hat", s8E23.OriginalTitle, true);
-
-            Assert.Equal(new DateTime(2012, 5, 17), s8E23.DateReleased);
-            Assert.Equal(new DateTime(2012, 5, 13), s8E23.DateOriginalReleased);
+            ValidateEpisode(s8E23, title: "Последний штрих", originalTitle: "Finishing the Hat",
+                dateReleased: new DateTime(2012, 5, 17, 0, 0, 0, DateTimeKind.Utc),
+                dateReleasedOrigianl: new DateTime(2012, 5, 13, 0, 0, 0, DateTimeKind.Utc));
 
             #endregion
 

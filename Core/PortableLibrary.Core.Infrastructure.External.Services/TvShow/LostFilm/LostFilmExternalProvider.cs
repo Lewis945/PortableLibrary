@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 using PortableLibrary.Core.Extensions;
+using PortableLibrary.Core.External.Services.TvShow;
+using PortableLibrary.Core.External.Services.TvShow.Models;
+using PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction;
+using PortableLibrary.Core.External.Services.TvShow.Models.Search;
+using PortableLibrary.Core.External.Services.TvShow.Models.Tracking;
 using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
@@ -14,7 +19,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
     /// <summary>
     /// https://www.lostfilm.tv
     /// </summary>
-    public class LostFilmExternalProvider : BaseExternalProvider
+    public class LostFilmExternalProvider : BaseExternalProvider,
+        ITvShowDataExtractionProvider, ITvShowTrackingProvider, ITvShowSearchProvider
     {
         #region Properties
 
@@ -38,11 +44,11 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
 
         #endregion
 
-        #region Public Methods
+        #region ITvShowDataExtractionProvider, ITvShowTrackingProvider, ITvShowSearchProvider
 
-        public async Task<LostFilmTvShowModel> ExtractTvShowAsync(string uri)
+        public async Task<TvShowDataExtractionModel> ExtractTvShowAsync(string uri)
         {
-            var model = new LostFilmTvShowModel();
+            var model = new TvShowDataExtractionModel();
 
             var web = new HtmlWeb();
             var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
@@ -55,14 +61,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
 
             var titles = ExtractTitles(divFirstTitleBlock);
 
-            model.Title = titles.Title;
-            model.OriginalTitle = titles.OriginalTitle;
+            model.Titles = new List<string> {titles.Title};
+            model.TitleOriginal = titles.OriginalTitle;
 
             #endregion
 
             #region Extract Status
 
-            model.IsComplete = ExtractStatus(divFirstTitleBlock);
+            bool? isComplete = ExtractStatus(divFirstTitleBlock);
+
+            if (isComplete.HasValue)
+                model.Status = isComplete.Value ? TvShowStatus.CanceledOrEnded : TvShowStatus.Ongoing;
 
             #endregion
 
@@ -96,6 +105,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
             #endregion
 
             return model;
+        }
+
+        public async Task<TvShowTrackingModel> TrackTvShowAsync(string uri)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<TvShowSearchModel>> FindTvShowAsync(string title)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -214,7 +233,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
             return description;
         }
 
-        private List<LostFilmTvShowSeasonModel> ExtractSeasons(HtmlWeb web, string uri)
+        private List<TvShowSeasonDataExtractionModel> ExtractSeasons(HtmlWeb web, string uri)
         {
             var document = web.Load($"{(uri.EndsWith("/") ? uri.Substring(0, uri.Length - 1) : uri)}/seasons");
 
@@ -227,7 +246,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
             if (divSeriesBlocks == null || !divSeriesBlocks.Any())
                 return null;
 
-            var seasons = new List<LostFilmTvShowSeasonModel>();
+            var seasons = new List<TvShowSeasonDataExtractionModel>();
             foreach (var divSerieBlock in divSeriesBlocks)
             {
                 var season = ExtractSeason(divSerieBlock);
@@ -239,9 +258,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
             return seasons;
         }
 
-        private LostFilmTvShowSeasonModel ExtractSeason(HtmlNode divSerieBlock)
+        private TvShowSeasonDataExtractionModel ExtractSeason(HtmlNode divSerieBlock)
         {
-            var season = new LostFilmTvShowSeasonModel();
+            var season = new TvShowSeasonDataExtractionModel();
 
             var h2Title = divSerieBlock.SelectSingleNode("./h2");
             if (h2Title != null)
@@ -249,7 +268,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
                 string title = h2Title.InnerText.Trim();
                 title = HttpUtility.HtmlDecode(title);
                 title = title.ClearString();
-                season.Title = title;
+                season.Titles = new List<string> {title};
 
                 string indexString = title != null ? Regex.Match(title, @"\d+").Value : null;
                 int.TryParse(indexString, out var index);
@@ -283,7 +302,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
 
             if (trEpisodes != null && trEpisodes.Count > 0)
             {
-                season.Episodes = new List<LostFilmTvShowEpisodeModel>();
+                season.Episodes = new List<TvShowEpisodeDataExtractionModel>();
 
                 foreach (var trEpisode in trEpisodes)
                 {
@@ -299,14 +318,14 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
             return season;
         }
 
-        private LostFilmTvShowEpisodeModel ExtractEpisode(HtmlNode trEpisode)
+        private TvShowEpisodeDataExtractionModel ExtractEpisode(HtmlNode trEpisode)
         {
             var tdsEpisode = trEpisode.SelectNodes("./td");
 
             if (tdsEpisode == null || !tdsEpisode.Any())
                 return null;
 
-            var episode = new LostFilmTvShowEpisodeModel();
+            var episode = new TvShowEpisodeDataExtractionModel();
 
             var tdSeason = tdsEpisode.FirstOrDefault(n => n.HasClass("beta"));
             if (tdSeason != null)
@@ -336,7 +355,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
 
                 string title = text?.Replace(originalTitle, string.Empty);
                 title = title.ClearString();
-                episode.Title = title;
+                episode.Titles = new List<string> {title};
             }
 
             var tdDates = tdsEpisode.FirstOrDefault(n => n.HasClass("delta"));
@@ -351,12 +370,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
                         : null;
 
                 DateTime.TryParseExact(dateOriginalReleasedString,
-                    "d.M.yyyy",
+                    "dd.M.yyyy",
                     CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
+                    DateTimeStyles.AssumeUniversal,
                     out var dateOriginalReleased);
 
-                episode.DateOriginalReleased = dateOriginalReleased;
+                episode.DateReleasedOrigianl = dateOriginalReleased;
 
                 string text = tdDates.InnerText.ClearString();
 
@@ -365,9 +384,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.LostFilm
                 dateReleasedString = Regex.Match(dateReleasedString, @"[\d\.]+").Value;
 
                 DateTime.TryParseExact(dateReleasedString,
-                    "d.M.yyyy",
+                    "dd.M.yyyy",
                     CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
+                    DateTimeStyles.AssumeUniversal,
                     out var dateReleased);
 
                 episode.DateReleased = dateReleased;

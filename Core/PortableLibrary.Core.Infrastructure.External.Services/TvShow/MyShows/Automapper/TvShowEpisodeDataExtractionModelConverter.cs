@@ -16,11 +16,17 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
 
             foreach (var season in model.Seasons)
             {
-                season.Episodes = context.Mapper.Map<List<TvShowEpisodeDataExtractionModel>>(
-                    source.Result.Episodes.Where(e => e.SeasonNumber == season.Index && e.EpisodeNumber > 0));
+                var episodes = source.Result.Episodes.Where(e => e.SeasonNumber == season.Index && e.EpisodeNumber > 0)
+                    .ToList();
+                if (episodes.Count > 0)
+                    season.Episodes = context.Mapper.Map<List<TvShowEpisodeDataExtractionModel>>(episodes);
 
-                season.Specials = context.Mapper.Map<List<TvShowEpisodeDataExtractionModel>>(
-                    source.Result.Episodes.Where(e => e.SeasonNumber == season.Index && e.EpisodeNumber == 0));
+                var specials =
+                    source.Result.Episodes.Where(e => e.SeasonNumber == season.Index && e.EpisodeNumber == 0).ToList();
+                if (specials.Count > 0)
+                    season.Specials = context.Mapper.Map<List<TvShowEpisodeDataExtractionModel>>(specials);
+
+                season.TotalEpisodesCount = source.Result.Episodes.Count(e => e.SeasonNumber == season.Index);
             }
 
             return model;

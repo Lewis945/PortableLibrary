@@ -82,7 +82,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
         #endregion
 
-        #region Public Methods
+        #region Internal Methods
 
         internal async Task<TvShowDataExtractionModel> ExtractTvShowAsync(int id)
         {

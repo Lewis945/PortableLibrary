@@ -25,7 +25,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
                 .ForMember(dest => dest.Index, opt => opt.MapFrom(src => src.SeasonNumber));
 
             CreateMap<EpisodeResponse, TvShowEpisodeDataExtractionModel>()
-                .ForMember(dest => dest.AirDate, opt => opt.MapFrom(src => src.AirDateUTC))
+                .ForMember(dest => dest.DateReleasedOrigianl, opt => opt.MapFrom(src => src.AirDateUTC))
+                .ForMember(dest => dest.Index, opt => opt.MapFrom(src => src.EpisodeNumber))
+                .ForMember(dest => dest.OriginalTitle, opt => opt.MapFrom(src => src.Title))
+                .ForMember(dest => dest.ImageUri, opt => opt.MapFrom(src => !string.IsNullOrWhiteSpace(src.Image) ? src.Image : null))
                 .ForMember(dest => dest.Titles, opt => opt.MapFrom(src => new List<string> {src.Title}));
 
             CreateMap<TvShowResponse, TvShowDataExtractionModel>()
@@ -59,6 +62,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.A
                 .ForMember(dest => dest.Seasons,
                     opt => opt.MapFrom(src =>
                         src.Episodes.DistinctBy(e => e.SeasonNumber).OrderBy(e => e.SeasonNumber)))
+                .ForMember(dest => dest.ImageUri,
+                    opt => opt.MapFrom(src => !string.IsNullOrWhiteSpace(src.Image) ? src.Image : null))
                 .ForMember(dest => dest.Titles, opt => opt.MapFrom(src => new List<string> {src.Title}));
 
             CreateMap<TvShowResponseWrapper, TvShowDataExtractionModel>()

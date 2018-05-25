@@ -19,7 +19,8 @@ namespace PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction
         public int? KinopoiskId { get; set; }
         public int? TvrageId { get; set; }
         public int? ImdbId { get; set; }
-        public string Image { get; set; }
+        public string ImageUri { get; set; }
+        public byte[] ImageByteArray { get; set; }
         public decimal? Rating { get; set; }
         public int? Runtime { get; set; }
 
