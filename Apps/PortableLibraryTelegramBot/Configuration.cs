@@ -6,7 +6,7 @@ using PortableLibrary.TelegramBot.Configuration;
 
 namespace PortableLibraryTelegramBot
 {
-    public class Configuration
+    public static class Configuration
     {
         internal static string GetAuthConfigurationFilePath(string[] args)
         {
@@ -32,13 +32,13 @@ namespace PortableLibraryTelegramBot
 
         public static async Task<TelegramAuthConfiguration> GetAuthConfiguration(string path)
         {
-            var fileContent = await File.ReadAllTextAsync(path);
+            var fileContent = await File.ReadAllTextAsync(path).ConfigureAwait(false);
             return JsonConvert.DeserializeObject<TelegramAuthConfiguration>(fileContent);
         }
 
-        public static async Task<TelegramConfiguration> GetConfiguration(string path)
+        public static async Task<TelegramConfiguration> GetConfigurationAsync(string path)
         {
-            var fileContent = await File.ReadAllTextAsync(path);
+            var fileContent = await File.ReadAllTextAsync(path).ConfigureAwait(false);
             return JsonConvert.DeserializeObject<TelegramConfiguration>(fileContent);
         }
     }

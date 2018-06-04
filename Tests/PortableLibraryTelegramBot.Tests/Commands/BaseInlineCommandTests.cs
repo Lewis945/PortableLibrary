@@ -13,24 +13,30 @@ namespace PortableLibraryTelegramBot.Tests.Commands
     {
         #region Fields
 
-        protected TelegramConfiguration Configuration;
-        protected Mock<ITelegramBotClient> ClientMock;
+        protected static readonly TelegramConfiguration Configuration;
+        protected static readonly Mock<ITelegramBotClient> ClientMock;
 
-        protected ChatId ChatId;
+        protected static readonly ChatId ChatId;
 
         #endregion
 
         #region .ctor
 
-        public BaseInlineCommandTests()
+        static BaseInlineCommandTests()
         {
-            Configuration = PortableLibraryTelegramBot.Configuration.GetConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                "..", "..", "..", "..", "..", "Configuration", "TelegramBotConfiguration.json")).Result;
-
             ChatId = new ChatId(12);
 
+            Configuration = PortableLibraryTelegramBot.Configuration.GetConfigurationAsync(Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "..", "..", "..", "..", "..", "Configuration", "TelegramBotConfiguration.json")).Result;
+
             ClientMock = new Mock<ITelegramBotClient>();
-            ClientMock.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(), default(System.Threading.CancellationToken)));
+            ClientMock.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(),
+                default(System.Threading.CancellationToken)));
+        }
+
+        public BaseInlineCommandTests()
+        {
         }
 
         #endregion
@@ -40,9 +46,9 @@ namespace PortableLibraryTelegramBot.Tests.Commands
         protected DbContextOptions<T> GetDatabaseOptions<T>(string dbName)
             where T : DbContext
             =>
-          new DbContextOptionsBuilder<T>()
-              .UseInMemoryDatabase(databaseName: dbName)
-              .Options;
+                new DbContextOptionsBuilder<T>()
+                    .UseInMemoryDatabase(databaseName: dbName)
+                    .Options;
 
         #endregion
     }

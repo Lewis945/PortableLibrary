@@ -20,11 +20,11 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
     {
         #region Fields
 
-        private TelegramConfiguration _configuration;
-        private Mock<ITelegramBotClient> _client;
+        private readonly TelegramConfiguration _configuration;
+        private readonly Mock<ITelegramBotClient> _client;
 
         private DbContextOptions<BotDataContext> _options;
-        private ChatId _chatId;
+        private readonly ChatId _chatId;
 
         #endregion
 
@@ -32,7 +32,7 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
 
         public AddCommandSequenceTests()
         {
-            _configuration = Configuration.GetConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
+            _configuration = Configuration.GetConfigurationAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 "..", "..", "..", "..", "..", "Configuration", "TelegramBotConfiguration.json")).Result;
 
             _options = new DbContextOptionsBuilder<BotDataContext>()
@@ -42,7 +42,8 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
             _chatId = new ChatId(12);
 
             _client = new Mock<ITelegramBotClient>();
-            _client.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(), default(System.Threading.CancellationToken)));
+            _client.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(),
+                default(System.Threading.CancellationToken)));
         }
 
         #endregion
@@ -65,12 +66,14 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
 
         #region Private Test Methods
 
-        private async Task SuccessfullyProcessAddCommand(string commandAlias, string type, string libraryType, string name, string language)
+        private async Task SuccessfullyProcessAddCommand(string commandAlias, string type, string libraryType,
+            string name, string language)
         {
             using (var context = new BotDataContext(GetDatabaseOptions($"addcommand{language}db")))
             {
                 var databaseService = new DatabaseService(context);
-                var commandSequenceProcessor = new CommandSequenceProcessor(_client.Object, _configuration, databaseService);
+                var commandSequenceProcessor =
+                    new CommandSequenceProcessor(_client.Object, _configuration, databaseService);
                 await commandSequenceProcessor.StartCommandSequence(_chatId, commandAlias);
 
                 var sequence = await context.ChatCommandSequencesState.ToListAsync();
@@ -110,9 +113,9 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
         #region Private Methods
 
         private DbContextOptions<BotDataContext> GetDatabaseOptions(string dbName) =>
-          new DbContextOptionsBuilder<BotDataContext>()
-              .UseInMemoryDatabase(databaseName: dbName)
-              .Options;
+            new DbContextOptionsBuilder<BotDataContext>()
+                .UseInMemoryDatabase(databaseName: dbName)
+                .Options;
 
         #endregion
     }

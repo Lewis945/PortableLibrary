@@ -32,9 +32,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             var model = await service.ExtractBook("https://fantlab.ru/work43493");
 
-            Assert.Equal("https://data.fantlab.ru/images/editions/big/21842",
-                model.ImageUri, true);
-
             Assert.Equal("Огненный Факультет", model.Title, true);
             Assert.Equal("Огненный Факультет", model.OriginalTitle, true);
             Assert.Null(model.OtherTitles);
@@ -49,6 +46,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             Assert.Equal("Ремесло", model.Series, true);
 
+            Assert.Equal("https://data.fantlab.ru/images/editions/big/21842",
+                model.ImageUri, true);
+            
             Assert.Equal("https://fantlab.ru/work43498/", model.TrackingUri, true);
 
             Assert.Equal(1, model.Index);
@@ -133,7 +133,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("Фантастика", item, true),
-                item => Assert.Equal("Гуманитарная («мягкая») НФ", item, true)
+                item => Assert.Equal("«Мягкая» (гуманитарная, социальная) научная фантастика", item, true)
             );
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);
@@ -184,7 +184,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("Фантастика", item, true),
-                item => Assert.Equal("Гуманитарная («мягкая») НФ", item, true)
+                item => Assert.Equal("«Мягкая» (гуманитарная, социальная) научная фантастика", item, true)
             );
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);

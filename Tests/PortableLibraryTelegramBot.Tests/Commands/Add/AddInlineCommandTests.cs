@@ -19,11 +19,11 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
     {
         #region Fields
 
-        private TelegramConfiguration _configuration;
-        private Mock<ITelegramBotClient> _clientMock;
+        private readonly TelegramConfiguration _configuration;
+        private readonly Mock<ITelegramBotClient> _clientMock;
 
         private DbContextOptions<BotDataContext> _options;
-        private ChatId _chatId;
+        private readonly ChatId _chatId;
 
         #endregion
 
@@ -31,7 +31,7 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
 
         public AddInlineCommandTests()
         {
-            _configuration = Configuration.GetConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            _configuration = Configuration.GetConfigurationAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 "..", "..", "..", "..", "..", "Configuration", "TelegramBotConfiguration.json")).Result;
 
             _options = new DbContextOptionsBuilder<BotDataContext>()
@@ -41,7 +41,8 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
             _chatId = new ChatId(12);
 
             _clientMock = new Mock<ITelegramBotClient>();
-            _clientMock.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(), default(System.Threading.CancellationToken)));
+            _clientMock.Setup(foo => foo.SendChatActionAsync(It.IsAny<ChatId>(), It.IsIn<ChatAction>(),
+                default(System.Threading.CancellationToken)));
 
             //_libraryServiceMock = new Mock<ILibraryService>();
             //_libraryServiceMock.Setup(s => s.AddLibrary(It.IsAny<string>(), It.IsIn<LibraryType>()));
@@ -59,14 +60,16 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
         public async Task Should_Process_English_Add_Books_Library_Command_With_Arguments()
         {
             const string libraryName = "Test library of books";
-            await SuccessfullyProcessAddCommand("add", $"library of books {libraryName}", $"addbooklibengdb", libraryName, LibraryType.Book);
+            await SuccessfullyProcessAddCommand("add", $"library of books {libraryName}", $"addbooklibengdb",
+                libraryName, LibraryType.Book);
         }
 
         [Fact]
         public async Task Should_Process_English_Add_TvShows_Library_Command_With_Arguments()
         {
             const string libraryName = "Test library of tv shows";
-            await SuccessfullyProcessAddCommand("add", $"library of tv shows {libraryName}", $"addtvshowlibengdb", libraryName, LibraryType.TvShow);
+            await SuccessfullyProcessAddCommand("add", $"library of tv shows {libraryName}", $"addtvshowlibengdb",
+                libraryName, LibraryType.TvShow);
         }
 
 
@@ -74,15 +77,18 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
         public async Task Should_Process_Russian_Add_Books_Library_Command_With_Arguments()
         {
             const string libraryName = "Тестовая бибилотека книг";
-            await SuccessfullyProcessAddCommand("добавить", $"библиотеку книг {libraryName}", $"addbooklibrusdb", libraryName, LibraryType.Book);
+            await SuccessfullyProcessAddCommand("добавить", $"библиотеку книг {libraryName}", $"addbooklibrusdb",
+                libraryName, LibraryType.Book);
         }
 
         [Fact]
         public async Task Should_Process_Russian_Add_TvShows_Library_Command_With_Arguments()
         {
             const string libraryName = "Тестовая бибилотека сериалов";
-            await SuccessfullyProcessAddCommand("добавить", $"библиотеку сериалов {libraryName}", $"addtvshowlibrusdb", libraryName, LibraryType.TvShow);
+            await SuccessfullyProcessAddCommand("добавить", $"библиотеку сериалов {libraryName}", $"addtvshowlibrusdb",
+                libraryName, LibraryType.TvShow);
         }
+
         #endregion
 
         #region Private Test Methods
@@ -95,7 +101,8 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
             using (var context = new BotDataContext(GetDatabaseOptions<BotDataContext>(dbName)))
             {
                 var databaseService = new DatabaseService(context);
-                var commandSequenceProcessor = new InlineCommandProcessor(_clientMock.Object, _configuration, databaseService);
+                var commandSequenceProcessor =
+                    new InlineCommandProcessor(_clientMock.Object, _configuration, databaseService);
 
                 commandSequenceProcessor.OnAddLibrary += (string name, LibraryType type) =>
                 {
@@ -118,9 +125,9 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Add
         private DbContextOptions<T> GetDatabaseOptions<T>(string dbName)
             where T : DbContext
             =>
-          new DbContextOptionsBuilder<T>()
-              .UseInMemoryDatabase(databaseName: dbName)
-              .Options;
+                new DbContextOptionsBuilder<T>()
+                    .UseInMemoryDatabase(databaseName: dbName)
+                    .Options;
 
         #endregion
     }

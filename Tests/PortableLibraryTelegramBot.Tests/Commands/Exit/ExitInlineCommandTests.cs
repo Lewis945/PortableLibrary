@@ -6,21 +6,21 @@ using Xunit;
 
 namespace PortableLibraryTelegramBot.Tests.Commands.Exit
 {
-    public class ExitInlineCommandTests:BaseInlineCommandTests
+    public class ExitInlineCommandTests : BaseInlineCommandTests
     {
         #region Inline Command Tests
 
         [Fact]
         public async Task Should_Process_English_Exit_Library_Command()
         {
-            await SuccessfullyProcessExitLibraryCommand("exit", null, $"exitlibengdb");
+            await SuccessfullyProcessExitLibraryCommand("exit", null, "exitlibengdb");
         }
 
 
         [Fact]
         public async Task Should_Process_Russian_Exit_Library_Command()
         {
-            await SuccessfullyProcessExitLibraryCommand("выйти", null, $"exitlibrusdb");
+            await SuccessfullyProcessExitLibraryCommand("выйти", null, "exitlibrusdb");
         }
 
         #endregion
@@ -34,12 +34,10 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Exit
             using (var context = new BotDataContext(GetDatabaseOptions<BotDataContext>(dbName)))
             {
                 var databaseService = new DatabaseService(context);
-                var commandSequenceProcessor = new InlineCommandProcessor(ClientMock.Object, Configuration, databaseService);
+                var commandSequenceProcessor =
+                    new InlineCommandProcessor(ClientMock.Object, Configuration, databaseService);
 
-                commandSequenceProcessor.OnExitLibrary += () =>
-                {
-                    isExitLibraryTriggered = true;
-                };
+                commandSequenceProcessor.OnExitLibrary += () => { isExitLibraryTriggered = true; };
 
                 await commandSequenceProcessor.ProcessInlineCommand(ChatId, commandAlias, arguments);
             }

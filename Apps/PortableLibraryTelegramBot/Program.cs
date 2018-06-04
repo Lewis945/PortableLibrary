@@ -12,7 +12,7 @@ namespace PortableLibraryTelegramBot
             {
                 var authConfiguration =
                     await Configuration.GetAuthConfiguration(Configuration.GetAuthConfigurationFilePath(args));
-                var configuration = await Configuration.GetConfiguration(Configuration.GetConfigurationFilePath(args));
+                var configuration = await Configuration.GetConfigurationAsync(Configuration.GetConfigurationFilePath(args));
 
                 var client = new TelegramBotClient(authConfiguration.Token);
 

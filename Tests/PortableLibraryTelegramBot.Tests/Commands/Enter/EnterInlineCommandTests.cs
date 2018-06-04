@@ -37,7 +37,8 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Enter
             using (var context = new BotDataContext(GetDatabaseOptions<BotDataContext>(dbName)))
             {
                 var databaseService = new DatabaseService(context);
-                var commandSequenceProcessor = new InlineCommandProcessor(ClientMock.Object, Configuration, databaseService);
+                var commandSequenceProcessor =
+                    new InlineCommandProcessor(ClientMock.Object, Configuration, databaseService);
 
                 commandSequenceProcessor.OnEnterLibrary += (name) =>
                 {
