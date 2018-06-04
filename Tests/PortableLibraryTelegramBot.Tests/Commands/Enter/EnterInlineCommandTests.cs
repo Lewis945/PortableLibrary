@@ -17,7 +17,6 @@ namespace PortableLibraryTelegramBot.Tests.Commands.Enter
             await SuccessfullyProcessEnterLibraryCommand("enter", libraryName, "enterlibengdb", libraryName);
         }
 
-
         [Fact]
         public async Task Should_Process_Russian_Enter_Library_Command_With_Arguments()
         {
