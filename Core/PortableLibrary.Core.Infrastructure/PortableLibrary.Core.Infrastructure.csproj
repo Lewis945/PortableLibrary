@@ -9,4 +9,10 @@
     <PackageReference Include="DinkToPdfIncludesDependencies" Version="1.0.8" />
     <PackageReference Include="Handlebars.Net" Version="1.9.4" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Templating\Libraries\LibrariesTemplate.html" />
+    <EmbeddedResource Include="Templating\Libraries\LibrariesTemplate.html" />
+    <None Remove="Templating\Table\TableTemplate.html" />
+    <EmbeddedResource Include="Templating\Table\TableTemplate.html" />
+  </ItemGroup>
 </Project>

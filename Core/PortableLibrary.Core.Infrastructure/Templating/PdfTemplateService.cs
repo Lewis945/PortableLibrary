@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
 using DinkToPdf;
-using HandlebarsDotNet;
 
 namespace PortableLibrary.Core.Infrastructure.Templating
 {
@@ -10,58 +7,78 @@ namespace PortableLibrary.Core.Infrastructure.Templating
     {
         #region Fields
 
-        
+        private readonly PdfSettings _settings;
 
         #endregion
-        
+
         #region .ctor
 
         /// <summary>
         /// https://github.com/rdvojmoc/DinkToPdf
         /// </summary>
-        public PdfTemplateService()
+        public PdfTemplateService(PdfSettings settings)
         {
-            
+            _settings = settings;
         }
 
         #endregion
 
         #region Public Methods
 
-        public void GeneratePdf(string htmlContent, string outputPath)
+        public byte[] GeneratePdf(string title, string htmlContent)
         {
             var converter = new SynchronizedConverter(new PdfTools());
-            
+
             var doc = new HtmlToPdfDocument
             {
-                GlobalSettings = {
+                GlobalSettings = new GlobalSettings
+                {
+                    DocumentTitle = title,
                     ColorMode = ColorMode.Color,
                     Orientation = Orientation.Portrait,
                     PaperSize = PaperKind.A4,
-                    Margins = new MarginSettings { Top = 10 }
+                    Margins = new MarginSettings
+                    {
+                        Top = 6,
+                        Bottom = 6
+                    }
                 },
-                Objects = {
-                    new ObjectSettings {
+                Objects =
+                {
+                    new ObjectSettings
+                    {
                         PagesCount = true,
                         HtmlContent = htmlContent,
-                        WebSettings = { DefaultEncoding = "utf-8" },
-                        HeaderSettings = { FontSize = 9, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 }
+                        WebSettings = new WebSettings
+                        {
+                            DefaultEncoding = "utf-8"
+                        },
+                        HeaderSettings = new HeaderSettings
+                        {
+                            FontSize = 8,
+                            Line = true,
+                            Spacing = 2,
+                            Left = _settings.HeaderLeftContent,
+                            Right = _settings.HeaderRightContent 
+                        },
+                        FooterSettings = new FooterSettings
+                        {
+                            FontSize = 8,
+                            Line = true,
+                            Spacing = 2,
+                            Center = _settings.FooterCenterContent
+                        }
                     }
                 }
             };
-            
-//            converter.Convert(doc);
-            
+
             byte[] pdf = converter.Convert(doc);
-            
-            File.WriteAllBytes(outputPath, pdf);
+            return pdf;
         }
 
         #endregion
-        
-        #region Private Methods
 
-        
+        #region Private Methods
 
         #endregion
     }

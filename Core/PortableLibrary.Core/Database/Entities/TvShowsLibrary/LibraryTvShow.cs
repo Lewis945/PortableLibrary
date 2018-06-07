@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 {
-    public class LibraryTvShow : BaseEntity
+    public class LibraryTvShow : BaseLibraryEntity
     {
         public LibraryTvShow()
         {
@@ -21,14 +21,8 @@ namespace PortableLibrary.Core.Database.Entities.TvShowsLibrary
 
         [Required]
         public string Name { get; set; }
-        public string Comments { get; set; }
-        public string CoverImage { get; set; }
 
-        public bool IsFavourite { get; set; }
         public bool IsClosed { get; set; }
-        public bool IsWatched { get; set; }
-        public bool IsWatchingPlanned { get; set; }
-        public bool IsWaitingToBecomeGlobal { get; set; }
 
         public virtual TvShowsLibrary TvShowsLibrary { get; set; }
 
