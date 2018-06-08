@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Core.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibraryTelegramBot.Tests", "Tests\PortableLibraryTelegramBot.Tests\PortableLibraryTelegramBot.Tests.csproj", "{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary", "Apps\PortableLibrary\PortableLibrary.csproj", "{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +97,7 @@ Global
 		{382FAAA4-8E65-46BC-9DE6-66F8681799F2} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
 		{9567B28C-CED3-4D52-BE0C-18AD39346296} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
 		{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
+		{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7C961EDA-CE55-4678-A53B-976549AF646D}

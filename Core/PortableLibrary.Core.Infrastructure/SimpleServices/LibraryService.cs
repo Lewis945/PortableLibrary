@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.Base;
@@ -8,6 +12,7 @@ using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
 using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.SimpleServices;
+using PortableLibrary.Core.SimpleServices.Models;
 
 namespace PortableLibrary.Core.Infrastructure.SimpleServices
 {
@@ -16,19 +21,45 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
         #region Fields
 
         private readonly PortableLibraryDataContext _context;
+        private readonly IMapper _mapper;
 
         #endregion
 
         #region .ctor
 
-        public LibraryService(PortableLibraryDataContext context)
+        public LibraryService(PortableLibraryDataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         #endregion
 
         #region ILibraryService
+
+        public IAsyncEnumerable<LibraryListModel> GetLibrariesAsync(LibraryType type = LibraryType.None,
+            bool extended = false)
+        {
+            try
+            {
+                switch (type)
+                {
+                    case LibraryType.Book:
+                        return _context.BookLibraries.ProjectTo<LibraryListModel>(_mapper).ToAsyncEnumerable();
+                    case LibraryType.TvShow:
+                        return _context.TvShowsLibraries.ProjectTo<LibraryListModel>(_mapper).ToAsyncEnumerable();
+                    default:
+                        return _context.BookLibraries.ProjectTo<LibraryListModel>(_mapper)
+                            .Concat(_context.TvShowsLibraries.ProjectTo<LibraryListModel>(_mapper))
+                            .ToAsyncEnumerable();
+                }
+            }
+            catch (Exception ex)
+            {
+                // log errors
+                throw;
+            }
+        }
 
         public async Task<bool> AddLibraryAsync(string name, LibraryType type)
         {
@@ -43,11 +74,11 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                 {
                     case LibraryType.Book:
                         library = new BooksLibrary();
-                        _context.BookLibraries.Add((BooksLibrary)library);
+                        _context.BookLibraries.Add((BooksLibrary) library);
                         break;
                     case LibraryType.TvShow:
                         library = new TvShowsLibrary();
-                        _context.TvShowsLibraries.Add((TvShowsLibrary)library);
+                        _context.TvShowsLibraries.Add((TvShowsLibrary) library);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -110,13 +141,11 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             switch (type)
             {
                 case LibraryType.Book:
-                    return await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted &&
-                                                                                 isAlias
+                    return await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && isAlias
                         ? l.Alias == name
                         : l.Name == name);
                 case LibraryType.TvShow:
-                    return await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted &&
-                                                                                    isAlias
+                    return await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && isAlias
                         ? l.Alias == name
                         : l.Name == name);
                 default:

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Database;
 using PortableLibrary.TelegramBot.Configuration;
 using PortableLibrary.TelegramBot.Data.Database;
@@ -23,6 +25,8 @@ namespace PortableLibraryTelegramBot
         private readonly TelegramBotClient _client;
         private readonly TelegramConfiguration _configuration;
 
+        private readonly IMapper _mapper;
+        
         #endregion
 
         #region .ctor
@@ -32,6 +36,8 @@ namespace PortableLibraryTelegramBot
             _client = client;
             _configuration = configuration;
 
+            _mapper = new Mapper(AutoMapperConfiguration.GetConfiguration());
+            
             _client.OnMessage += OnMessageReceived;
             _client.OnMessageEdited += OnMessageReceived;
             _client.OnCallbackQuery += OnCallbackQueryReceived;

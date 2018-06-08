@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
-using PortableLibrary.Core.SimpleServices;
 
 namespace PortableLibraryTelegramBot
 {
@@ -14,18 +13,18 @@ namespace PortableLibraryTelegramBot
             var options = new DbContextOptionsBuilder<PortableLibraryDataContext>()
                 .UseInMemoryDatabase(databaseName: "PortableLibrary")
                 .Options;
-            
+
             using (var context = new PortableLibraryDataContext(options))
             {
-                var service = new LibraryService(context);
+                var service = new LibraryService(context, _mapper);
                 var result = await service.AddLibraryAsync(name, type);
             }
         }
-        
+
         private void OnEnterLibraryEventHandler(string name)
         {
         }
-        
+
         private void OnExitLibraryEventHandler()
         {
         }

@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.BooksLibrary;
 using PortableLibrary.Core.Enums;
@@ -11,6 +13,22 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
 {
     public class LibraryServiceTests
     {
+        #region Fields
+
+        private readonly IMapper _mapper;
+
+        #endregion
+
+        #region .ctor
+
+        public LibraryServiceTests()
+        {
+            var config = new MapperConfiguration(cfg => { cfg.AddProfile<LibraryProfile>(); });
+            _mapper = new Mapper(config);
+        }
+
+        #endregion
+
         #region Tests
 
         [Fact]
@@ -21,7 +39,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
             using (var context =
                 new PortableLibraryDataContext(GetDatabaseOptions<PortableLibraryDataContext>("libserviceaddlibrary")))
             {
-                var service = new LibraryService(context);
+                var service = new LibraryService(context, _mapper);
 
                 var result = await service.AddLibraryAsync(title, LibraryType.Book);
                 Assert.True(result);
@@ -38,7 +56,8 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
             const string title = "Books library";
 
             using (var context =
-                new PortableLibraryDataContext(GetDatabaseOptions<PortableLibraryDataContext>("libserviceremovelibrary")))
+                new PortableLibraryDataContext(
+                    GetDatabaseOptions<PortableLibraryDataContext>("libserviceremovelibrary")))
             {
                 context.BookLibraries.Add(new BooksLibrary
                 {
@@ -48,7 +67,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
 
                 await context.SaveChangesAsync();
 
-                var service = new LibraryService(context);
+                var service = new LibraryService(context, _mapper);
                 var result = await service.RemoveLibraryAsync(title, LibraryType.Book);
                 Assert.True(result);
 
