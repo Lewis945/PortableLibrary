@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.SimpleServices;
 
 namespace PortableLibrary.Controllers
@@ -25,11 +27,10 @@ namespace PortableLibrary.Controllers
         #region Actions
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(LibraryType type = LibraryType.None, bool extended = false)
         {
-            var libraries = _libraryService.GetLibrariesAsync();
-            
-            return Json("");
+            var libraries = _libraryService.GetLibrariesAsync(type, extended);
+            return Json(await libraries.ToList());
         }
 
         #endregion
