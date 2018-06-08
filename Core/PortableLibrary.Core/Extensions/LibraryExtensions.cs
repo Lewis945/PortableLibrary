@@ -21,42 +21,6 @@ namespace PortableLibrary.Core.Extensions
             return 0;
         }
 
-        public static CountByFlagsQueryResponse GetCountByFlags(this BaseLibrary library)
-        {
-            CountByFlagsQueryResponse GetCounts(IEnumerable<BaseLibraryEntity> entities)
-            {
-                var baseLibraryEntities = entities.ToList();
-                var result = baseLibraryEntities.Select(e => new
-                {
-                    e.IsPublished,
-                    e.IsFavourite,
-                    e.IsProcessing,
-                    e.IsProcessed,
-                    e.IsProcessingPlanned,
-                    e.IsWaitingToBecomeGlobal
-                }).ToList();
-
-                return new CountByFlagsQueryResponse
-                {
-                    All = result.Count,
-                    IsPublished = result.Count(r => r.IsPublished),
-                    IsFavourite = result.Count(r => r.IsFavourite),
-                    IsProcessing = result.Count(r => r.IsProcessing),
-                    IsProcessed = result.Count(r => r.IsProcessed),
-                    IsProcessingPlanned = result.Count(r => r.IsProcessingPlanned),
-                    IsWaitingToBecomeGlobal = result.Count(r => r.IsWaitingToBecomeGlobal)
-                };
-            }
-
-            if (library is BooksLibrary booksLibrary)
-                return GetCounts(booksLibrary.Books);
-
-            if (library is TvShowsLibrary tvShowsLibrary)
-                return GetCounts(tvShowsLibrary.TvShows);
-
-            return default(CountByFlagsQueryResponse);
-        }
-
         public static LibraryType GetLibraryType(this BaseLibrary library)
         {
             if (library is BooksLibrary)

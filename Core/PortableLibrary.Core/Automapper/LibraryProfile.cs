@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using PortableLibrary.Core.Database.Entities.BooksLibrary;
+using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
+using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.SimpleServices.Models;
 
 namespace PortableLibrary.Core.Automapper
@@ -9,11 +11,16 @@ namespace PortableLibrary.Core.Automapper
         public LibraryProfile()
         {
             CreateMap<BooksLibrary, LibraryListModel>()
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Books.Count));
-//                .ForMember(dest => dest.Index, opt => opt.MapFrom(src => src.EpisodeNumber))
-//                .ForMember(dest => dest.OriginalTitle, opt => opt.MapFrom(src => src.Title))
-//                .ForMember(dest => dest.ImageUri, opt => opt.MapFrom(src => !string.IsNullOrWhiteSpace(src.Image) ? src.Image : null))
-//                .ForMember(dest => dest.Titles, opt => opt.MapFrom(src => new List<string> {src.Title}));
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetLibraryType()))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Books.Count))
+                .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.IsPublic));
+            
+            CreateMap<TvShowsLibrary, LibraryListModel>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetLibraryType()))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.TvShows.Count))
+                .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.IsPublic));
         }
     }
 }

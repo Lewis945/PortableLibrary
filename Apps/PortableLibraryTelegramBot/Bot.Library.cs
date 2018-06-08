@@ -16,7 +16,7 @@ namespace PortableLibraryTelegramBot
 
             using (var context = new PortableLibraryDataContext(options))
             {
-                var service = new LibraryService(context, _mapper);
+                var service = new LibraryService(context);
                 var result = await service.AddLibraryAsync(name, type);
             }
         }

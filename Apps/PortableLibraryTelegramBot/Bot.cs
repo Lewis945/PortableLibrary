@@ -25,8 +25,6 @@ namespace PortableLibraryTelegramBot
         private readonly TelegramBotClient _client;
         private readonly TelegramConfiguration _configuration;
 
-        private readonly IMapper _mapper;
-        
         #endregion
 
         #region .ctor
@@ -35,8 +33,6 @@ namespace PortableLibraryTelegramBot
         {
             _client = client;
             _configuration = configuration;
-
-            _mapper = new Mapper(AutoMapperConfiguration.GetConfiguration());
             
             _client.OnMessage += OnMessageReceived;
             _client.OnMessageEdited += OnMessageReceived;

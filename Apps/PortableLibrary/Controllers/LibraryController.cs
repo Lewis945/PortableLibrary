@@ -9,7 +9,7 @@ namespace PortableLibrary.Controllers
     {
         #region Fields
 
-        private ILibraryService _libraryService;
+        private readonly ILibraryService _libraryService;
 
         #endregion
 

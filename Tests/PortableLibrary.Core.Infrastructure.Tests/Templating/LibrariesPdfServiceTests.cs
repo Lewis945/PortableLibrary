@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using PortableLibrary.Core.Database.Entities.Base;
-using PortableLibrary.Core.Database.Entities.BooksLibrary;
-using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
+using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Infrastructure.Templating.Libraries;
+using PortableLibrary.Core.SimpleServices.Models;
 using Xunit;
 
 namespace PortableLibrary.Core.Infrastructure.Tests.Templating
@@ -15,29 +13,24 @@ namespace PortableLibrary.Core.Infrastructure.Tests.Templating
         [Fact]
         public void Should_Generate_Libraries_Pdf()
         {
-            var libraries = new List<BaseLibrary>
+            var libraries = new List<LibraryListModel>
             {
-                FeelLibrary(new BooksLibrary
+                FeelLibrary(new LibraryListModel
                 {
-                    Name = "Books library",
-                    Books = Enumerable.Range(0, 50).Select(n => new LibraryBook
-                    {
-                        Name = $"Book {n}"
-                    }).ToList()
+                    Title = "Books library",
+                    Type = LibraryType.Book,
+                    Public = true
                 }),
-                FeelLibrary(new TvShowsLibrary
+                FeelLibrary(new LibraryListModel
                 {
-                    Name = "TvShows library",
-                    TvShows = Enumerable.Range(0, 100).Select(n => new LibraryTvShow
-                    {
-                        Name = $"Tv show {n}"
-                    }).ToList()
+                    Title = "TvShows library",
+                    Type = LibraryType.TvShow
                 })
             };
 
             var librariesPdfService = new LibrariesPdfService();
 
-            var bytes = librariesPdfService.GeneratePdf(libraries, false);
+            var bytes = librariesPdfService.GeneratePdf(libraries, true);
 
             Assert.True(bytes.Length > 1000);
 
@@ -59,34 +52,19 @@ namespace PortableLibrary.Core.Infrastructure.Tests.Templating
             #endregion
         }
 
-        private static BaseLibrary FeelLibrary(BaseLibrary library)
+        private static LibraryListModel FeelLibrary(LibraryListModel library)
         {
             var random = new Random();
 
-            if (library is BooksLibrary booksLibrary)
-                Feel(booksLibrary.Books.Cast<BaseLibraryEntity>().ToList());
-            else if (library is TvShowsLibrary tvShowsLibrary)
-                Feel(tvShowsLibrary.TvShows.Cast<BaseLibraryEntity>().ToList());
-
-            void Feel(List<BaseLibraryEntity> entities)
-            {
-                foreach (var entity in entities)
-                {
-                    entity.IsPublished = NextBool(random);
-                    entity.IsFavourite = NextBool(random);
-                    entity.IsProcessed = NextBool(random);
-                    entity.IsProcessing = NextBool(random);
-                    entity.IsProcessingPlanned = NextBool(random);
-                    entity.IsWaitingToBecomeGlobal = NextBool(random);
-                }
-            }
+            library.Items = random.Next(100);
+            library.Published = random.Next(library.Items);
+            library.Favourits = random.Next(library.Items);
+            library.Processed = random.Next(library.Items);
+            library.Processing = random.Next(library.Items);
+            library.Planned = random.Next(library.Items);
+            library.AreWaitingToBecomeGlobal = random.Next(library.Items);
 
             return library;
-        }
-
-        private static bool NextBool(Random r, int truePercentage = 50)
-        {
-            return r.NextDouble() < truePercentage / 100.0;
         }
     }
 }

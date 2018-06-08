@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.Base;
 using PortableLibrary.Core.Database.Entities.BooksLibrary;
@@ -21,16 +22,14 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
         #region Fields
 
         private readonly PortableLibraryDataContext _context;
-        private readonly IMapper _mapper;
 
         #endregion
 
         #region .ctor
 
-        public LibraryService(PortableLibraryDataContext context, IMapper mapper)
+        public LibraryService(PortableLibraryDataContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         #endregion
@@ -42,16 +41,28 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
         {
             try
             {
+                var mapperConfig = new MapperConfiguration(cfg =>
+                {
+                    if (extended)
+                        cfg.AddProfile<ExtendedLibraryProfile>();
+                    else
+                        cfg.AddProfile<LibraryProfile>();
+                });
+                
                 switch (type)
                 {
                     case LibraryType.Book:
-                        return _context.BookLibraries.ProjectTo<LibraryListModel>(_mapper).ToAsyncEnumerable();
-                    case LibraryType.TvShow:
-                        return _context.TvShowsLibraries.ProjectTo<LibraryListModel>(_mapper).ToAsyncEnumerable();
-                    default:
-                        return _context.BookLibraries.ProjectTo<LibraryListModel>(_mapper)
-                            .Concat(_context.TvShowsLibraries.ProjectTo<LibraryListModel>(_mapper))
+                        return _context.BookLibraries
+                            .ProjectTo<LibraryListModel>(mapperConfig)
                             .ToAsyncEnumerable();
+                    case LibraryType.TvShow:
+                        return _context.TvShowsLibraries
+                            .ProjectTo<LibraryListModel>(mapperConfig)
+                            .ToAsyncEnumerable();
+                    default:
+                        var bookLibraries = _context.BookLibraries.ProjectTo<LibraryListModel>(mapperConfig);
+                        var tvShowLibraries = _context.TvShowsLibraries.ProjectTo<LibraryListModel>(mapperConfig);
+                        return bookLibraries.Concat(tvShowLibraries).ToAsyncEnumerable();
                 }
             }
             catch (Exception ex)

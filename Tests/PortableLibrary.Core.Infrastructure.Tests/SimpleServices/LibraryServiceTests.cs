@@ -39,7 +39,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
             using (var context =
                 new PortableLibraryDataContext(GetDatabaseOptions<PortableLibraryDataContext>("libserviceaddlibrary")))
             {
-                var service = new LibraryService(context, _mapper);
+                var service = new LibraryService(context);
 
                 var result = await service.AddLibraryAsync(title, LibraryType.Book);
                 Assert.True(result);
@@ -67,7 +67,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
 
                 await context.SaveChangesAsync();
 
-                var service = new LibraryService(context, _mapper);
+                var service = new LibraryService(context);
                 var result = await service.RemoveLibraryAsync(title, LibraryType.Book);
                 Assert.True(result);
 

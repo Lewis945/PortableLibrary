@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PortableLibrary.Core.Database.Entities.Base;
-using PortableLibrary.Core.Extensions;
+using System.Linq;
 using PortableLibrary.Core.Infrastructure.Templating.Table;
+using PortableLibrary.Core.SimpleServices.Models;
 using PortableLibrary.Core.Utilities;
 
 namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
@@ -42,12 +42,11 @@ namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
 
         #region Public Methods
 
-        public byte[] GeneratePdf(List<BaseLibrary> libraries, bool extended = false)
+        public byte[] GeneratePdf(List<LibraryListModel> libraries, bool extended = false)
         {
             var model = new LibrariesModel
             {
                 Title = "Libraries",
-                Libraries = new List<LibraryModel>(),
                 Table = new TableModel
                 {
                     Headers = GetHeaders(extended),
@@ -57,11 +56,6 @@ namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
 
             foreach (var library in libraries)
             {
-                model.Libraries.Add(new LibraryModel
-                {
-                    Title = library.Name,
-                });
-
                 model.Table.Rows.Add(GetRow(library, extended));
             }
 
@@ -100,31 +94,29 @@ namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
                 };
         }
 
-        private static List<string> GetRow(BaseLibrary library, bool extended)
+        private static List<string> GetRow(LibraryListModel library, bool extended)
         {
-            if (!extended)
-                return new List<string>
+            return extended
+                ? new List<string>
                 {
-                    library.Name,
-                    library.GetLibraryType().ToString(),
-                    library.GetItemsCount().ToString(),
-                    library.IsPublic ? "Yes" : "No"
+                    library.Title,
+                    library.Type.ToString(),
+                    library.Items.ToString(),
+                    library.Published?.ToString(),
+                    library.Favourits?.ToString(),
+                    library.Processing?.ToString(),
+                    library.Processed?.ToString(),
+                    library.Planned?.ToString(),
+                    library.AreWaitingToBecomeGlobal?.ToString(),
+                    library.Public.ToString()
+                }
+                : new List<string>
+                {
+                    library.Title,
+                    library.Type.ToString(),
+                    library.Items.ToString(),
+                    library.Public.ToString()
                 };
-
-            var counts = library.GetCountByFlags();
-            return new List<string>
-            {
-                library.Name,
-                library.GetLibraryType().ToString(),
-                counts.All.ToString(),
-                counts.IsPublished.ToString(),
-                counts.IsFavourite.ToString(),
-                counts.IsProcessing.ToString(),
-                counts.IsProcessed.ToString(),
-                counts.IsProcessingPlanned.ToString(),
-                counts.IsWaitingToBecomeGlobal.ToString(),
-                library.IsPublic ? "Yes" : "No"
-            };
         }
 
         #endregion
