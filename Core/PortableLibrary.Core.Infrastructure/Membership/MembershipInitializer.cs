@@ -1,19 +1,20 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
+using PortableLibrary.Core.Infrastructure.Membership.Jwt;
+using PortableLibrary.Core.Membership;
 
-namespace PortableLibrary.Core.Membership
+namespace PortableLibrary.Core.Infrastructure.Membership
 {
     public class MembershipInitializer
     {
         public static void Register(IServiceCollection services, IConfiguration configuration)
         {
-
             var signingKey = new SymmetricSecurityKey(
                 Encoding.ASCII.GetBytes(configuration.GetValue<string>("SecretKey")));
 

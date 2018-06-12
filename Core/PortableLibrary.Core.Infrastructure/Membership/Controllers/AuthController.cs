@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.Membership.Models;
+using PortableLibrary.Core.Membership;
 
-namespace PortableLibrary.Core.Membership.Controllers
+namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 {
     public abstract class AuthController : Controller
     {

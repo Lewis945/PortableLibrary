@@ -4,8 +4,9 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using PortableLibrary.Core.Membership;
 
-namespace PortableLibrary.Core.Membership
+namespace PortableLibrary.Core.Infrastructure.Membership.Jwt
 {
     public class JwtFactory : IJwtFactory
     {
@@ -20,13 +21,14 @@ namespace PortableLibrary.Core.Membership
         public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
         {
             var claims = new[]
-         {
-                 new Claim(JwtRegisteredClaimNames.Sub, userName),
-                 new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
-                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
-                 identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Rol),
-                 identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
-             };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, userName),
+                new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(),
+                    ClaimValueTypes.Integer64),
+                identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Rol),
+                identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
+            };
 
             // Create the JWT security token and encode it.
             var jwt = new JwtSecurityToken(
@@ -53,9 +55,9 @@ namespace PortableLibrary.Core.Membership
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
         private static long ToUnixEpochDate(DateTime date)
-          => (long)Math.Round((date.ToUniversalTime() -
-                               new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
-                              .TotalSeconds);
+            => (long) Math.Round((date.ToUniversalTime() -
+                                  new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                .TotalSeconds);
 
         private static void ThrowIfInvalidOptions(JwtIssuerOptions options)
         {

@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using PortableLibrary.Core.Membership;
 
-namespace PortableLibrary.Core.Membership
+namespace PortableLibrary.Core.Infrastructure.Membership
 {
     public class Tokens
     {

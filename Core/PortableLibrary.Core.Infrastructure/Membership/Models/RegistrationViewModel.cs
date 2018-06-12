@@ -1,4 +1,4 @@
-﻿namespace PortableLibrary.Core.Membership
+﻿namespace PortableLibrary.Core.Infrastructure.Membership.Models
 {
     public class RegistrationViewModel
     {

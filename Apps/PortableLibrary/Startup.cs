@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PortableLibrary.Core.Database;
+using PortableLibrary.Core.Infrastructure.Membership;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
 using PortableLibrary.Core.Membership;
 using PortableLibrary.Core.SimpleServices;
@@ -35,6 +36,16 @@ namespace PortableLibrary
 
             services.AddScoped<ILibraryService, LibraryService>();
 
+//            services.AddCors(options =>
+//            {
+//                options.AddPolicy("CorsPolicy",
+//                    builder => builder.AllowAnyOrigin()
+//                        .AllowAnyMethod()
+//                        .AllowAnyHeader()
+//                        .AllowCredentials()
+//                        .Build());
+//            });
+            
             services.AddMvc();
 
             // https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-dotnet-sqldatabase
@@ -52,6 +63,8 @@ namespace PortableLibrary
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+//            app.UseCors("CorsPolicy");
 
             app.UseMvc();
         }

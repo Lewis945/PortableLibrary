@@ -1,8 +1,8 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
-namespace PortableLibrary.Core.Membership
+namespace PortableLibrary.Core.Infrastructure.Membership
 {
     public class JwtIssuerOptions
     {

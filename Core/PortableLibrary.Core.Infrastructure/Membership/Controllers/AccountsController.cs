@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using PortableLibrary.Core.Infrastructure.Membership.Models;
+using PortableLibrary.Core.Membership;
 
-namespace PortableLibrary.Core.Membership.Controllers
+namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 {
     public abstract class AccountsController : Controller
     {
