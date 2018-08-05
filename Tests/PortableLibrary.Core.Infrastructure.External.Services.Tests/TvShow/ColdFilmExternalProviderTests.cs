@@ -248,7 +248,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var service = new ColdFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShowSeasonAsync(
-                "http://coldfilm.info/news/agenty_shhit_4_sezon_smotret_onlajn/1-0-435");
+                "http://coldfilm.cc/news/agenty_shhit_4_sezon_smotret_onlajn/1-0-435");
             
             #region Season 4
 
@@ -294,7 +294,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var service = new ColdFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShowSeasonAsync(
-                "http://coldfilm.info/news/flesh_1_sezon_smotret_onlajn/1-0-89");
+                "http://coldfilm.cc/news/flesh_1_sezon_smotret_onlajn/1-0-89");
             
             #region Season 1
 
@@ -340,7 +340,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var service = new ColdFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShowSeasonAsync(
-                "http://coldfilm.info/news/flehsh_3_sezon_smotret_onlajn/1-0-389");
+                "http://coldfilm.cc/news/flehsh_3_sezon_smotret_onlajn/1-0-389");
             
             #region Season 3
 
@@ -386,7 +386,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             var service = new ColdFilmExternalProvider(_retryService);
 
             var model = await service.ExtractTvShowSeasonAsync(
-                "http://coldfilm.info/news/strela_5_sezon_smotret_onlajn/1-0-391");
+                "http://coldfilm.cc/news/strela_5_sezon_smotret_onlajn/1-0-391");
             
             #region Season 5
 

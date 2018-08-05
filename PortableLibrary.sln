@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{36E778BB-5A7F-4FE2-A86E-2C057B7827D0}"
 	ProjectSection(SolutionItems) = preProject
+		MyShowsConfiguration.json = MyShowsConfiguration.json
 		Configuration\TelegramBotAuthConfiguration.json = Configuration\TelegramBotAuthConfiguration.json
 		Configuration\TelegramBotConfiguration.json = Configuration\TelegramBotConfiguration.json
 	EndProjectSection
@@ -23,19 +24,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.TelegramBot
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{CDC2A1A5-40F1-4024-B41C-3496DF316541}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Core.Infrastructure", "Core\PortableLibrary.Core.Infrastructure\PortableLibrary.Core.Infrastructure.csproj", "{9585F6BB-167B-4148-88DA-10546EAF5850}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Core.Infrastructure", "Core\PortableLibrary.Core.Infrastructure\PortableLibrary.Core.Infrastructure.csproj", "{9585F6BB-167B-4148-88DA-10546EAF5850}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Core.Infrastructure.External.Services", "Core\PortableLibrary.Core.Infrastructure.External.Services\PortableLibrary.Core.Infrastructure.External.Services.csproj", "{0E41BD93-AFFD-4F9D-ACDF-EB6BBC611BF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Core.Infrastructure.External.Services", "Core\PortableLibrary.Core.Infrastructure.External.Services\PortableLibrary.Core.Infrastructure.External.Services.csproj", "{0E41BD93-AFFD-4F9D-ACDF-EB6BBC611BF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Core.Infrastructure.External.Services.Tests", "Tests\PortableLibrary.Core.Infrastructure.External.Services.Tests\PortableLibrary.Core.Infrastructure.External.Services.Tests.csproj", "{ED35960E-DCB9-4EBE-8FA1-6E29017C04CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Core.Infrastructure.External.Services.Tests", "Tests\PortableLibrary.Core.Infrastructure.External.Services.Tests\PortableLibrary.Core.Infrastructure.External.Services.Tests.csproj", "{ED35960E-DCB9-4EBE-8FA1-6E29017C04CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Core.Infrastructure.Tests", "Tests\PortableLibrary.Core.Infrastructure.Tests\PortableLibrary.Core.Infrastructure.Tests.csproj", "{382FAAA4-8E65-46BC-9DE6-66F8681799F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Core.Infrastructure.Tests", "Tests\PortableLibrary.Core.Infrastructure.Tests\PortableLibrary.Core.Infrastructure.Tests.csproj", "{382FAAA4-8E65-46BC-9DE6-66F8681799F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Core.Tests", "Tests\PortableLibrary.Core.Tests\PortableLibrary.Core.Tests.csproj", "{9567B28C-CED3-4D52-BE0C-18AD39346296}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Core.Tests", "Tests\PortableLibrary.Core.Tests\PortableLibrary.Core.Tests.csproj", "{9567B28C-CED3-4D52-BE0C-18AD39346296}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibraryTelegramBot.Tests", "Tests\PortableLibraryTelegramBot.Tests\PortableLibraryTelegramBot.Tests.csproj", "{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibraryTelegramBot.Tests", "Tests\PortableLibraryTelegramBot.Tests\PortableLibraryTelegramBot.Tests.csproj", "{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary", "Apps\PortableLibrary\PortableLibrary.csproj", "{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary", "Apps\PortableLibrary\PortableLibrary.csproj", "{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Secret", "Secret", "{03ADF2E5-E40E-43D8-BFD2-A711BC33DA49}"
+	ProjectSection(SolutionItems) = preProject
+		Configuration\Secret\MyShowsConfiguration.json = Configuration\Secret\MyShowsConfiguration.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +104,7 @@ Global
 		{9567B28C-CED3-4D52-BE0C-18AD39346296} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
 		{2B4CF73F-9AB1-40E8-9DBA-71CDA6E879C5} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
 		{88C3DB71-D2D8-414C-8C73-A596F2CD7FDE} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
+		{03ADF2E5-E40E-43D8-BFD2-A711BC33DA49} = {36E778BB-5A7F-4FE2-A86E-2C057B7827D0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7C961EDA-CE55-4678-A53B-976549AF646D}

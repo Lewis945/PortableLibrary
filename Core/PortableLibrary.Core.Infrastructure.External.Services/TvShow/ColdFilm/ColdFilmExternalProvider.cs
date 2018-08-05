@@ -19,7 +19,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.ColdFilm
     {
         #region Properties
 
-        public override string ServiceUri => "http://coldfilm.info/";
+        public override string ServiceUri => "http://coldfilm.cc/";
         public override string ServiceName => "ColdFilm";
 
         #endregion
