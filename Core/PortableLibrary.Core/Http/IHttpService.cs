@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using PortableLibrary.Core.Enums;
 using System.Threading.Tasks;
 
 namespace PortableLibrary.Core.Http
@@ -15,10 +15,12 @@ namespace PortableLibrary.Core.Http
         /// <typeparam name="TResponse"></typeparam>
         /// <returns></returns>
         Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest requestObject,
-            string language = null)
+            NamingCaseType requestNamingCase = NamingCaseType.Pascal,
+            NamingCaseType responseNamingCase = NamingCaseType.Pascal,
+            string language = null, string authToken = null)
             where TRequest : class, new()
             where TResponse : class, new();
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -28,7 +30,8 @@ namespace PortableLibrary.Core.Http
         /// <typeparam name="TResponse"></typeparam>
         /// <returns></returns>
         Task<TResponse> PostStringAsync<TResponse>(string url, string content,
-            string language = null)
+            NamingCaseType responseNamingCase = NamingCaseType.Pascal,
+            string language = null, string authToken = null)
             where TResponse : class, new();
     }
 }

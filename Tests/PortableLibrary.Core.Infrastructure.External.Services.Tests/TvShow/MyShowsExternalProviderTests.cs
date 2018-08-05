@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.External.Services.TvShow.Models;
 using PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction;
 using PortableLibrary.Core.Http;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Response;
 using PortableLibrary.Core.Utilities;
 using Xunit;
 
@@ -34,6 +37,18 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             _englishService = new MyShowsExternalProvider(httpService, retryService, mapper, Language.English);
             _russianService = new MyShowsExternalProvider(httpService, retryService, mapper, Language.Russian);
+        }
+
+        #endregion
+
+        #region Token
+
+        [Fact]
+        public async Task Should_Get_Access_Token()
+        {
+            string token = await _englishService.GetToken();
+
+            Assert.True(!string.IsNullOrWhiteSpace(token));
         }
 
         #endregion
@@ -143,9 +158,6 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             Assert.True(model.ImdbId.HasValue);
             Assert.Equal(4047038, model.ImdbId.Value);
 
-            Assert.True(model.Rating.HasValue);
-            Assert.Equal(4.52m, model.Rating.Value, 2);
-
             Assert.True(model.Started.HasValue);
             Assert.Equal(new DateTimeOffset(new DateTime(2016, 10, 22, 0, 0, 0, DateTimeKind.Utc)),
                 model.Started.Value);
@@ -158,9 +170,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 switch (language)
                 {
                     case Language.English:
-                        return new List<string> {"Comedy", "Sci-Fi", "Mystery"};
+                        return new List<string> { "Comedy", "Sci-Fi", "Mystery" };
                     case Language.Russian:
-                        return new List<string> {"Комедия", "Фантастика", "Детектив"};
+                        return new List<string> { "Комедия", "Фантастика", "Детектив" };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(language), language, null);
                 }
@@ -393,9 +405,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 switch (language)
                 {
                     case Language.English:
-                        return new List<string> {"Drama", "Crime", "Supernatural"};
+                        return new List<string> { "Drama", "Crime", "Supernatural" };
                     case Language.Russian:
-                        return new List<string> {"Драма", "Криминал", "Сверхъестественное"};
+                        return new List<string> { "Драма", "Криминал", "Сверхъестественное" };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(language), language, null);
                 }
@@ -513,7 +525,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
 
             ValidateEpisode(s3S2, id: 2097145, title: "Love is In the Air", originalTitle: "Love is In the Air",
                 shortName: "s03 special-2",
-                dateReleasedOrigianl: new DateTime(2014, 1, 31, 6, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2014, 1, 29, 18, 0, 0, DateTimeKind.Utc));
 
             #endregion
 
@@ -799,9 +811,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 switch (language)
                 {
                     case Language.English:
-                        return new List<string> {"Comedy"};
+                        return new List<string> { "Comedy" };
                     case Language.Russian:
-                        return new List<string> {"Комедия"};
+                        return new List<string> { "Комедия" };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(language), language, null);
                 }
@@ -1341,9 +1353,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 switch (language)
                 {
                     case Language.English:
-                        return new List<string> {"Comedy"};
+                        return new List<string> { "Comedy" };
                     case Language.Russian:
-                        return new List<string> {"Комедия"};
+                        return new List<string> { "Комедия" };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(language), language, null);
                 }
@@ -1527,7 +1539,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             Assert.Equal(15897, model.Id);
 
             Assert.NotNull(model.Titles);
-            Assert.Equal(new List<string> {GetSteinsGateTitle(language)}, model.Titles);
+            Assert.Equal(new List<string> { GetSteinsGateTitle(language) }, model.Titles);
             Assert.Equal(GetSteinsGateTitle(Language.English), model.TitleOriginal, true);
 
             Assert.Equal(GetDescription().ClearString(), model.Description.ClearString(), true);
@@ -1570,9 +1582,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
                 switch (language)
                 {
                     case Language.English:
-                        return new List<string> {"Drama", "Sci-Fi", "Fantasy", "Anime"};
+                        return new List<string> { "Drama", "Sci-Fi", "Fantasy", "Anime" };
                     case Language.Russian:
-                        return new List<string> {"Драма", "Фантастика", "Фэнтези", "Аниме"};
+                        return new List<string> { "Драма", "Фантастика", "Фэнтези", "Аниме" };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(language), language, null);
                 }

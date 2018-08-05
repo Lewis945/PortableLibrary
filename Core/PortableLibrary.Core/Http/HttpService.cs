@@ -6,39 +6,68 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PortableLibrary.Core.Enums;
 
 namespace PortableLibrary.Core.Http
 {
     public class HttpService : IHttpService
     {
+        private static NamingStrategy GetNamingStrategy(NamingCaseType namingCase)
+        {
+            NamingStrategy namingStrategy = null;
+            if (namingCase == NamingCaseType.Camel)
+                namingStrategy = new CamelCaseNamingStrategy();
+            else if (namingCase == NamingCaseType.Snake)
+                namingStrategy = new SnakeCaseNamingStrategy();
+            return namingStrategy;
+        }
+
         /// <inheritdoc />
         public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest requestObject,
-            string language = null)
+            NamingCaseType requestNamingCase = NamingCaseType.Pascal,
+            NamingCaseType responseNamingCase = NamingCaseType.Pascal,
+            string language = null, string authToken = null)
             where TRequest : class, new()
             where TResponse : class, new()
         {
             var serializerSettings =
-                new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = GetNamingStrategy(requestNamingCase)
+                    }
+                };
 
             var content = JsonConvert.SerializeObject(requestObject, serializerSettings);
 
-            return await PostStringAsync<TResponse>(url, content, language).ConfigureAwait(false);
+            return await PostStringAsync<TResponse>(url, content, responseNamingCase, language, authToken).ConfigureAwait(false);
         }
-        
+
         /// <inheritdoc />
         public async Task<TResponse> PostStringAsync<TResponse>(string url, string content,
-            string language = null)
+            NamingCaseType responseNamingCase = NamingCaseType.Pascal, string language = null, string authToken = null)
             where TResponse : class, new()
         {
             const string mediaType = "application/json";
 
             var serializerSettings =
-                new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = GetNamingStrategy(responseNamingCase)
+                    }
+                };
 
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+
+                if (!string.IsNullOrWhiteSpace(authToken))
+                    client.DefaultRequestHeaders.Add("Authorization", authToken);
+
                 if (!string.IsNullOrWhiteSpace(language))
                     client.DefaultRequestHeaders.Add("Accept-Language", language);
 

@@ -39,7 +39,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
             Assert.Collection(model.Genres,
                 item => Assert.Equal("Фэнтези", item, true),
                 item => Assert.Equal("Героическое фэнтези", item, true),
-                item => Assert.Equal("Science Fantasy", item, true)
+                item => Assert.Equal("Научное фэнтези", item, true)
             );
 
             Assert.Equal("Алекс Кош", model.Author, true);
@@ -86,7 +86,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
             Assert.Collection(model.Genres,
                 item => Assert.Equal("Фэнтези", item, true),
                 item => Assert.Equal("Героическое фэнтези", item, true),
-                item => Assert.Equal("Science Fantasy", item, true)
+                item => Assert.Equal("Научное фэнтези", item, true)
             );
 
             Assert.Equal("Алекс Кош", model.Author, true);

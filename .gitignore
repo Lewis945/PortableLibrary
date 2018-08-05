@@ -336,3 +336,5 @@ Blog
 About
 Press h to open a hovercard with more details.
 Configuration/TelegramBotAuthConfiguration.json
+Tests/PortableLibrary.Core.Infrastructure.Tests/Templating/Output/
+Configuration/Secret/

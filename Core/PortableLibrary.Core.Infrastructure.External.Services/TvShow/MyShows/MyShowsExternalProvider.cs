@@ -23,6 +23,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
         #region Properties
 
         public override string ServiceUri => "https://api.myshows.me/v2/rpc/";
+        public string AuthUri => "https://myshows.me/oauth/token";
         public override string ServiceName => "MyShows";
 
         #endregion
@@ -73,7 +74,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
             var response = await _retryService.ExecuteAsync(() =>
                 _httpService.PostAsync<GetTvShowByTitleRequest, TvShowSearchResponseWrapper>(
-                    ServiceUri, request, _language)).ConfigureAwait(false);
+                    ServiceUri, request, Enums.NamingCaseType.Camel, Enums.NamingCaseType.Camel, _language)).ConfigureAwait(false);
 
             var model = _mapper.Map<IEnumerable<TvShowSearchModel>>(response.Result);
 
@@ -97,7 +98,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
             var response = await _retryService.ExecuteAsync(() =>
                 _httpService.PostAsync<GetTvShowByIdRequest, TvShowResponseWrapper>(
-                    ServiceUri, request, _language)).ConfigureAwait(false);
+                    ServiceUri, request, Enums.NamingCaseType.Camel, Enums.NamingCaseType.Camel, _language)).ConfigureAwait(false);
 
             var genresResponse = await GetTvShowGenresAsync().ConfigureAwait(false);
             var genreIds = response.Result.GenreIds.OrderBy(g => g).ToList();
@@ -123,11 +124,29 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
             var response = await _retryService.ExecuteAsync(() =>
                 _httpService.PostAsync<GetTvShowByIdRequest, TvShowResponseWrapper>(
-                    ServiceUri, request, _language)).ConfigureAwait(false);
+                    ServiceUri, request, Enums.NamingCaseType.Camel, Enums.NamingCaseType.Camel, _language)).ConfigureAwait(false);
 
             var model = _mapper.Map<TvShowTrackingModel>(response);
 
             return model;
+        }
+
+        public async Task<string> GetToken()
+        {
+            var request = new GetTokenRequest
+            {
+                GrantType = "password",
+                ClientId = "",
+                ClientSecret = "",
+                Username = "",
+                Password = ""
+            };
+
+            var response = await _retryService.ExecuteAsync(() =>
+                _httpService.PostAsync<GetTokenRequest, TokenResponse>(
+                    AuthUri, request, Enums.NamingCaseType.Snake, Enums.NamingCaseType.Snake, _language)).ConfigureAwait(false);
+
+            return response.AccessToken;
         }
 
         #endregion
@@ -140,7 +159,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
             var response = await _retryService.ExecuteAsync(() =>
                 _httpService.PostAsync<GetTvShowGenresRequest, GenresResponseWrapper>(
-                    ServiceUri, request, _language)).ConfigureAwait(false);
+                    ServiceUri, request, Enums.NamingCaseType.Camel, Enums.NamingCaseType.Camel, _language)).ConfigureAwait(false);
 
             return response.Result;
         }
