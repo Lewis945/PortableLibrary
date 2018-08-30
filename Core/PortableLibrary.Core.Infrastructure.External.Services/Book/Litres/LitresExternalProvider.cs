@@ -77,7 +77,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
                 var authorSeries = series.FirstOrDefault(s => s.Index.HasValue);
 
                 model.AuthorSeries = string.IsNullOrWhiteSpace(authorSeries.Name) ? null : authorSeries.Name;
-                model.Index = authorSeries.Index.HasValue ? authorSeries.Index.Value : (int?) null;
+                model.Index = authorSeries.Index.HasValue ? authorSeries.Index.Value : (int?)null;
                 model.TrackingUri = string.IsNullOrWhiteSpace(authorSeries.Uri) ? null : authorSeries.Uri;
 
                 var publisherSeries = series.Where(s => !s.Index.HasValue).Select(s => s.Name).ToList();
@@ -233,7 +233,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
             var divBiblioBookInfo =
                 divInfo1?.SelectNodes(".//div")?.FirstOrDefault(d => d.HasClass("biblio_book_info"));
             var liGenres = divBiblioBookInfo?.SelectNodes(".//li")
-                ?.FirstOrDefault(n => n.Descendants().First().InnerText == "Жанр:");
+                ?.FirstOrDefault(n => n.Descendants().FirstOrDefault()?.InnerText == "Жанр:");
 
             return liGenres?.SelectNodes("./a")?.Select(n => n.InnerText.Trim()).ToList();
         }
@@ -251,7 +251,8 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
             if (divBiblioBookInfoDetailed == null) return null;
 
             const string key = "Дата написания:";
-            var liDatePublished = divBiblioBookInfoDetailed.SelectNodes("//li")
+
+            var liDatePublished = divBiblioBookInfoDetailed.SelectNodes(".//li")
                 ?.FirstOrDefault(n => n.Descendants().First().InnerText == key);
 
             if (liDatePublished == null) return null;
@@ -267,7 +268,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
             if (divBiblioBookInfoDetailed == null) return null;
 
             const string key = "Объем:";
-            var liPagesCount = divBiblioBookInfoDetailed.SelectNodes("//li")
+            var liPagesCount = divBiblioBookInfoDetailed.SelectNodes(".//li")
                 ?.FirstOrDefault(n => n.Descendants().First().InnerText == key);
 
             if (liPagesCount == null) return null;

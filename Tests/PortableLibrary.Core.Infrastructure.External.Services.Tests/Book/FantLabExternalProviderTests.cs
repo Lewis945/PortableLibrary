@@ -133,7 +133,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("Фантастика", item, true),
-                item => Assert.Equal("«Мягкая» (гуманитарная, социальная) научная фантастика", item, true)
+                item => Assert.Equal("«Мягкая» (гуманитарная) научная фантастика", item, true)
             );
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);
@@ -184,7 +184,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             Assert.Collection(model.Genres,
                 item => Assert.Equal("Фантастика", item, true),
-                item => Assert.Equal("«Мягкая» (гуманитарная, социальная) научная фантастика", item, true)
+                item => Assert.Equal("«Мягкая» (гуманитарная) научная фантастика", item, true)
             );
 
             Assert.Equal("Гарри Гаррисон", model.Author, true);

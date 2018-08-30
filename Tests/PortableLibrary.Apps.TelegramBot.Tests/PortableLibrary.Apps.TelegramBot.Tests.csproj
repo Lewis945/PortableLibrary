@@ -12,11 +12,11 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\PortableLibrary.TelegramBot\PortableLibrary.TelegramBot.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Commands\Display\" />
     <Folder Include="Commands\Mark\" />
     <Folder Include="Commands\Enable\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Apps\PortableLibrary.Apps.TelegramBot\PortableLibrary.Apps.TelegramBot.csproj" />
   </ItemGroup>
 </Project>

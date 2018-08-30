@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Newtonsoft.Json;
 using PortableLibrary.Core.Http;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Models;
 using PortableLibrary.Core.Utilities;
+using System.IO;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow.MyShows
 {
@@ -24,8 +27,16 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow.MyS
             var config = new MapperConfiguration(cfg => { cfg.AddProfile<MyShowsMappingProfile>(); });
             IMapper mapper = new Mapper(config);
 
-            EnglishService = new MyShowsExternalProvider(httpService, retryService, mapper, Language.English);
-            RussianService = new MyShowsExternalProvider(httpService, retryService, mapper, Language.Russian);
+            #region Configuration
+
+            var fileContent = File.ReadAllText(Path.Combine("..", "..", "..", "..", "..",
+                "Configuration", "Secret", "MyShowsConfiguration.json"));
+            var authConfig = JsonConvert.DeserializeObject<AuthTokenModel>(fileContent);
+
+            #endregion
+
+            EnglishService = new MyShowsExternalProvider(httpService, retryService, mapper, Language.English, authConfig);
+            RussianService = new MyShowsExternalProvider(httpService, retryService, mapper, Language.Russian, authConfig);
         }
 
         #endregion

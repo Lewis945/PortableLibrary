@@ -8,6 +8,7 @@ using PortableLibrary.Core.External.Services.TvShow.Models.DataExtraction;
 using PortableLibrary.Core.External.Services.TvShow.Models.Search;
 using PortableLibrary.Core.External.Services.TvShow.Models.Tracking;
 using PortableLibrary.Core.Http;
+using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Models;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Request;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Response;
 using PortableLibrary.Core.Utilities;
@@ -34,6 +35,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
         private readonly IHttpService _httpService;
         private readonly IMapper _mapper;
         private readonly string _language;
+        private readonly AuthTokenModel _authToken;
 
         #endregion
 
@@ -46,6 +48,12 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
             _httpService = httpService;
             _mapper = mapper;
             _language = GetLanguage(language);
+        }
+
+        public MyShowsExternalProvider(IHttpService httpService, IRetryService retryService, IMapper mapper,
+          Language language, AuthTokenModel authToken) : this(httpService, retryService, mapper, language)
+        {
+            _authToken = authToken;
         }
 
         #endregion
@@ -136,10 +144,10 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
             var request = new GetTokenRequest
             {
                 GrantType = "password",
-                ClientId = "",
-                ClientSecret = "",
-                Username = "",
-                Password = ""
+                ClientId = _authToken.ClientId,
+                ClientSecret = _authToken.ClientSecret,
+                Username = _authToken.Username,
+                Password = _authToken.Password
             };
 
             var response = await _retryService.ExecuteAsync(() =>
@@ -166,7 +174,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows
 
         private int GetTvShowId(string uri)
         {
-            if (uri.EndsWith("/")) uri = uri.Remove(uri.LastIndexOf("/", StringComparison.InvariantCultureIgnoreCase));
+            if (uri.EndsWith("/", StringComparison.Ordinal)) uri = uri.Remove(uri.LastIndexOf("/", StringComparison.InvariantCultureIgnoreCase));
             string idString = uri.Substring(uri.LastIndexOf("/", StringComparison.InvariantCultureIgnoreCase) + 1);
 
             if (!int.TryParse(idString, out int id))
