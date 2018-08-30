@@ -17,23 +17,23 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
         {
             Assert.Equal(imageUri, tvShowModel.ImageUri, true);
 
-            Assert.Equal(new List<string> {title}, tvShowModel.Titles);
+            Assert.Equal(new List<string> { title }, tvShowModel.Titles);
             Assert.Equal(originalTitle, tvShowModel.TitleOriginal, true);
 
             Assert.Equal(TvShowStatus.CanceledOrEnded, tvShowModel.Status);
 
             Assert.Equal(genres, tvShowModel.Genres);
 
-//            Assert.Collection(tvShowModel.Genres,
-//                item => Assert.Equal("Комедия", item, true),
-//                item => Assert.Equal("Мистика", item, true),
-//                item => Assert.Equal("Фантастика", item, true),
-//                item => Assert.Equal("Детектив", item, true)
-//            );
+            //            Assert.Collection(tvShowModel.Genres,
+            //                item => Assert.Equal("Комедия", item, true),
+            //                item => Assert.Equal("Мистика", item, true),
+            //                item => Assert.Equal("Фантастика", item, true),
+            //                item => Assert.Equal("Детектив", item, true)
+            //            );
 
             string modelDescription = Regex.Replace(tvShowModel.Description, @"\t|\n|\r|\s", string.Empty);
             description = Regex.Replace(description, @"\t|\n|\r|\s", string.Empty);
-            
+
             Assert.Equal(description, modelDescription, true);
 
             if (seasonsCount.HasValue)
@@ -89,7 +89,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow
             else
                 Assert.Null(episode.Id);
 
-            Assert.Equal(new List<string> {title}, episode.Titles);
+            Assert.Equal(new List<string> { title }, episode.Titles);
             Assert.Equal(originalTitle, episode.OriginalTitle, true);
 
             if (shortName != "-1")
