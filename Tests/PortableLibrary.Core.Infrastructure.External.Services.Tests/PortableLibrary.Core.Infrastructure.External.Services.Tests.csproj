@@ -15,4 +15,7 @@
     <ProjectReference Include="..\..\Core\PortableLibrary.Core.Infrastructure.External.Services\PortableLibrary.Core.Infrastructure.External.Services.csproj" />
     <ProjectReference Include="..\..\Core\PortableLibrary.Core\PortableLibrary.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TvShow\OnlineAnidub\" />
+  </ItemGroup>
 </Project>

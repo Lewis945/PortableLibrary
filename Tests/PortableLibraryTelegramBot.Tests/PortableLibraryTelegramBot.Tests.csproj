@@ -12,8 +12,6 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Apps\PortableLibraryTelegramBot\PortableLibraryTelegramBot.csproj" />
-    <ProjectReference Include="..\..\Apps\PortableLibraryTelegramBot\PortableLibraryTelegramBot.csproj" />
     <ProjectReference Include="..\..\Libraries\PortableLibrary.TelegramBot\PortableLibrary.TelegramBot.csproj" />
   </ItemGroup>
   <ItemGroup>
