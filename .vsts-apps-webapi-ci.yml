@@ -27,8 +27,8 @@ steps:
   inputs:
     command: publish
     projects: './Apps/PortableLibrary.Apps.WebApi'
-    publishWebProjects: False
-    arguments: '--configuration $(BuildConfiguration) –-output $(Build.ArtifactStagingDirectory)/publish'
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration)'
     zipAfterPublish: True
 
 #- task: AzureRmWebAppDeployment@3
