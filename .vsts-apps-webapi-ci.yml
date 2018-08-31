@@ -1,0 +1,38 @@
+# Build ASP.NET Core project using VSTS
+# https://docs.microsoft.com/vsts/pipelines/languages/dotnet-core?view=vsts
+
+#queue: 'Hosted Linux Preview', 'Hosted VS2017', 'Hosted macOS Preview'
+queue: 'Hosted VS2017'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+#- task: DotNetCoreInstaller@0
+#  inputs:
+#    version: '2.1.300' # replace this value with the version that you need for your project
+
+- script: dotnet build ./Apps/PortableLibrary.Apps.WebApi --configuration $(buildConfiguration)
+  displayName: Build
+
+#- task: DotNetCoreCLI@2
+#  displayName: Test
+#  inputs:
+#    command: test
+#    projects: '**/*Tests/*.csproj'
+#    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish artifacts
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
+
+#- task: AzureRmWebAppDeployment@3
+#  displayName: Publishing to azure
+#  inputs:
+#    azureSubscription: '<Azure service connection>'
+#    WebAppName: '<Name of web app>'
+#    Package: $(System.ArtifactsDirectory)/**/*.zip
