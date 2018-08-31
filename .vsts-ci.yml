@@ -12,19 +12,23 @@ steps:
 #  inputs:
 #    version: '2.1.300' # replace this value with the version that you need for your project
 
-- script: |
-    dotnet build --configuration $(buildConfiguration)
-    dotnet test dotnetcore-tests --configuration $(buildConfiguration) --logger trx
-    dotnet publish --configuration $(buildConfiguration) --output $BUILD_ARTIFACTSTAGINGDIRECTORY
+- script: dotnet build --configuration $(buildConfiguration)
 
-- task: PublishTestResults@2
+- task: DotNetCoreCLI@2
   inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
+    command: test
+    projects: **/*Tests/*.csproj
+    arguments: '--configuration $(BuildConfiguration)'
 
-- task: PublishBuildArtifacts@1
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
 
 #- task: AzureRmWebAppDeployment@3
 #  inputs:
-#    azureSubscription: '<Test environment Azure service connection>'
-#    WebAppName: '<name of test environment web app>'
+#    azureSubscription: '<Azure service connection>'
+#    WebAppName: '<Name of web app>'
+#    Package: $(System.ArtifactsDirectory)/**/*.zip
