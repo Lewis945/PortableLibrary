@@ -1,0 +1,30 @@
+# Build ASP.NET Core project using VSTS
+# https://docs.microsoft.com/vsts/pipelines/languages/dotnet-core?view=vsts
+
+#queue: 'Hosted Linux Preview', 'Hosted VS2017', 'Hosted macOS Preview'
+queue: 'Hosted VS2017'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+#- task: DotNetCoreInstaller@0
+#  inputs:
+#    version: '2.1.300' # replace this value with the version that you need for your project
+
+- script: |
+    dotnet build --configuration $(buildConfiguration)
+    dotnet test dotnetcore-tests --configuration $(buildConfiguration) --logger trx
+    dotnet publish --configuration $(buildConfiguration) --output $BUILD_ARTIFACTSTAGINGDIRECTORY
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
+- task: PublishBuildArtifacts@1
+
+#- task: AzureRmWebAppDeployment@3
+#  inputs:
+#    azureSubscription: '<Test environment Azure service connection>'
+#    WebAppName: '<name of test environment web app>'
