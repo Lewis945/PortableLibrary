@@ -13,14 +13,17 @@ steps:
 #    version: '2.1.300' # replace this value with the version that you need for your project
 
 - script: dotnet build --configuration $(buildConfiguration)
+  displayName: Build
+
+#- task: DotNetCoreCLI@2
+#  displayName: Test
+#  inputs:
+#    command: test
+#    projects: '**/*Tests/*.csproj'
+#    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  inputs:
-    command: test
-    projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
-
-- task: DotNetCoreCLI@2
+  displayName: Publish artifacts
   inputs:
     command: publish
     publishWebProjects: True
@@ -28,6 +31,7 @@ steps:
     zipAfterPublish: True
 
 #- task: AzureRmWebAppDeployment@3
+#  displayName: Publishing to azure
 #  inputs:
 #    azureSubscription: '<Azure service connection>'
 #    WebAppName: '<Name of web app>'
