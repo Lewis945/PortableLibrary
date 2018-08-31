@@ -23,7 +23,7 @@ steps:
 #    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: Publish artifacts
+  displayName: Prepare Artifacts
   inputs:
     command: publish
     projects: './Apps/PortableLibrary.Apps.WebApi'
@@ -31,6 +31,13 @@ steps:
     arguments: '--configuration $(BuildConfiguration)'
     zipAfterPublish: True
 
+# Publish the artifacts
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts
+  inputs:
+    pathToPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: drop
+    
 #- task: AzureRmWebAppDeployment@3
 #  displayName: Publishing to azure
 #  inputs:
