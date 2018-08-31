@@ -42,6 +42,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Apps.Fronte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Apps.TelegramBot.Tests", "Tests\PortableLibrary.Apps.TelegramBot.Tests\PortableLibrary.Apps.TelegramBot.Tests.csproj", "{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Apps.WebApi", "Apps\PortableLibrary.Apps.WebApi\PortableLibrary.Apps.WebApi.csproj", "{EEA6303F-056A-4E19-90E3-880485E0F06D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA6303F-056A-4E19-90E3-880485E0F06D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA6303F-056A-4E19-90E3-880485E0F06D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA6303F-056A-4E19-90E3-880485E0F06D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA6303F-056A-4E19-90E3-880485E0F06D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{D7A2ADEB-9421-4265-B1C9-42EB3D814CA3} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
 		{E69D87B5-6B04-444D-AC3F-E13E835E33EE} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
+		{EEA6303F-056A-4E19-90E3-880485E0F06D} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7C961EDA-CE55-4678-A53B-976549AF646D}
