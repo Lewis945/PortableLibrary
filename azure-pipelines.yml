@@ -1,0 +1,48 @@
+# ASP.NET Core
+# Build and test ASP.NET Core web applications targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/vsts/pipelines/languages/dotnet-core
+
+pool:
+  vmImage: 'VS2017-Win2016' # other options: 'macOS 10.13', 'Ubuntu 16.04'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+#- task: DotNetCoreInstaller@0
+#  inputs:
+#    version: '2.1.300' # replace this value with the version that you need for your project
+
+- script: dotnet build ./Apps/PortableLibrary.Apps.WebApi --configuration $(buildConfiguration)
+  displayName: Build WebApi
+
+#- task: DotNetCoreCLI@2
+#  displayName: Test
+#  inputs:
+#    command: test
+#    projects: '**/*Tests/*.csproj'
+#    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Prepare Artifacts for WebApi
+  inputs:
+    command: publish
+    projects: './Apps/PortableLibrary.Apps.WebApi'
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
+
+# Publish the artifacts
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts for WebApi
+  inputs:
+    pathToPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: drop
+    
+#- task: AzureRmWebAppDeployment@3
+#  displayName: Publishing to azure
+#  inputs:
+#    azureSubscription: '<Azure service connection>'
+#    WebAppName: '<Name of web app>'
+#    Package: $(System.ArtifactsDirectory)/**/*.zip
