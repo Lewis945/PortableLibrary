@@ -31,7 +31,7 @@ steps:
     projects: './Apps/PortableLibrary.Apps.WebApi'
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: True
+    zipAfterPublish: False
 
 # Publish the artifacts
 - task: PublishBuildArtifacts@1
