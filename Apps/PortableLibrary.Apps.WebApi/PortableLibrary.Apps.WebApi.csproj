@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>c4c9dd16-7a03-4e6e-9f37-43063b385904</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +10,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\PortableLibrary.Core.Infrastructure\PortableLibrary.Core.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Core\PortableLibrary.Core\PortableLibrary.Core.csproj" />
   </ItemGroup>
 
 </Project>

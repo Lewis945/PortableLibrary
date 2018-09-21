@@ -41,7 +41,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
             {
                 var service = new LibraryService(context);
 
-                var result = await service.AddLibraryAsync(title, LibraryType.Book);
+                var result = await service.AddLibraryAsync(null, title, LibraryType.Book);
                 Assert.True(result);
 
                 var booksLibrary = await context.BookLibraries.FirstOrDefaultAsync(l => l.Name == title);
@@ -68,7 +68,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
                 await context.SaveChangesAsync();
 
                 var service = new LibraryService(context);
-                var result = await service.RemoveLibraryAsync(title, LibraryType.Book);
+                var result = await service.RemoveLibraryAsync(null, title, LibraryType.Book);
                 Assert.True(result);
 
                 var library = await context.BookLibraries.FirstOrDefaultAsync(l => l.Name == title);

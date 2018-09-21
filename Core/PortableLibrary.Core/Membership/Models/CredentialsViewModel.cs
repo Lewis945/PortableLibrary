@@ -1,4 +1,4 @@
-﻿namespace PortableLibrary.Core.Infrastructure.Membership.Models
+﻿namespace PortableLibrary.Core.Membership.Models
 {
     public class CredentialsViewModel
     {

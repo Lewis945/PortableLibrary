@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Database.Entities.BooksLibrary;
+using PortableLibrary.Core.Database.Entities.Membership;
 using PortableLibrary.Core.Database.Entities.TvShowsLibrary;
 
 namespace PortableLibrary.Core.Database
 {
-    public class PortableLibraryDataContext : DbContext
+    public class PortableLibraryDataContext : IdentityDbContext<AppUser>
     {
         #region .ctor
 

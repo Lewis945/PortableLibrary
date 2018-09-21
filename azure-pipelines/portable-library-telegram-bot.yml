@@ -14,8 +14,8 @@ steps:
 #  inputs:
 #    version: '2.1.300' # replace this value with the version that you need for your project
 
-- script: dotnet build ./Apps/PortableLibrary.Apps.WebApi --configuration $(buildConfiguration)
-  displayName: Build WebApi
+- script: dotnet build ./Apps/PortableLibrary.Apps.TelegramBot --configuration $(buildConfiguration)
+  displayName: Build TelegramBot
 
 #- task: DotNetCoreCLI@2
 #  displayName: Test
@@ -25,19 +25,19 @@ steps:
 #    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: Prepare Artifacts for WebApi
+  displayName: Prepare Artifacts for TelegramBot
   inputs:
     command: publish
-    projects: './Apps/PortableLibrary.Apps.WebApi'
+    projects: './Apps/PortableLibrary.Apps.TelegramBot'
     publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/telegram-bot'
     zipAfterPublish: True
 
 # Publish the artifacts
 - task: PublishBuildArtifacts@1
-  displayName: Publish Artifacts for WebApi
+  displayName: Publish Artifacts for TelegramBot
   inputs:
-    pathToPublish: $(Build.ArtifactStagingDirectory)
+    pathToPublish: $(Build.ArtifactStagingDirectory)/telegram-bot
     artifactName: drop
     
 #- task: AzureRmWebAppDeployment@3

@@ -2,18 +2,22 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PortableLibrary.Core.Infrastructure.Membership.Models;
+using PortableLibrary.Core.Database;
+using PortableLibrary.Core.Database.Entities.Membership;
+using PortableLibrary.Core.Infrastructure.Models;
 using PortableLibrary.Core.Membership;
 
 namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 {
-    public abstract class AccountsController : Controller
+    [Route("api/membership")]
+    [ApiController]
+    public abstract class AccountsBaseController : ControllerBase
     {
-        private readonly MembershipDataContext _appDbContext;
+        private readonly PortableLibraryDataContext _appDbContext;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AccountsController(UserManager<AppUser> userManager, IMapper mapper, MembershipDataContext appDbContext)
+        public AccountsBaseController(UserManager<AppUser> userManager, IMapper mapper, PortableLibraryDataContext appDbContext)
         {
             _userManager = userManager;
             _mapper = mapper;
@@ -21,8 +25,8 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
         }
 
         // POST api/accounts
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody]RegistrationViewModel model)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody]RegistrationViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -33,11 +37,14 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
             var result = await _userManager.CreateAsync(userIdentity, model.Password);
 
-            //if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+            if (!result.Succeeded)
+            {
+                return BadRequest(result);
+            }
 
             await _appDbContext.SaveChangesAsync();
 
-            return new OkObjectResult("Account created");
+            return Ok("Account created");
         }
     }
 }

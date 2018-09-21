@@ -330,6 +330,11 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
                 {
                     Assert.Equal("Ярость Гуорры", item.Title, true);
                     Assert.Equal(7, item.Index);
+                },
+                item =>
+                {
+                    Assert.Equal("Великий Поход", item.Title, true);
+                    Assert.Equal(8, item.Index);
                 }
             );
         }

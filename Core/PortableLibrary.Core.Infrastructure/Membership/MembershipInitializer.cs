@@ -1,13 +1,14 @@
-﻿using System;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using PortableLibrary.Core.Database;
+using PortableLibrary.Core.Database.Entities.Membership;
 using PortableLibrary.Core.Infrastructure.Membership.Jwt;
 using PortableLibrary.Core.Membership;
+using System;
+using System.Text;
 
 namespace PortableLibrary.Core.Infrastructure.Membership
 {
@@ -17,10 +18,6 @@ namespace PortableLibrary.Core.Infrastructure.Membership
         {
             var signingKey = new SymmetricSecurityKey(
                 Encoding.ASCII.GetBytes(configuration.GetValue<string>("SecretKey")));
-
-            // Add framework services.
-            services.AddDbContext<MembershipDataContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddSingleton<IJwtFactory, JwtFactory>();
 
@@ -80,7 +77,7 @@ namespace PortableLibrary.Core.Infrastructure.Membership
                 o.Password.RequiredLength = 6;
             });
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
-            builder.AddEntityFrameworkStores<MembershipDataContext>().AddDefaultTokenProviders();
+            builder.AddEntityFrameworkStores<PortableLibraryDataContext>().AddDefaultTokenProviders();
         }
     }
 }

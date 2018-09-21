@@ -4,18 +4,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using PortableLibrary.Core.Infrastructure.Membership.Models;
+using PortableLibrary.Core.Database.Entities.Membership;
 using PortableLibrary.Core.Membership;
+using PortableLibrary.Core.Membership.Models;
 
 namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 {
-    public abstract class AuthController : Controller
+    [Route("api/membership")]
+    [ApiController]
+    public abstract class AuthBaseController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;
 
-        public AuthController(UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public AuthBaseController(UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
         {
             _userManager = userManager;
             _jwtFactory = jwtFactory;
@@ -24,7 +27,7 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
         // POST api/auth/login
         [HttpPost("login")]
-        public async Task<IActionResult> Post([FromBody]CredentialsViewModel credentials)
+        public async Task<IActionResult> Login([FromBody]CredentialsViewModel credentials)
         {
             if (!ModelState.IsValid)
             {
@@ -34,11 +37,12 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
             var identity = await GetClaimsIdentity(credentials.UserName, credentials.Password);
             if (identity == null)
             {
-                //return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid username or password.", ModelState));
+                ModelState.AddModelError("login_failure", "Invalid username or password.");
+                return BadRequest(ModelState);
             }
 
             var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, credentials.UserName, _jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
-            return new OkObjectResult(jwt);
+            return Ok(jwt);
         }
 
         private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)

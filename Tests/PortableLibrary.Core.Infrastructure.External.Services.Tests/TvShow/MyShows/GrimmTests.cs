@@ -278,7 +278,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow.MyS
 
             ValidateEpisode(s3S2, id: 2097145, title: "Love is In the Air", originalTitle: "Love is In the Air",
                 shortName: "s03 special-2",
-                dateReleasedOrigianl: new DateTime(2014, 1, 29, 10, 0, 0, DateTimeKind.Utc));
+                dateReleasedOrigianl: new DateTime(2014, 1, 29, 6, 0, 0, DateTimeKind.Utc));
 
             #endregion
 

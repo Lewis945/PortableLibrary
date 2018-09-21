@@ -29,7 +29,7 @@ namespace PortableLibrary.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(LibraryType type = LibraryType.None, bool extended = false)
         {
-            var libraries = _libraryService.GetLibrariesAsync(type, extended);
+            var libraries = _libraryService.GetLibrariesAsync("", type, extended);
             return Json(await libraries.ToList());
         }
 

@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PortableLibrary.Core.Database;
+using PortableLibrary.Core.Infrastructure.Membership;
+using PortableLibrary.Core.Infrastructure.SimpleServices;
 
 namespace PortableLibrary.Apps.WebApi
 {
@@ -25,7 +30,15 @@ namespace PortableLibrary.Apps.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            services.AddAutoMapper();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDbContext<PortableLibraryDataContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+
+            services.AddScoped(provider => new LibraryService(provider.GetService<PortableLibraryDataContext>()));
+
+            MembershipInitializer.Register(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +52,14 @@ namespace PortableLibrary.Apps.WebApi
             {
                 app.UseHsts();
             }
+
+            app.UseCors(x => x
+             .AllowAnyOrigin()
+             .AllowAnyMethod()
+             .AllowAnyHeader()
+             .AllowCredentials());
+
+            app.UseAuthentication();
 
             app.UseHttpsRedirection();
             app.UseMvc();

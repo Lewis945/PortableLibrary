@@ -3,7 +3,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Database\Migrations\" />
     <Folder Include="Validation" />
   </ItemGroup>
   <ItemGroup>
