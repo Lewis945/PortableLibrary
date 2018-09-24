@@ -13,7 +13,7 @@ namespace PortableLibrary.Apps.WebApi.Controllers
     [Authorize]
     public class LibrariesController : ControllerBase
     {
-        private LibraryService _libraryService;
+        private readonly LibraryService _libraryService;
 
         public LibrariesController(LibraryService libraryService)
         {

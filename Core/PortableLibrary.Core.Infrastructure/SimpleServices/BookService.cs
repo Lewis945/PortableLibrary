@@ -28,17 +28,19 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
 
         #region IBookService
 
-        public async Task<bool> AddLibraryBookAsync(string bookName, string author, string libraryName)
+        public async Task<bool> AddLibraryBookAsync(string bookName, string author, string userId, string libraryName)
         {
             try
             {
+                string libraryAlias = libraryName.FormatAlias();
                 var library =
-                    await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.Name == libraryName);
+                    await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == libraryAlias);
 
                 if (library == null)
                     return false;
 
-                var libraryBook = library.Books.FirstOrDefault(b => b.Name == bookName && b.Author == author);
+                string bookAlias = bookName.FormatAlias(author);
+                var libraryBook = library.Books.FirstOrDefault(b => b.Alias == bookAlias && b.Author == author);
 
                 if (libraryBook != null)
                     return false;
@@ -51,7 +53,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                     Author = author,
                     DateCreated = now,
                     DateModified = now,
-                    Alias = await GenerateLibraryBookAliasAsync(bookName, author),
+                    Alias = bookAlias,
                     IsPublished = true
                 };
 
@@ -67,11 +69,14 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             return true;
         }
 
-        public async Task<bool> RemoveLibraryBookAsync(string name, string author)
+        public async Task<bool> RemoveLibraryBookAsync(string name, string author, string userId, string libraryName)
         {
             try
             {
-                var book = await _context.LibrariesBooks.FirstOrDefaultAsync(b => b.Name == name && b.Author == author);
+                string libraryAlias = libraryName.FormatAlias();
+                string bookAlias = name.FormatAlias(author);
+                var book = await _context.LibrariesBooks.FirstOrDefaultAsync(b => b.BooksLibrary.Alias == libraryAlias &&
+                b.BooksLibrary.AppUserId == userId && !b.BooksLibrary.IsDeleted && b.Alias == bookAlias && b.Author == author);
 
                 if (book == null)
                     return false;
@@ -86,15 +91,6 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             }
 
             return true;
-        }
-
-        public async Task<string> GenerateLibraryBookAliasAsync(string name, string author)
-        {
-            var alias = name.FormatAlias(author);
-            var book = await _context.LibrariesBooks.FirstOrDefaultAsync(b => b.Alias == alias);
-            if (book != null)
-                throw new Exception($"Book with the given alias ({alias}) already exists.");
-            return alias;
         }
 
         #endregion

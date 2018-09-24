@@ -11,6 +11,5 @@ namespace PortableLibrary.Core.SimpleServices
 
         Task<bool> AddLibraryAsync(string userId, string name, LibraryType type);
         Task<bool> RemoveLibraryAsync(string userId, string name, LibraryType type);
-        Task<string> GenerateAliasAsync(string userId, string name, LibraryType type);
     }
 }

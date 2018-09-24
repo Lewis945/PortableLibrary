@@ -28,17 +28,19 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
 
         #region ITvShowService
 
-        public async Task<bool> AddLibraryTvShowAsync(string tvShowName, string libraryName)
+        public async Task<bool> AddLibraryTvShowAsync(string tvShowName, string userId, string libraryName)
         {
             try
             {
+                string libraryAlias = libraryName.FormatAlias();
                 var library =
-                    await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.Name == libraryName);
+                    await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == libraryAlias);
 
                 if (library == null)
                     return false;
 
-                var libraryTvShow = library.TvShows.FirstOrDefault(show => show.Name == tvShowName);
+                string tvShowAlias = tvShowName.FormatAlias();
+                var libraryTvShow = library.TvShows.FirstOrDefault(show => show.Alias == tvShowAlias);
 
                 if (libraryTvShow != null)
                     return false;
@@ -50,7 +52,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                     Name = tvShowName,
                     DateCreated = now,
                     DateModified = now,
-                    Alias = await GenerateLibraryTvShowAliasAsync(tvShowName),
+                    Alias = tvShowAlias,
                     IsPublished = true
                 };
 
@@ -66,11 +68,14 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             return true;
         }
 
-        public async Task<bool> RemoveLibraryTvShowAsync(string name)
+        public async Task<bool> RemoveLibraryTvShowAsync(string name, string userId, string libraryName)
         {
             try
             {
-                var tvShow = await _context.LibrariesTvShows.FirstOrDefaultAsync(show => show.Name == name);
+                string libraryAlias = libraryName.FormatAlias();
+                string tvShowAlias = name.FormatAlias();
+                var tvShow = await _context.LibrariesTvShows.FirstOrDefaultAsync(show => show.TvShowsLibrary.Alias == libraryAlias && show.TvShowsLibrary.AppUserId == userId &&
+                !show.TvShowsLibrary.IsDeleted && show.Alias == tvShowAlias);
 
                 if (tvShow == null)
                     return false;
@@ -85,15 +90,6 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             }
 
             return true;
-        }
-
-        public async Task<string> GenerateLibraryTvShowAliasAsync(string name)
-        {
-            var alias = name.FormatAlias();
-            var tvShow = await _context.LibrariesTvShows.FirstOrDefaultAsync(show => show.Alias == alias);
-            if (tvShow != null)
-                throw new Exception($"Tv show with the given alias ({alias}) already exists.");
-            return alias;
         }
 
         #endregion

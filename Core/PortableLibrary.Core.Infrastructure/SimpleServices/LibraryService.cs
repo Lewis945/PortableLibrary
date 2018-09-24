@@ -76,7 +76,8 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
         {
             try
             {
-                var library = await GetLibraryAsync(userId, name, type);
+                string alias = name.FormatAlias();
+                var library = await GetLibraryAsync(userId, alias, type);
 
                 if (library != null)
                     return false;
@@ -101,7 +102,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                 library.DateCreated = now;
                 library.DateModified = now;
                 library.IsPublished = true;
-                library.Alias = await GenerateAliasAsync(userId, name, type);
+                library.Alias = alias;
 
                 await _context.SaveChangesAsync();
             }
@@ -117,7 +118,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
         {
             try
             {
-                var library = await GetLibraryAsync(userId, name, type);
+                var library = await GetLibraryAsync(userId, name.FormatAlias(), type);
 
                 if (library == null)
                     return false;
@@ -134,33 +135,18 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             return true;
         }
 
-        public async Task<string> GenerateAliasAsync(string userId, string name, LibraryType type)
-        {
-            var alias = name.FormatAlias();
-            var library = await GetLibraryAsync(userId, alias, type, true);
-            if (library != null)
-                throw new Exception($"Library with the given alias ({alias}) already exists.");
-            return alias;
-        }
-
         #endregion
 
         #region Private Methods
 
-        private async Task<BaseLibrary> GetLibraryAsync(string userId, string name, LibraryType type, bool isAlias = false)
+        private async Task<BaseLibrary> GetLibraryAsync(string userId, string alias, LibraryType type)
         {
             switch (type)
             {
                 case LibraryType.Book:
-                    return await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId
-                        && isAlias
-                        ? l.Alias == name
-                        : l.Name == name);
+                    return await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == alias);
                 case LibraryType.TvShow:
-                    return await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId
-                        && isAlias
-                        ? l.Alias == name
-                        : l.Name == name);
+                    return await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == alias);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

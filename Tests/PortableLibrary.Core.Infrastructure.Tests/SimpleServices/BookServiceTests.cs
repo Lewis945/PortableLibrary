@@ -50,7 +50,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
                 });
                 await context.SaveChangesAsync();
 
-                var result = await service.AddLibraryBookAsync(bookTitle, author, libraryTitle);
+                var result = await service.AddLibraryBookAsync(bookTitle, author, null, libraryTitle);
                 Assert.True(result);
 
                 var booksLibrary = await context.BookLibraries.FirstOrDefaultAsync(l => l.Name == libraryTitle);
