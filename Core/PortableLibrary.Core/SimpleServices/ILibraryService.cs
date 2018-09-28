@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortableLibrary.Core.Enums;
+﻿using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.SimpleServices.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortableLibrary.Core.SimpleServices
 {
@@ -9,7 +9,7 @@ namespace PortableLibrary.Core.SimpleServices
     {
         IAsyncEnumerable<LibraryListModel> GetLibrariesAsync(string userId, LibraryType type = LibraryType.None, bool extended = false);
 
-        Task<bool> AddLibraryAsync(string userId, string name, LibraryType type);
-        Task<bool> RemoveLibraryAsync(string userId, string name, LibraryType type);
+        Task<bool> AddLibraryAsync(string title, LibraryType type, string userId);
+        Task<bool> RemoveLibraryAsync(string title, LibraryType type, string userId);
     }
 }

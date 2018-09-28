@@ -96,3 +96,101 @@ function Get-PlainText() {
     }
     END { }
 }
+
+function Get-BaseUri {
+    [cmdletbinding()]
+    param(
+        [parameter(Mandatory = $true)]
+        $Env
+    )
+    if ( $Env -eq "Local" ) { $result = "http://localhost:49452/api"; }
+    elseif ( $Env -eq "CI" ) { $result = "https://portable-library-web-api-ci.azurewebsites.net/api" }
+    return $result;
+}
+
+function Invoke-Api {
+    [cmdletbinding()]
+    param(
+        [parameter(Mandatory = $true)]
+        $Env,
+        [parameter(Mandatory = $true)]
+        $Resource,
+        $Query,
+        $Content,
+        $Method = "GET",
+        $BarearToken
+    )
+    $uri = Get-BaseUri($Env)
+    Write-Host "Base uri: " + $uri
+    if (!$uri) {
+        Write-Error "Base uri is required! Check environment name and uri it provides."
+    }
+
+    # if (!$BarearToken -and ($Resource -ne "membership/register" -or $Resource -ne "membership/login")) {
+    #     Write-Error "Authentication is required for this request!"
+    # }
+        
+    $headers = @{
+        "Content-Type" = 'application/json';
+        "Accept"       = 'application/json';
+    }
+
+    if ($BarearToken) {
+        $headers.Add("Authorization", "Bearer $BarearToken"); 
+    }
+    else {
+        $BarearToken = Get-Token -Env $Env
+        if ($BarearToken) {
+            $headers.Add("Authorization", "Bearer $BarearToken"); 
+        }
+    }
+        
+    if ($Query) {
+        $queryString = "?" + $Query
+    }
+    
+    $uri = $uri + "/" + $Resource + $queryString
+        
+    if ($Method -eq "POST") {
+        $body = $Content
+    }
+        
+    Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -Body $body
+}
+
+function Invoke-FileDownload {
+    [cmdletbinding()]
+    param(
+        [parameter(Mandatory = $true)]
+        $Env,
+        [parameter(Mandatory = $true)]
+        $Resource,
+        $FileName,
+        $Method = "GET",
+        $BarearToken
+    )
+    $uri = Get-BaseUri($Env)
+    Write-Host "Base uri: " + $uri
+    if (!$uri) {
+        Write-Error "Base uri is required! Check environment name and uri it provides."
+    }
+        
+    $headers = @{
+        "Content-Type" = 'application/json';
+        "Accept"       = 'application/json';
+    }
+
+    if ($BarearToken) {
+        $headers.Add("Authorization", "Bearer $BarearToken"); 
+    }
+    else {
+        $BarearToken = Get-Token -Env $Env
+        if ($BarearToken) {
+            $headers.Add("Authorization", "Bearer $BarearToken"); 
+        }
+    }
+    
+    $uri = $uri + "/" + $Resource
+        
+    Invoke-WebRequest $uri -Headers $headers -OutFile $FileName -PassThru
+}

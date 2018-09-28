@@ -36,8 +36,8 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
 
         #region ILibraryService
 
-        public IAsyncEnumerable<LibraryListModel> GetLibrariesAsync(string userId, LibraryType type = LibraryType.None,
-            bool extended = false)
+        public IAsyncEnumerable<LibraryListModel> GetLibrariesAsync(string userId,
+            LibraryType type = LibraryType.None, bool extended = false)
         {
             try
             {
@@ -52,16 +52,18 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
                 switch (type)
                 {
                     case LibraryType.Book:
-                        return _context.BookLibraries
+                        return _context.BookLibraries.Where(l => !l.IsDeleted && l.AppUserId == userId)
                             .ProjectTo<LibraryListModel>(mapperConfig)
                             .ToAsyncEnumerable();
                     case LibraryType.TvShow:
-                        return _context.TvShowsLibraries
+                        return _context.TvShowsLibraries.Where(l => !l.IsDeleted && l.AppUserId == userId)
                             .ProjectTo<LibraryListModel>(mapperConfig)
                             .ToAsyncEnumerable();
                     default:
-                        var bookLibraries = _context.BookLibraries.ProjectTo<LibraryListModel>(mapperConfig);
-                        var tvShowLibraries = _context.TvShowsLibraries.ProjectTo<LibraryListModel>(mapperConfig);
+                        var bookLibraries = _context.BookLibraries.Where(l => !l.IsDeleted && l.AppUserId == userId)
+                            .ProjectTo<LibraryListModel>(mapperConfig);
+                        var tvShowLibraries = _context.TvShowsLibraries.Where(l => !l.IsDeleted && l.AppUserId == userId)
+                            .ProjectTo<LibraryListModel>(mapperConfig);
                         return bookLibraries.Concat(tvShowLibraries).ToAsyncEnumerable();
                 }
             }
@@ -72,12 +74,12 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             }
         }
 
-        public async Task<bool> AddLibraryAsync(string userId, string name, LibraryType type)
+        public async Task<bool> AddLibraryAsync(string title, LibraryType type, string userId)
         {
             try
             {
-                string alias = name.FormatAlias();
-                var library = await GetLibraryAsync(userId, alias, type);
+                string alias = title.FormatAlias();
+                var library = await GetLibraryAsync(alias, type, userId);
 
                 if (library != null)
                     return false;
@@ -98,11 +100,12 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
 
                 var now = DateTime.Now;
 
-                library.Name = name;
+                library.Name = title;
                 library.DateCreated = now;
                 library.DateModified = now;
                 library.IsPublished = true;
                 library.Alias = alias;
+                library.AppUserId = userId;
 
                 await _context.SaveChangesAsync();
             }
@@ -114,17 +117,19 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             return true;
         }
 
-        public async Task<bool> RemoveLibraryAsync(string userId, string name, LibraryType type)
+        public async Task<bool> RemoveLibraryAsync(string title, LibraryType type, string userId)
         {
             try
             {
-                var library = await GetLibraryAsync(userId, name.FormatAlias(), type);
+                string alias = title.FormatAlias();
+                var library = await GetLibraryAsync(alias, type, userId);
 
                 if (library == null)
                     return false;
 
                 library.IsDeleted = true;
 
+                //_context.Attach(library);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -139,7 +144,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
 
         #region Private Methods
 
-        private async Task<BaseLibrary> GetLibraryAsync(string userId, string alias, LibraryType type)
+        private async Task<BaseLibrary> GetLibraryAsync(string alias, LibraryType type, string userId)
         {
             switch (type)
             {

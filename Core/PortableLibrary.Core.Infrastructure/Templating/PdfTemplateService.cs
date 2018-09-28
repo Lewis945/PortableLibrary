@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using DinkToPdf;
 
 namespace PortableLibrary.Core.Infrastructure.Templating
@@ -27,23 +28,25 @@ namespace PortableLibrary.Core.Infrastructure.Templating
 
         public byte[] GeneratePdf(string title, string htmlContent)
         {
-            var converter = new SynchronizedConverter(new PdfTools());
-
-            var doc = new HtmlToPdfDocument
+            using (var pdfTools = new PdfTools())
             {
-                GlobalSettings = new GlobalSettings
+                var converter = new SynchronizedConverter(pdfTools);
+
+                var doc = new HtmlToPdfDocument
                 {
-                    DocumentTitle = title,
-                    ColorMode = ColorMode.Color,
-                    Orientation = Orientation.Portrait,
-                    PaperSize = PaperKind.A4,
-                    Margins = new MarginSettings
+                    GlobalSettings = new GlobalSettings
                     {
-                        Top = 6,
-                        Bottom = 6
-                    }
-                },
-                Objects =
+                        DocumentTitle = title,
+                        ColorMode = ColorMode.Color,
+                        Orientation = Orientation.Portrait,
+                        PaperSize = PaperKind.A4,
+                        Margins = new MarginSettings
+                        {
+                            Top = 6,
+                            Bottom = 6
+                        }
+                    },
+                    Objects =
                 {
                     new ObjectSettings
                     {
@@ -59,7 +62,7 @@ namespace PortableLibrary.Core.Infrastructure.Templating
                             Line = true,
                             Spacing = 2,
                             Left = _settings.HeaderLeftContent,
-                            Right = _settings.HeaderRightContent 
+                            Right = _settings.HeaderRightContent
                         },
                         FooterSettings = new FooterSettings
                         {
@@ -70,10 +73,11 @@ namespace PortableLibrary.Core.Infrastructure.Templating
                         }
                     }
                 }
-            };
+                };
 
-            byte[] pdf = converter.Convert(doc);
-            return pdf;
+                byte[] pdf = converter.Convert(doc);
+                return pdf;
+            }
         }
 
         #endregion

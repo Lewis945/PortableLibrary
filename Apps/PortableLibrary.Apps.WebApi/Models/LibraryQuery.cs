@@ -4,7 +4,7 @@ namespace PortableLibrary.Apps.WebApi.Models
 {
     public class LibraryQuery
     {
-        public string Name { get; set; }
+        public string Title { get; set; }
         public LibraryType Type { get; set; }
     }
 }

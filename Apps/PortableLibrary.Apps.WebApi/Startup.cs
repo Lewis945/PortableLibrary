@@ -15,6 +15,8 @@ using Microsoft.Extensions.Options;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Infrastructure.Membership;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
+using PortableLibrary.Core.Infrastructure.Templating.Libraries;
+using PortableLibrary.Core.SimpleServices;
 
 namespace PortableLibrary.Apps.WebApi
 {
@@ -36,7 +38,9 @@ namespace PortableLibrary.Apps.WebApi
 
             services.AddDbContext<PortableLibraryDataContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.AddScoped(provider => new LibraryService(provider.GetService<PortableLibraryDataContext>()));
+            services.AddScoped<ILibraryService>(provider => new LibraryService(provider.GetService<PortableLibraryDataContext>()));
+            services.AddScoped<IBookService>(provider => new BookService(provider.GetService<PortableLibraryDataContext>()));
+            services.AddScoped<ITvShowService>(provider => new TvShowService(provider.GetService<PortableLibraryDataContext>()));
 
             MembershipInitializer.Register(services, Configuration);
         }
