@@ -6,7 +6,7 @@
 pool:
   vmImage: 'VS2017-Win2016' # other options: 'macOS 10.13', 'Ubuntu 16.04'
 
-name: 1.0.$(Date:yy)$(DayOfYear).$(Rev:.r)
+name: 1.0.$(Date:yy)$(DayOfYear)$(Rev:.r)
 
 variables:
   buildConfiguration: 'Release'
