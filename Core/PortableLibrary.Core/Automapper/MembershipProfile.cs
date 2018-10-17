@@ -8,7 +8,7 @@ namespace PortableLibrary.Core.Automapper
     {
         public MembershipProfile()
         {
-            CreateMap<RegistrationViewModel, AppUser>()
+            CreateMap<RegisterModel, AppUser>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
         }

@@ -26,7 +26,7 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
         // POST api/accounts
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody]RegistrationViewModel model)
+        public async Task<IActionResult> Register([FromBody]RegisterModel model)
         {
             if (!ModelState.IsValid)
             {

@@ -38,11 +38,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Secret", "Secret", "{03ADF2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Apps.TelegramBot", "Apps\PortableLibrary.Apps.TelegramBot\PortableLibrary.Apps.TelegramBot.csproj", "{D7A2ADEB-9421-4265-B1C9-42EB3D814CA3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Apps.Frontend", "Apps\PortableLibrary.Apps.Frontend\PortableLibrary.Apps.Frontend.csproj", "{E69D87B5-6B04-444D-AC3F-E13E835E33EE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Apps.TelegramBot.Tests", "Tests\PortableLibrary.Apps.TelegramBot.Tests\PortableLibrary.Apps.TelegramBot.Tests.csproj", "{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableLibrary.Apps.WebApi", "Apps\PortableLibrary.Apps.WebApi\PortableLibrary.Apps.WebApi.csproj", "{EEA6303F-056A-4E19-90E3-880485E0F06D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortableLibrary.Apps.WebApi", "Apps\PortableLibrary.Apps.WebApi\PortableLibrary.Apps.WebApi.csproj", "{EEA6303F-056A-4E19-90E3-880485E0F06D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,10 +80,6 @@ Global
 		{D7A2ADEB-9421-4265-B1C9-42EB3D814CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7A2ADEB-9421-4265-B1C9-42EB3D814CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7A2ADEB-9421-4265-B1C9-42EB3D814CA3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E69D87B5-6B04-444D-AC3F-E13E835E33EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E69D87B5-6B04-444D-AC3F-E13E835E33EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E69D87B5-6B04-444D-AC3F-E13E835E33EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E69D87B5-6B04-444D-AC3F-E13E835E33EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -108,7 +102,6 @@ Global
 		{9567B28C-CED3-4D52-BE0C-18AD39346296} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
 		{03ADF2E5-E40E-43D8-BFD2-A711BC33DA49} = {36E778BB-5A7F-4FE2-A86E-2C057B7827D0}
 		{D7A2ADEB-9421-4265-B1C9-42EB3D814CA3} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
-		{E69D87B5-6B04-444D-AC3F-E13E835E33EE} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
 		{4DF4D087-7BD1-44D8-9D1B-84C1514DB3E4} = {DF5A1199-270F-4B62-85A6-7B42E7838433}
 		{EEA6303F-056A-4E19-90E3-880485E0F06D} = {85D0D862-7CD2-46C6-BCE4-D62F7910E8C5}
 	EndGlobalSection
