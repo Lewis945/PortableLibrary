@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.Membership;
 using PortableLibrary.Core.Infrastructure.Models;
-using PortableLibrary.Core.Membership;
+using PortableLibrary.Core.Membership.Validation;
+using System.Threading.Tasks;
 
 namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 {
@@ -13,36 +12,36 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
     [ApiController]
     public abstract class AccountsBaseController : ControllerBase
     {
-        private readonly PortableLibraryDataContext _appDbContext;
+        //private readonly PortableLibraryDataContext _appDbContext;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AccountsBaseController(UserManager<AppUser> userManager, IMapper mapper, PortableLibraryDataContext appDbContext)
+        public AccountsBaseController(UserManager<AppUser> userManager, IMapper mapper)//, PortableLibraryDataContext appDbContext)
         {
             _userManager = userManager;
             _mapper = mapper;
-            _appDbContext = appDbContext;
+            //_appDbContext = appDbContext;
         }
 
         // POST api/accounts
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody]RegisterModel model)
+        public async Task<IActionResult> Register([FromBody]RegisterModel credentials)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
-            var userIdentity = _mapper.Map<AppUser>(model);
+            var validator = new RegisterModelValidator();
+            var validationResult = await validator.ValidateAsync(credentials);
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
 
-            var result = await _userManager.CreateAsync(userIdentity, model.Password);
+            var userIdentity = _mapper.Map<AppUser>(credentials);
 
+            var result = await _userManager.CreateAsync(userIdentity, credentials.Password);
             if (!result.Succeeded)
-            {
-                return BadRequest(result);
-            }
+                return BadRequest(validationResult);
 
-            await _appDbContext.SaveChangesAsync();
+            //await _appDbContext.SaveChangesAsync();
 
             return Ok("Account created");
         }
