@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Askmethat.Aspnet.JsonLocalizer" Version="1.1.5" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
@@ -18,6 +19,15 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\PortableLibrary.Core.Infrastructure\PortableLibrary.Core.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Core\PortableLibrary.Core\PortableLibrary.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Locales\Common.Validation.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Locales\Common.Validation.ru.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

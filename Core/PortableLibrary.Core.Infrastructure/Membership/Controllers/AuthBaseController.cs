@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using PortableLibrary.Core.Database.Entities.Membership;
@@ -18,12 +20,17 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;
+        private readonly IStringLocalizer _localizer;
+        private readonly ILogger _logger;
 
-        public AuthBaseController(UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public AuthBaseController(UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions,
+            IStringLocalizerFactory localizerFactory, ILogger<AuthBaseController> logger)
         {
             _userManager = userManager;
             _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
+            _localizer = localizerFactory.Create("Common.Validation", System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+            _logger = logger;
         }
 
         [HttpPost("login")]
@@ -40,7 +47,7 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
             var identity = await GetClaimsIdentity(credentials.Email, credentials.Password);
             if (identity == null)
             {
-                ModelState.AddModelError("login_failure", "Invalid username or password.");
+                ModelState.AddModelError("login_failure", _localizer["LoginFailure"]);
                 return BadRequest(ModelState);
             }
 
