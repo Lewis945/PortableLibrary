@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Askmethat.Aspnet.JsonLocalizer.Extensions;
+﻿using Askmethat.Aspnet.JsonLocalizer.Extensions;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Infrastructure.Membership;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
-using PortableLibrary.Core.Infrastructure.Templating.Libraries;
 using PortableLibrary.Core.SimpleServices;
+using System;
+using System.Globalization;
+using System.Text;
 
 namespace PortableLibrary.Apps.WebApi
 {

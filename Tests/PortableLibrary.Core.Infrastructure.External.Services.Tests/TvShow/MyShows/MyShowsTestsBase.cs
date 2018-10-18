@@ -5,6 +5,7 @@ using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Automapper;
 using PortableLibrary.Core.Infrastructure.External.Services.TvShow.MyShows.Models;
 using PortableLibrary.Core.Utilities;
+using System;
 using System.IO;
 
 namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow.MyShows
