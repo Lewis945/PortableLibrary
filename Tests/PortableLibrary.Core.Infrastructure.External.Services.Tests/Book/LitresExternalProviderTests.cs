@@ -31,7 +31,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             var model = await service.ExtractBook("https://www.litres.ru/aleks-kosh/souz-proklyatyh/");
 
-            Assert.Equal("https://cv4.litres.ru/sbc/25539349_cover-elektronnaya-kniga-aleks-kosh-souz-proklyatyh.jpg",
+            Assert.Equal("https://cv3.litres.ru/pub/c/elektronnaya-kniga/cover/22075237-aleks-kosh-souz-proklyatyh.jpg",
                 model.ImageUri, true);
 
             Assert.Equal("https://www.litres.ru/serii-knig/odinochka-441373/", model.TrackingUri, true);
@@ -75,7 +75,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             var model = await service.ExtractBook("https://www.litres.ru/aleks-kosh/igry-masok/");
 
-            Assert.Equal("https://cv9.litres.ru/sbc/00827592_cover-elektronnaya-kniga-aleks-kosh-igry-masok.jpg",
+            Assert.Equal("https://cv6.litres.ru/pub/c/elektronnaya-kniga/cover/183464-aleks-kosh-igry-masok.jpg",
                 model.ImageUri, true);
 
             Assert.Null(model.TrackingUri);
@@ -116,7 +116,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
             var model = await service.ExtractBook("https://www.litres.ru/garri-garrison/rozhdenie-stalnoy-krysy/");
 
             Assert.Equal(
-                "https://cv8.litres.ru/sbc/07036886_cover-elektronnaya-kniga-garri-garrison-rozhdenie-stalnoy-krysy.jpg",
+                "https://cv0.litres.ru/pub/c/elektronnaya-kniga/cover/144001-garri-garrison-rozhdenie-stalnoy-krysy.jpg",
                 model.ImageUri, true);
 
             Assert.Equal("https://www.litres.ru/serii-knig/stalnaya-krysa/", model.TrackingUri, true);
@@ -154,7 +154,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.Book
 
             var model = await service.ExtractBook("https://www.litres.ru/dem-mihaylov/grom-nebesnyy/");
 
-            Assert.Equal("https://cv3.litres.ru/sbc/12100038_cover-elektronnaya-kniga-dem-mihaylov-grom-nebesnyy.jpg",
+            Assert.Equal("https://cv3.litres.ru/pub/c/elektronnaya-kniga/cover/9000736-dem-mihaylov-grom-nebesnyy.jpg",
                 model.ImageUri, true);
 
             Assert.Equal("https://www.litres.ru/serii-knig/gospodstvo-klana-nespyaschih/", model.TrackingUri, true);

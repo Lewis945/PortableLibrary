@@ -128,9 +128,9 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
             var document = await _retryService.ExecuteAsync(() => web.LoadFromWebAsync(uri));
 
             var divSerie = document.DocumentNode.SelectNodes(".//div")?
-                .FirstOrDefault(n => n.HasClass("serie"));
+                .FirstOrDefault(n => n.HasClass("biblio_series__wrap"));
 
-            var divsBookTitle = divSerie?.SelectNodes(".//div").Where(n => n.HasClass("booktitle"));
+            var divsBookTitle = divSerie?.SelectNodes(".//div").Where(n => n.HasClass("art-item__name"));
 
             if (divsBookTitle == null)
                 return null;
@@ -140,7 +140,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
             int counter = 1;
             foreach (var divBookTitle in divsBookTitle)
             {
-                var aTitle = divBookTitle.SelectNodes(".//a")?.FirstOrDefault(n => n.HasClass("title"));
+                var aTitle = divBookTitle.SelectNodes(".//a")?.FirstOrDefault();
 
                 var title = aTitle?.InnerText.ClearString();
 
@@ -170,7 +170,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Book.Litres
 
             var img = divBiblioBookCoverInside?.SelectNodes(".//img")?.FirstOrDefault();
 
-            var imageUri = img?.Attributes["data-original-image-url"].Value;
+            var imageUri = img?.Attributes["data-src"]?.Value;
             if (string.IsNullOrWhiteSpace(imageUri))
                 return null;
 

@@ -218,6 +218,7 @@ namespace PortableLibrary.Core.Infrastructure.External.Services.Tests.TvShow.MyS
 
             ValidateEpisode(s2E45, id: 1979110, title: "Charlie and Lacey Shack Up",
                 originalTitle: "Charlie and Lacey Shack Up", shortName: "s02e45",
+                image: "https://media.myshows.me/episodes/normal/9/5f/95f90071add9b3227bc28d213c872664.jpg",
                 dateReleasedOrigianl: new DateTime(2013, 12, 13, 2, 30, 0, DateTimeKind.Utc));
 
             #endregion
