@@ -38,6 +38,8 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
             const string bookTitle = "Огненный факультет";
             const string author = "Алекс Кош";
 
+            string libraryAlias = libraryTitle.FormatAlias();
+
             using (var context =
                 new PortableLibraryDataContext(GetDatabaseOptions<PortableLibraryDataContext>("bookserviceaddlibbook")))
             {
@@ -46,11 +48,11 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
                 context.BookLibraries.Add(new BooksLibrary
                 {
                     Name = libraryTitle,
-                    Alias = libraryTitle.FormatAlias()
+                    Alias = libraryAlias
                 });
                 await context.SaveChangesAsync();
 
-                var result = await service.AddLibraryBookAsync(bookTitle, author, null, libraryTitle);
+                var result = await service.AddLibraryBookAsync(bookTitle, author, libraryAlias, null);
                 Assert.True(result);
 
                 var booksLibrary = await context.BookLibraries.FirstOrDefaultAsync(l => l.Name == libraryTitle);
