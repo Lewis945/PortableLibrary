@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PortableLibrary.Apps.WebApi.Models;
+using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Infrastructure.Templating.Libraries;
 using PortableLibrary.Core.Membership;
 using PortableLibrary.Core.SimpleServices;
@@ -21,9 +22,10 @@ namespace PortableLibrary.Apps.WebApi.Controllers
             _libraryService = libraryService;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet("{type?}")]
+        public async Task<IActionResult> Index(LibraryType type = LibraryType.None)
         {
-            var libraries = _libraryService.GetLibrariesAsync(User.GetUserId());
+            var libraries = _libraryService.GetLibrariesAsync(User.GetUserId(), type);
             var t = await libraries.ToList();
             if (t.Count == 0)
                 return BadRequest();
