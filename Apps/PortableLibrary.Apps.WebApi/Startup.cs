@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NSwag.AspNetCore;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Infrastructure.Membership;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
@@ -60,6 +61,11 @@ namespace PortableLibrary.Apps.WebApi
             services.AddScoped<ITvShowService>(provider => new TvShowService(provider.GetService<PortableLibraryDataContext>()));
 
             MembershipInitializer.Register(services, Configuration);
+
+            // Add OpenAPI/Swagger document
+            services
+                // Register an OpenAPI 3.0 document generator
+                .AddOpenApiDocument(document => document.DocumentName = "openapi");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,6 +92,26 @@ namespace PortableLibrary.Apps.WebApi
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            // Add OpenAPI/Swagger middlewares
+            // Add OpenAPI 3.0 document serving middleware
+            app.UseSwagger(options =>
+            {
+                options.DocumentName = "openapi";
+                options.Path = "/openapi/v1/openapi.json";
+            });
+
+            // Add web UIs to interact with the document
+            app.UseSwaggerUi3(options =>
+            {
+                options.DocumentPath = "/openapi/v1/openapi.json";
+                options.Path = "/openapi";
+            });
+            app.UseReDoc(options =>
+            {
+                options.DocumentPath = "/openapi/v1/openapi.json";
+                options.Path = "/redoc";
+            });
         }
     }
 }
