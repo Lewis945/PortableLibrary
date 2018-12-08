@@ -5,7 +5,10 @@ using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Infrastructure.Templating.Libraries;
 using PortableLibrary.Core.Membership;
 using PortableLibrary.Core.SimpleServices;
+using PortableLibrary.Core.SimpleServices.Models;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PortableLibrary.Apps.WebApi.Controllers
@@ -23,14 +26,16 @@ namespace PortableLibrary.Apps.WebApi.Controllers
         }
 
         [HttpGet("{type?}")]
+        [ProducesResponseType(typeof(IEnumerable<LibraryListModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Index(LibraryType type = LibraryType.None)
         {
             var libraries = _libraryService.GetLibrariesAsync(User.GetUserId(), type);
-            var t = await libraries.ToList();
-            if (t.Count == 0)
+            var librariesList = await libraries.ToList();
+            if (librariesList.Count == 0)
                 return BadRequest();
 
-            return Ok(new { user = User.GetUserName(), userid = User.GetUserId(), libs = t });
+            return Ok(librariesList);
         }
 
         [HttpGet("pdf")]
