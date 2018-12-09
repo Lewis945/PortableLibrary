@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +11,8 @@ using PortableLibrary.Core.Database.Entities.Membership;
 using PortableLibrary.Core.Membership;
 using PortableLibrary.Core.Membership.Models;
 using PortableLibrary.Core.Membership.Validation;
+using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -34,6 +39,9 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(IList<ValidationFailure>), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Login([FromBody]LoginModel credentials)
         {
             if (!ModelState.IsValid)
@@ -53,6 +61,13 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
             var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, credentials.Email, _jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
             return Ok(jwt);
+        }
+
+        [HttpGet("probe")]
+        [Authorize]
+        public async Task<IActionResult> Probe()
+        {
+            return Ok();
         }
 
         private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)

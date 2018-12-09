@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NSwag;
 using NSwag.AspNetCore;
+using NSwag.SwaggerGeneration.Processors.Security;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Infrastructure.Membership;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
@@ -65,7 +67,21 @@ namespace PortableLibrary.Apps.WebApi
             // Add OpenAPI/Swagger document
             services
                 // Register an OpenAPI 3.0 document generator
-                .AddOpenApiDocument(document => document.DocumentName = "openapi");
+                .AddOpenApiDocument(document =>
+                {
+                    document.DocumentName = "openapi";
+
+                    document.DocumentProcessors.Add(new SecurityDefinitionAppender("Bearer",
+                            new SwaggerSecurityScheme
+                            {
+                                Type = SwaggerSecuritySchemeType.ApiKey,
+                                Name = "Authorization",
+                                In = SwaggerSecurityApiKeyLocation.Header,
+                                Description = "Authorization"
+                            }));
+
+                    document.OperationProcessors.Add(new OperationSecurityScopeProcessor("Bearer"));
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

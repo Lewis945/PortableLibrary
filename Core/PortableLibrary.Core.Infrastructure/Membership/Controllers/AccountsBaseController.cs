@@ -1,12 +1,16 @@
 ﻿using AutoMapper;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using PortableLibrary.Core.Database;
 using PortableLibrary.Core.Database.Entities.Membership;
 using PortableLibrary.Core.Infrastructure.Models;
 using PortableLibrary.Core.Membership.Validation;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
@@ -33,6 +37,10 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
         // POST api/accounts
         [HttpPost("register")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(IList<ValidationFailure>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<IdentityError>), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Register([FromBody]RegisterModel credentials)
         {
             _logger.LogInformation($"Register request for {credentials.Email}.");
@@ -49,7 +57,7 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
             var result = await _userManager.CreateAsync(userIdentity, credentials.Password);
             if (!result.Succeeded)
-                return BadRequest(validationResult);
+                return BadRequest(result.Errors);
 
             //await _appDbContext.SaveChangesAsync();
 
