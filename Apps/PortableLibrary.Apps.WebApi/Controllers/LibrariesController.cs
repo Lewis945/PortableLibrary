@@ -51,20 +51,20 @@ namespace PortableLibrary.Apps.WebApi.Controllers
         public async Task<IActionResult> Add([FromBody]LibraryQuery query)
         {
             var result = await _libraryService.AddLibraryAsync(query.Title, query.Type, User.GetUserId());
-            if (result)
-                return Ok(query);
-            else
+            if (!result)
                 return BadRequest(query);
+
+            return Ok(query);
         }
 
         [HttpPost("remove")]
         public async Task<IActionResult> Remove([FromBody]LibraryQuery query)
         {
             var result = await _libraryService.RemoveLibraryAsync(query.Title, query.Type, User.GetUserId());
-            if (result)
-                return Ok(query);
-            else
+            if (!result)
                 return BadRequest(query);
+
+            return Ok(query);
         }
     }
 }
