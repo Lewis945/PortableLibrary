@@ -23,21 +23,30 @@ namespace PortableLibrary.Apps.WebApi.Controllers
         public async Task<IActionResult> Index(string libraryAlias)
         {
             var books = await _bookService.GetBooks(libraryAlias, User.GetUserId());
-            return Ok(new { user = User.GetUserName(), userid = User.GetUserId(), books });
+            if (books == null)
+                return BadRequest(libraryAlias);
+
+            return Ok(books);
         }
 
         [HttpPost("{libraryAlias}/add/book")]
         public async Task<IActionResult> Add(string libraryAlias, [FromBody]LibraryBookQuery query)
         {
             var result = await _bookService.AddLibraryBookAsync(query.Title, query.Author, libraryAlias, User.GetUserId());
-            return Ok(new { query.Title, query.Author, result });
+            if (!result)
+                return BadRequest(query);
+
+            return Ok(query);
         }
 
         [HttpPost("{libraryAlias}/remove/book")]
         public async Task<IActionResult> Remove(string libraryAlias, [FromBody]LibraryBookQuery query)
         {
             var result = await _bookService.RemoveLibraryBookAsync(query.Title, query.Author, libraryAlias, User.GetUserId());
-            return Ok(new { query.Title, query.Author, result });
+            if (!result)
+                return BadRequest(query);
+
+            return Ok(query);
         }
     }
 }
