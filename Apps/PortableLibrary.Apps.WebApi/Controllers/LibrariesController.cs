@@ -33,7 +33,7 @@ namespace PortableLibrary.Apps.WebApi.Controllers
             var libraries = _libraryService.GetLibrariesAsync(User.GetUserId(), type);
             var librariesList = await libraries.ToList();
             if (librariesList.Count == 0)
-                return BadRequest();
+                return BadRequest("Libraries not found!");
 
             return Ok(librariesList);
         }

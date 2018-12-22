@@ -65,7 +65,7 @@ namespace PortableLibrary.Core.Infrastructure.Membership.Controllers
 
         [HttpGet("probe")]
         [Authorize]
-        public async Task<IActionResult> Probe()
+        public IActionResult Probe()
         {
             return Ok();
         }
