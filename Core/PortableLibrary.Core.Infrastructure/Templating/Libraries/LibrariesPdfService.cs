@@ -42,7 +42,7 @@ namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
 
         #region Public Methods
 
-        public byte[] GeneratePdf(List<LibraryListModel> libraries, bool extended = false)
+        public byte[] GeneratePdf(List<LibraryListExtendedModel> libraries, bool extended = false)
         {
             var model = new LibrariesModel
             {
@@ -94,7 +94,7 @@ namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
                 };
         }
 
-        private static List<string> GetRow(LibraryListModel library, bool extended)
+        private static List<string> GetRow(LibraryListExtendedModel library, bool extended)
         {
             return extended
                 ? new List<string>
@@ -102,12 +102,12 @@ namespace PortableLibrary.Core.Infrastructure.Templating.Libraries
                     library.Title,
                     library.Type.ToString(),
                     library.Items.ToString(),
-                    library.Published?.ToString(),
-                    library.Favourits?.ToString(),
-                    library.Processing?.ToString(),
-                    library.Processed?.ToString(),
-                    library.Planned?.ToString(),
-                    library.AreWaitingToBecomeGlobal?.ToString(),
+                    library.Published.ToString(),
+                    library.Favourits.ToString(),
+                    library.Processing.ToString(),
+                    library.Processed.ToString(),
+                    library.Planned.ToString(),
+                    library.AreWaitingToBecomeGlobal.ToString(),
                     library.Public.ToString()
                 }
                 : new List<string>

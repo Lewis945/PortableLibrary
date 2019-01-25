@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Automapper;
 using PortableLibrary.Core.Database;
@@ -7,6 +6,8 @@ using PortableLibrary.Core.Database.Entities.BooksLibrary;
 using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.Infrastructure.SimpleServices;
+using PortableLibrary.Core.SimpleServices.Models;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
@@ -74,6 +75,35 @@ namespace PortableLibrary.Core.Infrastructure.Tests.SimpleServices
                 var library = await context.BookLibraries.FirstOrDefaultAsync(l => l.Name == title);
                 Assert.NotNull(library);
                 Assert.True(library.IsDeleted);
+            }
+        }
+
+        [Fact]
+        public async Task GetLibraryAsync_WithExtendedFalse_ShouldReturnLibraryWithLimitedSetOfProperties()
+        {
+            const string title = "Books library";
+            string alias = title.FormatAlias();
+
+            using (var context =
+                new PortableLibraryDataContext(
+                    GetDatabaseOptions<PortableLibraryDataContext>("libservicegetlibrary")))
+            {
+                context.BookLibraries.Add(new BooksLibrary
+                {
+                    Name = title,
+                    Alias = alias
+                });
+
+                await context.SaveChangesAsync();
+
+                var service = new LibraryService(context);
+                var result = await service.GetLibraryAsync(LibraryType.Book, alias, null);
+                var library = result as LibraryExtendedModel;
+                Assert.NotNull(library);
+                Assert.Equal(title, library.Title);
+                Assert.Equal(LibraryType.Book, library.Type);
+                Assert.Equal(0, library.Items);
+                Assert.False( library.Public);
             }
         }
 

@@ -43,8 +43,18 @@ namespace PortableLibrary.Apps.WebApi.Controllers
         {
             var librariesPdfService = new LibrariesPdfService();
             var libraries = await _libraryService.GetLibrariesAsync(User.GetUserId()).ToList();
-            var bytes = librariesPdfService.GeneratePdf(libraries, extended);
+            var bytes = librariesPdfService.GeneratePdf(new List<LibraryListExtendedModel>(), extended);
             return File(bytes, "application/pdf");
+        }
+
+        [HttpGet("{type}/{alias}")]
+        public async Task<IActionResult> Get(LibraryType type, string alias, bool extended = false)
+        {
+            var library = await _libraryService.GetLibraryAsync(type, alias, User.GetUserId(), extended);
+            if (library == null)
+                return BadRequest(new { alias, type });
+
+            return Ok(library);
         }
 
         [HttpPost("add")]

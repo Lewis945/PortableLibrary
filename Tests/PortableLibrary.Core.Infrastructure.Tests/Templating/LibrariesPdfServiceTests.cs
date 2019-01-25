@@ -13,15 +13,15 @@ namespace PortableLibrary.Core.Infrastructure.Tests.Templating
         [Fact]
         public void Should_Generate_Libraries_Pdf()
         {
-            var libraries = new List<LibraryListModel>
+            var libraries = new List<LibraryListExtendedModel>
             {
-                FeelLibrary(new LibraryListModel
+                FeelLibrary(new LibraryListExtendedModel
                 {
                     Title = "Books library",
                     Type = LibraryType.Book,
                     Public = true
                 }),
-                FeelLibrary(new LibraryListModel
+                FeelLibrary(new LibraryListExtendedModel
                 {
                     Title = "TvShows library",
                     Type = LibraryType.TvShow
@@ -52,7 +52,7 @@ namespace PortableLibrary.Core.Infrastructure.Tests.Templating
             #endregion
         }
 
-        private static LibraryListModel FeelLibrary(LibraryListModel library)
+        private static LibraryListExtendedModel FeelLibrary(LibraryListExtendedModel library)
         {
             var random = new Random();
 

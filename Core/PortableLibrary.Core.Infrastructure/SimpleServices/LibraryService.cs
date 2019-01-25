@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using PortableLibrary.Core.Automapper;
@@ -14,6 +10,10 @@ using PortableLibrary.Core.Enums;
 using PortableLibrary.Core.Extensions;
 using PortableLibrary.Core.SimpleServices;
 using PortableLibrary.Core.SimpleServices.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortableLibrary.Core.Infrastructure.SimpleServices
 {
@@ -74,12 +74,37 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             }
         }
 
+        public async Task<LibraryModel> GetLibraryAsync(LibraryType type, string alias, string userId, bool extended = false)
+        {
+            try
+            {
+                var mapperConfig = new MapperConfiguration(cfg =>
+                {
+                    if (extended)
+                        cfg.AddProfile<ExtendedLibraryProfile>();
+                    else
+                        cfg.AddProfile<LibraryProfile>();
+                });
+                var mapper = mapperConfig.CreateMapper();
+
+                var library = await GetLibraryAsync(alias, type, userId).ConfigureAwait(false);
+                if (extended)
+                    return mapper.Map<LibraryExtendedModel>(library);
+                else
+                    return mapper.Map<LibraryModel>(library);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> AddLibraryAsync(string title, LibraryType type, string userId)
         {
             try
             {
                 string alias = title.FormatAlias();
-                var library = await GetLibraryAsync(alias, type, userId);
+                var library = await GetLibraryAsync(alias, type, userId).ConfigureAwait(false);
 
                 if (library != null)
                     return false;
@@ -122,7 +147,7 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             try
             {
                 string alias = title.FormatAlias();
-                var library = await GetLibraryAsync(alias, type, userId);
+                var library = await GetLibraryAsync(alias, type, userId).ConfigureAwait(false);
 
                 if (library == null)
                     return false;
@@ -149,9 +174,11 @@ namespace PortableLibrary.Core.Infrastructure.SimpleServices
             switch (type)
             {
                 case LibraryType.Book:
-                    return await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == alias);
+                    return await _context.BookLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == alias)
+                        .ConfigureAwait(false);
                 case LibraryType.TvShow:
-                    return await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == alias);
+                    return await _context.TvShowsLibraries.FirstOrDefaultAsync(l => !l.IsDeleted && l.AppUserId == userId && l.Alias == alias)
+                        .ConfigureAwait(false);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
